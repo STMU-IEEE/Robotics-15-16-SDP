@@ -1,0 +1,9 @@
+[Unit]
+Description=Bluetooth slave serial port with login
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/btslave.sh
+
+[Install]
+WantedBy=multi-user.target
