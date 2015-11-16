@@ -12,8 +12,18 @@
 # 11/15/2015
 #
 # References:
-# http://raspberrypi.stackexchange.com/questions/14598
-# http://unix.stackexchange.com/questions/92255
+# 
+# hciconfig command example
+# http://raspberrypi.stackexchange.com/a/19865
+# 
+# rfcomm + agetty slave example
+# http://unix.stackexchange.com/a/153651
+#
+# for disabling ModemManager in systemd
+# http://askubuntu.com/a/612646
+#
+# for writing and registering systemd boot script
+# http://unix.stackexchange.com/a/47715
 
 # configure bluetooth device (assume hci0) with page and inquiry scan
 hciconfig hci0 piscan
