@@ -9,71 +9,71 @@ import getch
 
 # Commands for Arduino
 class arduino_comms():
-	MC_ECHO_INIT = bytes([170])
-	MC_ECHO_COMM = bytes([171])
-	SERVO_ATTACH = bytes([14])
-	SERVO_DETACH = bytes([15])
-	SERVO_ANGLE	= bytes([16])
+	MC_ECHO_INIT = 170
+	MC_ECHO_COMM = 171
+	SERVO_ATTACH = 14
+	SERVO_DETACH = 15
+	SERVO_ANGLE	= 16
 
 # channels for servos (not pins--defined in arduino_comm.ino)
 class servo_channels():
-	GRABBER = bytes([0])
-	ARM = bytes([1])
+	GRABBER = 0
+	ARM = 1
 
 class servo_angles():
-	OPEN = bytes([140])
-	GRAB = bytes([95])
-	LIFT = bytes([22])
-	DROP = bytes([89])
+	OPEN = 140
+	GRAB = 95
+	LIFT = 22
+	DROP = 89
 	
 # commands for Sabertooth 2x25
 class mc_comms():
-	driveForwardMotor1 = bytes([0])
-	driveBackwardsMotor1 = bytes([1])
-	minVoltage = bytes([2])
-	maxVoltage = bytes([3])
-	driveForwardMotor2 = bytes([4])
-	driveBackwardsMotor2 = bytes([5])
-	driveMotor1_7bit = bytes([6])
-	driveMotor2_7bit = bytes([7])
+	driveForwardMotor1 = 0
+	driveBackwardsMotor1 = 1
+	minVoltage = 2
+	maxVoltage = 3
+	driveForwardMotor2 = 4
+	driveBackwardsMotor2 = 5
+	driveMotor1_7bit = 6
+	driveMotor2_7bit = 7
 	#mixed mode commands:
-	driveForwardMixed = bytes([8])
-	driveBackwardsMixed = bytes([9])
-	driveTurnRightMixed = bytes([10])
-	driveTurnLeftMixed = bytes([11])
-	driveMixed_7bit = bytes([12])
-	driveTurn_7bit = bytes([13])
+	driveForwardMixed = 8
+	driveBackwardsMixed = 9
+	driveTurnRightMixed = 10
+	driveTurnLeftMixed = 11
+	driveMixed_7bit = 12
+	driveTurn_7bit = 13
 	
 	
 # Set baud on Sabertooth
 def mcinit(ser):
-	nchout = ser.write(arduino_comms.MC_ECHO_INIT)
+	nchout = ser.write(bytes([arduino_comms.MC_ECHO_INIT]))
 	nchin = ser.read(1)
 	return [nchout, len(nchin)]
 	
 # send packetized command
 def mcwrite(ser, addr, comm, data):
-	nchout = ser.write(bytes.join(arduino_comms.MC_ECHO_COMM,addr,comm,data))
+	nchout = ser.write(bytes([arduino_comms.MC_ECHO_COMM,addr,comm,data]))
 	nchin = ser.read(4)
 	return [nchout, len(nchin)]
 
 # set minimum battery voltage
 def mcbatt(ser,addr,volts):
     data = (volts-6)*5
-    return mcwrite(ser,addr,mc_comms.minVoltage,bytes([data]))
+    return mcwrite(bytes([ser,addr,mc_comms.minVoltage,data]))
 #http://www.varesano.net/blog/fabio/serial%20rs232%20connections%20python
 
 # set servo angle
 def	servoWrite(ser,channel,angle):
-	return ser.write(bytes.join(arduino_comms.SERVO_ANGLE,channel,angle))
+	return ser.write(bytes([arduino_comms.SERVO_ANGLE,channel,angle]))
 	
 # attach servo
 def	servoAttach(ser,channel):
-	return ser.write(bytes.join(arduino_comms.SERVO_ATTACH,channel))
+	return ser.write(bytes([arduino_comms.SERVO_ATTACH,channel]))
 	
 # detach servo
 def	servoDetach(ser,channel):
-	return ser.write(bytes.join(arduino_comms.SERVO_DETACH,channel))
+	return ser.write(bytes([arduino_comms.SERVO_DETACH,channel]))
 
 	
 
@@ -87,10 +87,10 @@ print(ser)
 # Testing: Send command to set minimum battery voltage too high (should trigger shutoff) 
 #print(mcbatt(ser,addr,16))
 #ser.close()
-addr = bytes([128])		#from DIP switches on Sabertooth
-speed = bytes([15])
-turn = bytes([15])
-stop = bytes([0])
+addr = 128		#from DIP switches on Sabertooth
+speed = 15
+turn = 15
+stop = 0
 time.sleep(2)
 print(mcinit(ser))
 print(servoAttach(ser,servo_channels.GRABBER))
