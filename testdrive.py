@@ -139,16 +139,16 @@ while True:
 		break
 	elif inchr == 'h':
 		print('Open')
-		print(setServo(ser,servo_channels.GRABBER,servo_angles.OPEN))
+		print(servoWrite(ser,servo_channels.GRABBER,servo_angles.OPEN))
 	elif inchr == 'j':
 		print('Grab')
-		print(setServo(ser,servo_channels.GRABBER,servo_angles.GRAB))
+		print(servoWrite(ser,servo_channels.GRABBER,servo_angles.GRAB))
 	elif inchr == 'k':
 		print('Drop')
-		print(setServo(ser,servo_channels.ARM,servo_angles.DROP))
+		print(servoWrite(ser,servo_channels.ARM,servo_angles.DROP))
 	elif inchr == 'l':
 		print('Lift')
-		print(setServo(ser,servo_channels.ARM,servo_angles.LIFT))
+		print(servoWrite(ser,servo_channels.ARM,servo_angles.LIFT))
 	#elif inchr == 'f':
 		#Don't Crash Like I Did!
 		#print('Turbo forward')
