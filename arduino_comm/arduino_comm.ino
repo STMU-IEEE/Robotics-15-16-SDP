@@ -26,6 +26,11 @@ Servo my_servos[2];
 #define ARM_PIN       10
 int servo_pins[2] = {GRABBER_PIN, ARM_PIN};
 
+//debug LED
+#define DEBUG_LED 14
+#define DEBUG_ON  HIGH
+#define DEBUG_OFF LOW
+
 void setup() {
   // put your setup code here, to run once:
   
@@ -41,11 +46,15 @@ void setup() {
   
   my_servos[0].attach(servo_pins[0]);
   my_servos[1].attach(servo_pins[1]);
+
+  //debug LED
+  pinMode(DEBUG_LED,OUTPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   while(Serial.available() > 0){
+    digitalWrite(DEBUG_LED,DEBUG_OFF);
     switch(Serial.read()){
       case MC_ECHO_INIT:
         //enable output to motor controller
@@ -90,6 +99,8 @@ void loop() {
         my_servos[idx].write(Serial.read());
         break;
       }
+      default:
+        digitalWrite(DEBUG_LED,DEBUG_ON);
     } //end switch(ser_comm)
   } //end while(Serial.available() > 0)
 } //end loop()
