@@ -15,12 +15,10 @@ class arduino_comms():
 	SERVO_DETACH = bytes([15])
 	SERVO_ANGLE	= bytes([16])
 
-# Set baud on Sabertooth
-def mcinit(ser):
-	nchout = ser.write(arduino_comms.MC_ECHO_INIT)
-	nchin = ser.read(1)
-	return [nchout, len(nchin)]
-
+# channels for servos (not pins--defined in arduino_comm.ino)
+class servo_channels():
+	GRABBER_CHANNEL = 0;
+	ARM_CHANNEL = 1; 
 # commands for Sabertooth 2x25
 class mc_comms():
 	driveForwardMotor1 = 0
@@ -39,6 +37,13 @@ class mc_comms():
 	driveMixed_7bit = 12
 	driveTurn_7bit = 13
 	
+	
+# Set baud on Sabertooth
+def mcinit(ser):
+	nchout = ser.write(arduino_comms.MC_ECHO_INIT)
+	nchin = ser.read(1)
+	return [nchout, len(nchin)]
+	
 # send packetized command
 def mcwrite(ser, addr, comm, data):
 	nchout = ser.write(arduino_comms.MC_ECHO_COMM)
@@ -54,8 +59,22 @@ def mcbatt(ser,addr,volts):
 
 # set servo angle
 def	setServo(ser,channel,angle):
-	nchout = ser.write(arduino_comms.
+	nchout = ser.write(arduino_comms.SERVO_ANGLE)
+	nchout += ser.write(bytes([channel,angle]);
 	return nchout
+	
+# attach servo
+def	setServo(ser,channel,angle):
+	nchout = ser.write(arduino_comms.SERVO_ATTACH)
+	nchout += ser.write(bytes([channel]);
+	return nchout
+	
+# detach servo
+def	setServo(ser,channel,angle):
+	nchout = ser.write(arduino_comms.SERVO_DETACH)
+	nchout += ser.write(bytes([channel]);
+	return nchout
+	
 
 #initialize motor controller for 8N1
 #issue: Sabertooth gets initialized before this program can attempt to do so.
@@ -114,7 +133,7 @@ while 1:
 		break
 	elif inchr == 'h':
 		print('Open')
-		print(setServo
+		print(setServo(ser,addr,
 	#elif inchr == 'f':
 		#Don't Crash Like I Did!
 		#print('Turbo forward')

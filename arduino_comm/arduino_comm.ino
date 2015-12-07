@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 //digital output for gating serial TX to motor controller
 #define MC_GATE 2
 //enable value for motor controller (for NAND gate)
@@ -16,6 +18,11 @@
 #define SERVO_ATTACH  14
 #define SERVO_DETACH  15
 #define SERVO_ANGLE   16
+#define GRABBER_PIN   9
+#define ARM_PIN       10
+//servos
+Servo my_servos[2];
+byte servo_pins[2] = {GRABBER_PIN, ARM_PIN};
 //#define READ_COLOR   20
 
 void setup() {
@@ -37,8 +44,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   while(Serial.available() > 0){
-    int ser_comm = Serial.read();
-    switch(ser_comm){
+    switch(Serial.read()){
       case MC_ECHO_INIT:
         //enable output to motor controller
         digitalWrite(MC_GATE,MC_ON);
@@ -50,6 +56,7 @@ void loop() {
         digitalWrite(MC_GATE,MC_OFF);
         break;
       case MC_ECHO_COMM:
+      {
         //buffer for address, command, data, and checksum 
         byte mc_comm[4];
         //read address, command, and data
@@ -65,9 +72,22 @@ void loop() {
         //disable output to motor controller
         digitalWrite(MC_GATE,MC_OFF);
         break;
+      }
       case SERVO_ATTACH:
+      {
+        int idx = Serial.read();
+        my_servos[idx].attach(servo_pins[idx]);
+        break;
+      }
       case SERVO_DETACH:
+        my_servos[Serial.read()].detach();
+        break;
       case SERVO_ANGLE:
+      {
+        int idx = Serial.read();
+        my_servos[servo_pins[idx]].write(Serial.read());
+        break;
+      }
     } //end switch(ser_comm)
   } //end while(Serial.available() > 0)
 } //end loop()
