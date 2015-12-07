@@ -54,8 +54,8 @@ def mcbatt(ser,addr,volts):
 #issue: Sabertooth gets initialized before this program can attempt to do so.
 # Is the resulting baud consistent?
 # Options are either 2400, 9600, 19200, or 38400 
-#ser = serial.Serial('/dev/ttyACM0',9600)	#USB serial to Arduino on linux
-ser = serial.Serial('/dev/cu.usbmodem1421',9600)	#USB serial to Arduino on os x
+ser = serial.Serial('/dev/ttyACM0',9600)	#USB serial to Arduino on linux
+#ser = serial.Serial('/dev/cu.usbmodem1421',9600)	#USB serial to Arduino on os x
 print(ser)
 # Testing: Send command to set minimum battery voltage too high (should trigger shutoff) 
 #print(mcbatt(ser,addr,16))
