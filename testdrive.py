@@ -3,15 +3,24 @@
 import serial
 import time
 
-#http://code.activestate.com/recipes/134892-getch-like-unbuffered-character-reading-from-stdin/
-from getch import getch
+#getch 1.0 from pypi:
+#	sudo -H pip install getch
+import getch
+
+# Commands for Arduino
+class arduino_comms():
+	MC_ECHO_INIT = bytes([170])
+	MC_ECHO_COMM = bytes([171])
+
 
 # Set baud on Sabertooth
 def mcinit(ser):
-	return ser.write(bytes([170]))
+	nchout = ser.write(arduino_comms.MC_ECHO_INIT)
+	nchin = ser.read(1)
+	return [nchout, len(nchin)]
 
 # commands for Sabertooth 2x25
-class Comms():
+class mc_comms():
 	driveForwardMotor1 = 0
 	driveBackwardsMotor1 = 1
 	minVoltage = 2
@@ -30,75 +39,83 @@ class Comms():
 	
 # send packetized command
 def mcwrite(ser, addr, comm, data):
-	chk = (addr + comm + data) & 0b01111111
-	return ser.write(bytes([addr,comm,data,chk]))
+	nchout = ser.write(arduino_comms.MC_ECHO_COMM)
+	nchout += ser.write(bytes([addr,comm,data]))
+	nchin = ser.read(4)
+	return [nchout, len(nchin)]
 
 # set minimum battery voltage
 def mcbatt(ser,addr,volts):
     data = (volts-6)*5
-    return mcwrite(ser,addr,Comms.minVoltage,data)
+    return mcwrite(ser,addr,mc_comms.minVoltage,data)
 #http://www.varesano.net/blog/fabio/serial%20rs232%20connections%20python
 
 #initialize motor controller for 8N1
 #issue: Sabertooth gets initialized before this program can attempt to do so.
 # Is the resulting baud consistent?
 # Options are either 2400, 9600, 19200, or 38400 
-ser = serial.Serial('/dev/ttyACM0',38400)	#USB serial to Arduino on linux
-#ser = serial.Serial('/dev/cu.usbmodem1411',9600)	#USB serial to Arduino on os x
+#ser = serial.Serial('/dev/ttyACM0',9600)	#USB serial to Arduino on linux
+ser = serial.Serial('/dev/cu.usbmodem1421',9600)	#USB serial to Arduino on os x
 print(ser)
 # Testing: Send command to set minimum battery voltage too high (should trigger shutoff) 
 #print(mcbatt(ser,addr,16))
 #ser.close()
-addr = 128
+addr = 128		#from DIP switches on Sabertooth
 speed = 15
-turn = 15
+turn = 8
 stop = 0
+time.sleep(2)
 print(mcinit(ser))
 #while 1:
 #	speed = int(input("Forward: "))
 	#time.sleep(2)
-#	print(mcwrite(ser,addr,Comms.driveForwardMixed,speed))
-	#print(mcwrite(ser,addr,Comms.driveBackwardsMotor2,speed))
-	#print(mcwrite(ser,addr,Comms.driveForwardMotor1,speed))
+#	print(mcwrite(ser,addr,mc_comms.driveForwardMixed,speed))
+	#print(mcwrite(ser,addr,mc_comms.driveBackwardsMotor2,speed))
+	#print(mcwrite(ser,addr,mc_comms.driveForwardMotor1,speed))
 #	speed = int(input("Turn right: "))
-#	print(mcwrite(ser,addr,Comms.driveTurnRightMixed,speed))
-	#print(mcwrite(ser,addr,Comms.driveForwardMixed,stop))
-	#print(mcwrite(ser,addr,Comms.driveBackwardsMotor2,stop))
-	#print(mcwrite(ser,addr,Comms.driveForwardMotor1,stop))
+#	print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,speed))
+	#print(mcwrite(ser,addr,mc_comms.driveForwardMixed,stop))
+	#print(mcwrite(ser,addr,mc_comms.driveBackwardsMotor2,stop))
+	#print(mcwrite(ser,addr,mc_comms.driveForwardMotor1,stop))
+	
+# Remote control:
+#	wasd to go forward/backward, turn in place
+#	q to stop and exit
+#	any other key to stop
 while 1:
-	inchr = getch()
+	inchr = getch.getch()
 	if inchr == 'a':
 		print('Left')
-		mcwrite(ser,addr,Comms.driveForwardMixed,stop)
-		mcwrite(ser,addr,Comms.driveTurnLeftMixed,turn)
+		print(mcwrite(ser,addr,mc_comms.driveForwardMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveTurnLeftMixed,turn))
 	elif inchr == 'd':
 		print('Right')
-		mcwrite(ser,addr,Comms.driveForwardMixed,stop)
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,turn)
+		print(mcwrite(ser,addr,mc_comms.driveForwardMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,turn))
 	elif inchr == 'w':
 		print('Forward')
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		mcwrite(ser,addr,Comms.driveForwardMixed,speed)
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveForwardMixed,speed))
 	elif inchr == 's':
 		print('Backwards')
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		mcwrite(ser,addr,Comms.driveBackwardsMixed,speed)
-	elif inchr == '\x03': #Ctrl-C
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,speed))
+	elif inchr == 'q':
 		print('Stop and quit')
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		mcwrite(ser,addr,Comms.driveBackwardsMixed,stop)		
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
 		break
-	elif inchr == 'f':
+	#elif inchr == 'f':
 		#Don't Crash Like I Did!
 		#print('Turbo forward')
-		#mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		#mcwrite(ser,addr,Comms.driveForwardMixed,127)
+		#mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop)
+		#mcwrite(ser,addr,mc_comms.driveForwardMixed,127)
 		#time.sleep(1)
-		print('Stop')
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		mcwrite(ser,addr,Comms.driveBackwardsMixed,stop)	
+		#print('Stop')
+		#mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop)
+		#mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop)	
 		break
 	else:
 		print('Stop')
-		mcwrite(ser,addr,Comms.driveTurnRightMixed,stop)
-		mcwrite(ser,addr,Comms.driveBackwardsMixed,stop)		
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))	
