@@ -11,7 +11,9 @@ import getch
 class arduino_comms():
 	MC_ECHO_INIT = bytes([170])
 	MC_ECHO_COMM = bytes([171])
-
+	SERVO_ATTACH = bytes([14])
+	SERVO_DETACH = bytes([15])
+	SERVO_ANGLE	= bytes([16])
 
 # Set baud on Sabertooth
 def mcinit(ser):
@@ -49,6 +51,11 @@ def mcbatt(ser,addr,volts):
     data = (volts-6)*5
     return mcwrite(ser,addr,mc_comms.minVoltage,data)
 #http://www.varesano.net/blog/fabio/serial%20rs232%20connections%20python
+
+# set servo angle
+def	setServo(ser,channel,angle):
+	nchout = ser.write(arduino_comms.
+	return nchout
 
 #initialize motor controller for 8N1
 #issue: Sabertooth gets initialized before this program can attempt to do so.
@@ -105,6 +112,9 @@ while 1:
 		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
 		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
 		break
+	elif inchr == 'h':
+		print('Open')
+		print(setServo
 	#elif inchr == 'f':
 		#Don't Crash Like I Did!
 		#print('Turbo forward')
