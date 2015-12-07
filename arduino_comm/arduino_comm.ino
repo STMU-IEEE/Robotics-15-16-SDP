@@ -96,7 +96,8 @@ void loop() {
       case SERVO_ANGLE:
       {
         int idx = Serial.read();
-        my_servos[idx].write(Serial.read());
+        int angle = Serial.read();
+        my_servos[idx].write(angle);
         break;
       }
       default:
