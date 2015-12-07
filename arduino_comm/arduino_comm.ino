@@ -24,7 +24,7 @@
 Servo my_servos[2];
 #define GRABBER_PIN   9
 #define ARM_PIN       10
-byte servo_pins[2] = {GRABBER_PIN, ARM_PIN};
+int servo_pins[2] = {GRABBER_PIN, ARM_PIN};
 
 void setup() {
   // put your setup code here, to run once:
