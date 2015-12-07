@@ -18,12 +18,13 @@
 #define SERVO_ATTACH  14
 #define SERVO_DETACH  15
 #define SERVO_ANGLE   16
-#define GRABBER_PIN   9
-#define ARM_PIN       10
+//#define READ_COLOR   20
+
 //servos
 Servo my_servos[2];
+#define GRABBER_PIN   9
+#define ARM_PIN       10
 byte servo_pins[2] = {GRABBER_PIN, ARM_PIN};
-//#define READ_COLOR   20
 
 void setup() {
   // put your setup code here, to run once:

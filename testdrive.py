@@ -17,25 +17,32 @@ class arduino_comms():
 
 # channels for servos (not pins--defined in arduino_comm.ino)
 class servo_channels():
-	GRABBER_CHANNEL = 0;
-	ARM_CHANNEL = 1; 
+	GRABBER = bytes([0])
+	ARM = bytes([1])
+
+class servo_angles():
+	OPEN = bytes([140])
+	GRAB = bytes([95])
+	LIFT = bytes([22])
+	DROP = bytes([89])
+	
 # commands for Sabertooth 2x25
 class mc_comms():
-	driveForwardMotor1 = 0
-	driveBackwardsMotor1 = 1
-	minVoltage = 2
-	maxVoltage = 3
-	driveForwardMotor2 = 4
-	driveBackwardsMotor2 = 5
-	driveMotor1_7bit = 6
-	driveMotor2_7bit = 7
+	driveForwardMotor1 = bytes([0])
+	driveBackwardsMotor1 = bytes([1])
+	minVoltage = bytes([2])
+	maxVoltage = bytes([3])
+	driveForwardMotor2 = bytes([4])
+	driveBackwardsMotor2 = bytes([5])
+	driveMotor1_7bit = bytes([6])
+	driveMotor2_7bit = bytes([7])
 	#mixed mode commands:
-	driveForwardMixed = 8
-	driveBackwardsMixed = 9
-	driveTurnRightMixed = 10
-	driveTurnLeftMixed = 11
-	driveMixed_7bit = 12
-	driveTurn_7bit = 13
+	driveForwardMixed = bytes([8])
+	driveBackwardsMixed = bytes([9])
+	driveTurnRightMixed = bytes([10])
+	driveTurnLeftMixed = bytes([11])
+	driveMixed_7bit = bytes([12])
+	driveTurn_7bit = bytes([13])
 	
 	
 # Set baud on Sabertooth
@@ -46,34 +53,28 @@ def mcinit(ser):
 	
 # send packetized command
 def mcwrite(ser, addr, comm, data):
-	nchout = ser.write(arduino_comms.MC_ECHO_COMM)
-	nchout += ser.write(bytes([addr,comm,data]))
+	nchout = ser.write(bytes.join(arduino_comms.MC_ECHO_COMM,addr,comm,data))
 	nchin = ser.read(4)
 	return [nchout, len(nchin)]
 
 # set minimum battery voltage
 def mcbatt(ser,addr,volts):
     data = (volts-6)*5
-    return mcwrite(ser,addr,mc_comms.minVoltage,data)
+    return mcwrite(ser,addr,mc_comms.minVoltage,bytes([data]))
 #http://www.varesano.net/blog/fabio/serial%20rs232%20connections%20python
 
 # set servo angle
-def	setServo(ser,channel,angle):
-	nchout = ser.write(arduino_comms.SERVO_ANGLE)
-	nchout += ser.write(bytes([channel,angle]);
-	return nchout
+def	servoWrite(ser,channel,angle):
+	return ser.write(bytes.join(arduino_comms.SERVO_ANGLE,channel,angle))
 	
 # attach servo
-def	setServo(ser,channel,angle):
-	nchout = ser.write(arduino_comms.SERVO_ATTACH)
-	nchout += ser.write(bytes([channel]);
-	return nchout
+def	servoAttach(ser,channel,angle):
+	return ser.write(bytes.join(arduino_comms.SERVO_ATTACH,channel))
 	
 # detach servo
-def	setServo(ser,channel,angle):
-	nchout = ser.write(arduino_comms.SERVO_DETACH)
-	nchout += ser.write(bytes([channel]);
-	return nchout
+def	servoDetach(ser,channel):
+	return ser.write(bytes.join(arduino_comms.SERVO_DETACH,channel))
+
 	
 
 #initialize motor controller for 8N1
@@ -86,12 +87,14 @@ print(ser)
 # Testing: Send command to set minimum battery voltage too high (should trigger shutoff) 
 #print(mcbatt(ser,addr,16))
 #ser.close()
-addr = 128		#from DIP switches on Sabertooth
-speed = 15
-turn = 15
-stop = 0
+addr = bytes([128])		#from DIP switches on Sabertooth
+speed = bytes([15])
+turn = bytes([15])
+stop = bytes([0])
 time.sleep(2)
 print(mcinit(ser))
+print(servoAttach(ser,servo_channels.GRABBER))
+print(servoAttach(ser,servo_channels.ARM))
 #while 1:
 #	speed = int(input("Forward: "))
 	#time.sleep(2)
@@ -106,9 +109,10 @@ print(mcinit(ser))
 	
 # Remote control:
 #	wasd to go forward/backward, turn in place
+#	h to open, j to grab, k to drop, l to lift
 #	q to stop and exit
 #	any other key to stop
-while 1:
+while True:
 	inchr = getch.getch()
 	if inchr == 'a':
 		print('Left')
@@ -130,10 +134,21 @@ while 1:
 		print('Stop and quit')
 		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
 		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
+		print(servoDetach(ser,servo_channes.GRABBER))
+		print(servoDetach(ser,servo_channes.ARM))
 		break
 	elif inchr == 'h':
 		print('Open')
-		print(setServo(ser,addr,
+		print(setServo(ser,servo_channels.GRABBER,servo_angles.OPEN))
+	elif inchr == 'j':
+		print('Grab')
+		print(setServo(ser,servo_channels.GRABBER,servo_angles.GRAB))
+	elif inchr == 'k':
+		print('Drop')
+		print(setServo(ser,servo_channels.ARM,servo_angles.DROP))
+	elif inchr == 'l':
+		print('Lift')
+		print(setServo(ser,servo_channels.ARM,servo_angles.LIFT))
 	#elif inchr == 'f':
 		#Don't Crash Like I Did!
 		#print('Turbo forward')
