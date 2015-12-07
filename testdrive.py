@@ -13,7 +13,7 @@ class arduino_comms():
 	MC_ECHO_COMM = 171
 	SERVO_ATTACH = 14
 	SERVO_DETACH = 15
-	SERVO_ANGLE	= 16
+	SERVO_WRITE	= 16
 
 # channels for servos (not pins--defined in arduino_comm.ino)
 class servo_channels():
@@ -65,7 +65,7 @@ def mcbatt(ser,addr,volts):
 
 # set servo angle
 def	servoWrite(ser,channel,angle):
-	return ser.write(bytes([arduino_comms.SERVO_ANGLE,channel,angle]))
+	return ser.write(bytes([arduino_comms.SERVO_WRITE,channel,angle]))
 	
 # attach servo
 def	servoAttach(ser,channel):

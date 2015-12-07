@@ -17,7 +17,7 @@
 #define MC_ECHO_COMM 171
 #define SERVO_ATTACH  14
 #define SERVO_DETACH  15
-#define SERVO_ANGLE   16
+#define SERVO_WRITE   16
 //#define READ_COLOR   20
 
 //servos
@@ -93,7 +93,7 @@ void loop() {
       case SERVO_DETACH:
         my_servos[Serial.read()].detach();
         break;
-      case SERVO_ANGLE:
+      case SERVO_WRITE:
       {
         int idx = Serial.read();
         int angle = Serial.read();
