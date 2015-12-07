@@ -134,8 +134,8 @@ while True:
 		print('Stop and quit')
 		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
 		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
-		print(servoDetach(ser,servo_channes.GRABBER))
-		print(servoDetach(ser,servo_channes.ARM))
+		print(servoDetach(ser,servo_channels.GRABBER))
+		print(servoDetach(ser,servo_channels.ARM))
 		break
 	elif inchr == 'h':
 		print('Open')
