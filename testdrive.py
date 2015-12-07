@@ -130,13 +130,6 @@ while True:
 		print('Backwards')
 		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
 		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,speed))
-	elif inchr == 'q':
-		print('Stop and quit')
-		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
-		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
-		print(servoDetach(ser,servo_channels.GRABBER))
-		print(servoDetach(ser,servo_channels.ARM))
-		break
 	elif inchr == 'h':
 		print('Open')
 		print(servoWrite(ser,servo_channels.GRABBER,servo_angles.OPEN))
@@ -149,15 +142,12 @@ while True:
 	elif inchr == 'l':
 		print('Lift')
 		print(servoWrite(ser,servo_channels.ARM,servo_angles.LIFT))
-	#elif inchr == 'f':
-		#Don't Crash Like I Did!
-		#print('Turbo forward')
-		#mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop)
-		#mcwrite(ser,addr,mc_comms.driveForwardMixed,127)
-		#time.sleep(1)
-		#print('Stop')
-		#mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop)
-		#mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop)	
+	elif inchr == 'q':
+		print('Stop and quit')
+		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
+		print(mcwrite(ser,addr,mc_comms.driveBackwardsMixed,stop))
+		print(servoDetach(ser,servo_channels.GRABBER))
+		print(servoDetach(ser,servo_channels.ARM))
 		break
 	else:
 		print('Stop')
