@@ -62,7 +62,7 @@ print(ser)
 #ser.close()
 addr = 128		#from DIP switches on Sabertooth
 speed = 15
-turn = 8
+turn = 12
 stop = 0
 time.sleep(2)
 print(mcinit(ser))
