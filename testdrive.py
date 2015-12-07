@@ -93,8 +93,8 @@ turn = 15
 stop = 0
 time.sleep(2)
 print('mcinit',mcinit(ser))
-print('attach grabber',servoAttach(ser,servo_channels.GRABBER))
-print('attach arm',servoAttach(ser,servo_channels.ARM))
+#print('attach grabber',servoAttach(ser,servo_channels.GRABBER))
+#print('attach arm',servoAttach(ser,servo_channels.ARM))
 #while 1:
 #	speed = int(input("Forward: "))
 	#time.sleep(2)
