@@ -68,7 +68,7 @@ def	servoWrite(ser,channel,angle):
 	return ser.write(bytes.join(arduino_comms.SERVO_ANGLE,channel,angle))
 	
 # attach servo
-def	servoAttach(ser,channel,angle):
+def	servoAttach(ser,channel):
 	return ser.write(bytes.join(arduino_comms.SERVO_ATTACH,channel))
 	
 # detach servo
