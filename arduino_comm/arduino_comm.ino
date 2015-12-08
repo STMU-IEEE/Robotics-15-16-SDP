@@ -95,14 +95,8 @@ void loop() {
         break;
       case SERVO_WRITE:
       {
+        while(Serial.available() < 2);
         int idx = Serial.read();
-        if(idx == -1){
-         break; 
-         digitalWrite(DEBUG_LED,DEBUG_ON);
-         delay(500);
-         digitalWrite(DEBUG_LED,DEBUG_OFF);
-         delay(500);
-        }
         int angle = Serial.read();
         my_servos[idx].write(angle);
         break;
