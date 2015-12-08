@@ -22,7 +22,7 @@ class servo_channels():
 
 class servo_angles():
 	OPEN = 140
-	GRAB = 75
+	GRAB = 72
 	LIFT = 22
 	DROP = 89
 	
