@@ -102,6 +102,9 @@ void loop() {
       }
       default:
         digitalWrite(DEBUG_LED,DEBUG_ON);
+        delay(500);
+        digitalWrite(DEBUG_LED,DEBUG_OFF);
+        delay(500);
     } //end switch(ser_comm)
   } //end while(Serial.available() > 0)
 } //end loop()
