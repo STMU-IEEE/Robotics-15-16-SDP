@@ -51,11 +51,17 @@ void setup() {
   pinMode(DEBUG_LED,OUTPUT);
 }
 
+
+/* possible to use if() instead of while(),
+ *  or serialEvent() instead of loop()?
+ */
+
 void loop() {
   // put your main code here, to run repeatedly:
   while(Serial.available() > 0){
     digitalWrite(DEBUG_LED,DEBUG_OFF);
     switch(Serial.read()){
+      //New scopes {} used where local variables are declared
       case MC_ECHO_INIT:
         //enable output to motor controller
         digitalWrite(MC_GATE,MC_ON);
@@ -68,9 +74,14 @@ void loop() {
         break;
       case MC_ECHO_COMM:
       {
+        /* possible optimization: echo individual bytes
+         *  without waiting for whole command
+         */
+        
         //buffer for address, command, data, and checksum 
         byte mc_comm[4];
         //read address, command, and data
+        while(Serial.available() < 3);
         Serial.readBytes(mc_comm,3);
         //compute checksum
         mc_comm[3] = (mc_comm[0]+mc_comm[1]+mc_comm[2]) & 0b01111111;
@@ -78,7 +89,7 @@ void loop() {
         digitalWrite(MC_GATE,MC_ON);
         //write command to motor controller
         Serial.write(mc_comm,4);
-        //wait for TX to finish
+        //wait for TX to finish before disabling output
         Serial.flush();
         //disable output to motor controller
         digitalWrite(MC_GATE,MC_OFF);
@@ -86,11 +97,13 @@ void loop() {
       }
       case SERVO_ATTACH:
       {
+        while(Serial.available() < 1);
         int idx = Serial.read();
         my_servos[idx].attach(servo_pins[idx]);
         break;
       }
       case SERVO_DETACH:
+        while(Serial.available() < 1);
         my_servos[Serial.read()].detach();
         break;
       case SERVO_WRITE:
