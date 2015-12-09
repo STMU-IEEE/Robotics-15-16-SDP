@@ -107,11 +107,11 @@ print('mcinit',mcinit(ser))
 	#print(mcwrite(ser,addr,mc_comms.driveBackwardsMotor2,stop))
 	#print(mcwrite(ser,addr,mc_comms.driveForwardMotor1,stop))
 	
-# Remote control:
-#	wasd to go forward/backward, turn in place
-#	h to open, j to grab, k to drop, l to lift
-#	q to stop and exit
-#	any other key to stop
+print('Remote control:')
+print('	wasd to go forward/backward, turn in place')
+print('	h to open, j to grab, k to drop, l to lift')
+print('	q to stop and exit')
+print('	any other key to stop')
 while True:
 	inchr = getch.getch()
 	if inchr == 'a':
