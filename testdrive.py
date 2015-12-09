@@ -24,7 +24,7 @@ class servo_angles():
 	OPEN = 140
 	GRAB = 72
 	LIFT = 22
-	DROP = 89
+	DROP = 90
 	
 # commands for Sabertooth 2x25
 class mc_comms():
