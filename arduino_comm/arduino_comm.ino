@@ -129,8 +129,11 @@ void loop() {
       case READ_GYRO:
       {
         gyro.read();
+        debugBlink();
         float gyro_values[3] = {gyro.data.x, gyro.data.y, gyro.data.z}; //array for x, y, z
+        debugBlink();
         Serial.write((byte*)gyro_values,3*sizeof(float));
+        debugBlink();
         break;
       }
       default:
@@ -139,3 +142,12 @@ void loop() {
     } //end switch(ser_comm)
   } //end while(Serial.available() > 0)
 } //end loop()
+
+void debugBlink()
+{
+        digitalWrite(DEBUG_LED,DEBUG_ON);
+        delay(250);
+        digitalWrite(DEBUG_LED,DEBUG_OFF);
+        delay(250);
+}
+
