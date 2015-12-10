@@ -78,7 +78,7 @@ def	servoDetach(ser,channel):
 	return ser.write(bytes([arduino_comms.SERVO_DETACH,channel]))
 
 # read color sensor
-def readColor(ser):
+def colorRead(ser):
 	nchout = ser.write(bytes([arduino_comms.READ_COLOR]))
 	#read 8 bytes as 4 big-endian unsigned short (uint16_t)
 	buffer = ser.read(8)
@@ -87,7 +87,7 @@ def readColor(ser):
 	return [result, nchout, len(buffer)]
 
 # read gyro sensor
-def readGyro(ser):
+def gyroRead(ser):
 	nchout = ser.write(bytes([arduino_comms.READ_GYRO]))
 	#read 12 bytes as 3 big-endian single-precision float
 	buffer = ser.read(12)
