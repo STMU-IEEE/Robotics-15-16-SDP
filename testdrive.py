@@ -14,6 +14,8 @@ class arduino_comms():
 	SERVO_ATTACH = 14
 	SERVO_DETACH = 15
 	SERVO_WRITE	= 16
+	READ_COLOR = 20
+	READ_GYRO = 30
 
 # channels for servos (not pins--defined in arduino_comm.ino)
 class servo_channels():
@@ -75,7 +77,24 @@ def	servoAttach(ser,channel):
 def	servoDetach(ser,channel):
 	return ser.write(bytes([arduino_comms.SERVO_DETACH,channel]))
 
-	
+# read color sensor
+def readColor(ser):
+	nchout = ser.write(bytes([arduino_comms.READ_COLOR]))
+	#read 8 bytes as 4 big-endian unsigned short (uint16_t)
+	buffer = ser.read(8)
+	#result = [red, green, blue, clear]
+	result = struct.unpack_from('<H',buffer)
+	return [result, nchout, len(buffer)]
+
+# read gyro sensor
+def readGyro(ser):
+	nchout = ser.write(bytes([arduino_comms.READ_GYRO]))
+	#read 12 bytes as 3 big-endian single-precision float
+	buffer = ser.read(12)
+	#result = [x, y, z]
+	result = struct.unpack_from('<f',buffer)
+	return [result, nchout, len(buffer)]
+
 
 #initialize motor controller for 8N1
 #issue: Sabertooth gets initialized before this program can attempt to do so.
@@ -142,6 +161,12 @@ while True:
 	elif inchr == 'l':
 		print('Lift')
 		print(servoWrite(ser,servo_channels.ARM,servo_angles.LIFT))
+	elif inchr == 'g':
+		print('Gyro')
+		print(gyroRead(ser))
+	elif inchr == 'c':
+		print('Color sensor')
+		print(colorRead(ser))
 	elif inchr == 'q':
 		print('Stop and quit')
 		print(mcwrite(ser,addr,mc_comms.driveTurnRightMixed,stop))
