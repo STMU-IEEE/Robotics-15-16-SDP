@@ -128,6 +128,7 @@ void loop() {
       }
       case READ_GYRO:
       {
+        debugBlink();
         gyro.read();
         debugBlink();
         float gyro_values[3] = {gyro.data.x, gyro.data.y, gyro.data.z}; //array for x, y, z
