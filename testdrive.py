@@ -2,6 +2,7 @@
 
 import serial
 import time
+import struct
 
 #getch 1.0 from pypi:
 #	sudo -H pip install getch
