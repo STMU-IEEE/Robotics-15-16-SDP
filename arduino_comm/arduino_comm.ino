@@ -43,9 +43,6 @@ void setup() {
   Serial.begin(9600);
 
   //TODO: see libraries for how to initialize ultrasonic range finders
-  
-  my_servos[0].attach(servo_pins[0]);
-  my_servos[1].attach(servo_pins[1]);
 
   //debug LED
   pinMode(DEBUG_LED,OUTPUT);
