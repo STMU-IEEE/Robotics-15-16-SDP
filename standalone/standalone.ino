@@ -1,8 +1,8 @@
 #include <Servo.h>
 #include <Wire.h>
-#include "Adafruit_TCS34725.h"
-#include "Adafruit_L3GD20.h"
-
+#include "Adafruit_TCS34725.h"  //color sensor
+#include "Adafruit_L3GD20.h"    //gyro sensor
+#include "FastLED.h"            //for rgb2hsv_approximate()
 //servos
 #define GRABBER_PIN   9
 #define ARM_PIN       10
@@ -95,11 +95,11 @@ void ledFade() {
   int brightness = 0;
   while(brightness < 255) {
     // set the brightness of pin 9:
-    analogWrite(COLOR_LED_PIN, brightness++);
+    analogWrite(COLOR_LED_PIN, ++brightness);
     delay(6);
   }
   while(brightness > 0) {
-    analogWrite(COLOR_LED_PIN, brightness--);
+    analogWrite(COLOR_LED_PIN, --brightness);
     delay(6);
   }
 }
@@ -129,9 +129,18 @@ void mcWrite(byte cmd, byte data) {
   digitalWrite(MC_GATE,MC_OFF);
 }
 
-/*int readHue() {
+
+//Calculate the hue (color) detected
+//Hypothesis is that this is more immune to changes in lighting than e.g. simply using red/green values.
+//As written, there is room for optimization and improved accuracy--test first.
+uint8_t readHue() {
   uint16_t tcs_r, tcs_g, tcs_b, tcs_c;  //red, green, blue, clear
   tcs.getRawData(&tcs_r,&tcs_b,&tcs_g,&tcs_c);
-  
-}*/
+  CRGB tcs_rgb;
+  tcs_rgb.red = highByte(tcs_r);
+  tcs_rgb.green = highByte(tcs_g);
+  tcs_rgb.blue = highByte(tcs_b);
+  CHSV tcs_hsv = rgb2hsv_approximate(tcs_rgb);
+  return tcs_hsv.hue;
+}
 
