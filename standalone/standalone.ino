@@ -83,7 +83,7 @@ void loop() {
   //robot is done, slow blink color sensor LED
   //ledFade();
   //print photogate output to help identify threshold
-  Serial.println(analogRead(PHOTOGATE_PIN));
+  Serial.println(photogateAverage());
   //ledBlink(1000);
 } //end loop()
 
@@ -169,5 +169,15 @@ uint8_t readHue() {
   tcs_rgb.blue = highByte(tcs_b);
   CHSV tcs_hsv = rgb2hsv_approximate(tcs_rgb);
   return tcs_hsv.hue;
+}
+
+//Take sum of 32 readings (interpret as 15-bit average instead of 10-bit)
+//(Why 32? maximimum number that fit inside signed 16-bit, and still fast)
+int photogateAverage() {
+  int average = 0;
+  for(int count = 0; count < 32; count--) {
+    average += analogRead(PHOTOGATE_PIN);
+  }
+  return average;
 }
 
