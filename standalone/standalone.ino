@@ -5,53 +5,57 @@
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 //servos
-#define GRABBER_PIN   5
-#define ARM_PIN       6
+#define GRABBER_PIN     5
+#define ARM_PIN         6
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
-#define ARM_UP        22
-#define ARM_DOWN      94
-#define GRABBER_OPEN  140
-#define GRABBER_CLOSE 72
+#define ARM_UP          25
+#define ARM_DOWN        97
+#define GRABBER_OPEN    140
+#define GRABBER_CLOSE   75
 
 Adafruit_L3GD20 gyro;
-Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //digital output for gating serial TX to motor controller
-#define MC_GATE       2
+#define MC_GATE         2
 //enable value for motor controller (for NAND gate)
-#define MC_ON         HIGH
-#define MC_OFF        LOW
+#define MC_ON           HIGH
+#define MC_OFF          LOW
 
 //Sabertooth address from DIP switches
-#define MC_ADDR       128
+#define MC_ADDR         128
 
 //Sabertooth initialization value
-#define MC_INIT_BYTE  170
+#define MC_INIT_BYTE    170
 
 //Sabertooth commands
-#define MC_FORWARD    8
-#define MC_BACKWARDS  9
-#define MC_RIGHT      10
-#define MC_LEFT       11
+#define MC_FORWARD      8
+#define MC_BACKWARDS    9
+#define MC_RIGHT        10
+#define MC_LEFT         11
 
 //color sensor LED
-#define COLOR_LED_PIN 14
-#define COLOR_LED_ON  HIGH
-#define COLOR_LED_OFF LOW
+#define COLOR_LED_PIN   14
+#define COLOR_LED_ON    HIGH
+#define COLOR_LED_OFF   LOW
 
 //pins for ultrasonic range finders
-#define SRF_L_ECHO    3
-#define SRF_L_TRIGGER 11
-#define SRF_R_ECHO    9
-#define SRF_R_TRIGGER 10
+#define SRF_L_ECHO      3
+#define SRF_L_TRIGGER   11
+#define SRF_R_ECHO      9
+#define SRF_R_TRIGGER   10
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 
 //pin for photogate (analog)
-#define PHOTOGATE_PIN 3
+#define PHOTOGATE_PIN   3
 
+//15-bit thresholds with hysteresis
+//(readings are roughly 2200 to 20000)
+#define PHOTOGATE_LOW   6000
+#define PHOTOGATE_HIGH  12000
 void setup() {
   // put your setup code here, to run once:
   
@@ -70,21 +74,44 @@ void setup() {
 
   //Servos
   grabber_servo.attach(GRABBER_PIN);
+  grabber_servo.write(GRABBER_OPEN);
   arm_servo.attach(ARM_PIN);
+  arm_servo.write(ARM_UP);
   
-  //debug LED
+  //color sensor LED
   pinMode(COLOR_LED_PIN,OUTPUT);
 
+  //initialize color sensor
+  //based on Adafruit TCS3725 example code
+  Serial.print("TCS34725 I2C color sensor ");
+  if (!tcs.begin())
+    Serial.print("not ");
+  Serial.println("found");
+  
+  //initialize gyro sensor
+  //based on Adafruit L3GD20 example code:
+  Serial.print("L3GD20H I2C gyro sensor");
+  if (!gyro.begin(gyro.L3DS20_RANGE_250DPS))
+  //if (!gyro.begin(gyro.L3DS20_RANGE_500DPS))
+  //if (!gyro.begin(gyro.L3DS20_RANGE_2000DPS))
+    Serial.print(" not");
+  Serial.println(" found");
+
+  
   //perform robot behaviors
   robotMain();
+
+  //turn off servos
+  arm_servo.detach();
+  grabber_servo.detach();
 }
 
 void loop() {
   //robot is done, slow blink color sensor LED
   //ledFade();
   //print photogate output to help identify threshold
-  Serial.println(photogateAverage());
-  //ledBlink(1000);
+  //Serial.println(photogateAverage());
+  ledBlink(1000);
 } //end loop()
 
 
@@ -98,15 +125,29 @@ void robotMain(){
   arm_servo.write(ARM_DOWN);
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
-/*  //go forward until photo gate triggered
-  while(analogRead(
+/*  //go forward until photo gate triggered */
+  while(photogateAverage() > PHOTOGATE_LOW);
+  while(photogateAverage() < PHOTOGATE_HIGH)
+    //fast toggle LED
+    digitalWrite(COLOR_LED_PIN, !digitalRead(COLOR_LED_PIN));
+  //stop
+  digitalWrite(COLOR_LED_PIN, COLOR_LED_OFF);
   //close grabber
-  grabber_servo.write(GRABBER_OPEN);
+  grabber_servo.write(GRABBER_CLOSE);
+  //wait for grabber to close
+  delay(500);
   //raise arm
   arm_servo.write(ARM_UP);
+  digitalWrite(COLOR_LED_PIN,COLOR_LED_ON);
+  delay(1000);
   //print hue
-  Serial.print(readHue());
-  */
+  Serial.println(readHue());
+  //drop victim
+  delay(2000);
+  arm_servo.write(ARM_DOWN);
+  delay(500);
+  grabber_servo.write(GRABBER_OPEN);
+  delay(500);
 }
 
 //blink color sensor LED once
@@ -162,22 +203,43 @@ void mcWrite(byte cmd, byte data) {
 //As written, there is room for optimization and improved accuracy--test first.
 uint8_t readHue() {
   uint16_t tcs_r, tcs_g, tcs_b, tcs_c;  //red, green, blue, clear
-  tcs.getRawData(&tcs_r,&tcs_b,&tcs_g,&tcs_c);
+  tcs.getRawData(&tcs_r,&tcs_g,&tcs_b,&tcs_c);
   CRGB tcs_rgb;
+  /*
   tcs_rgb.red = highByte(tcs_r);
   tcs_rgb.green = highByte(tcs_g);
-  tcs_rgb.blue = highByte(tcs_b);
+  tcs_rgb.blue = highByte(tcs_b);*/
+  //scale to 8-bit (only need relative precision for hue)
+  Serial.println("Color sensor readings:");
+  Serial.print("R:\t");
+  Serial.println(tcs_r);
+  Serial.print("G:\t");
+  Serial.println(tcs_g);
+  Serial.print("B:\t");
+  Serial.println(tcs_b);
+  while(max(max(tcs_r,tcs_g),tcs_b) > 255) {
+    tcs_r >>= 1;
+    tcs_g >>= 1;
+    tcs_b >>= 1;
+  }
+  Serial.println("Color sensor (scaled to 8 bit):");
+  Serial.print("R:\t");
+  Serial.println(tcs_rgb.r = tcs_r);
+  Serial.print("G:\t");
+  Serial.println(tcs_rgb.g = tcs_g);
+  Serial.print("B:\t");
+  Serial.println(tcs_rgb.b = tcs_b);
   CHSV tcs_hsv = rgb2hsv_approximate(tcs_rgb);
+  Serial.print("Hue (8-bit):\t");
   return tcs_hsv.hue;
 }
 
 //Take sum of 32 readings (interpret as 15-bit average instead of 10-bit)
-//(Why 32? maximimum number that fit inside signed 16-bit, and still fast)
+//(Why 32? maximimum readings that fit inside signed 16-bit, and still fast)
 int photogateAverage() {
   int average = 0;
-  for(int count = 0; count < 32; count++) {
+  for(int count = 0; count < 32; count++)
     average += analogRead(PHOTOGATE_PIN);
-  }
   return average;
 }
 
