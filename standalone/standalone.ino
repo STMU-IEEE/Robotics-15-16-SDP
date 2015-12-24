@@ -3,9 +3,10 @@
 #include "Adafruit_TCS34725.h"  //color sensor
 #include "Adafruit_L3GD20.h"    //gyro sensor
 #include "FastLED.h"            //for rgb2hsv_approximate()
+#include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 //servos
-#define GRABBER_PIN   9
-#define ARM_PIN       10
+#define GRABBER_PIN   5
+#define ARM_PIN       6
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
@@ -41,7 +42,15 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS3472
 #define COLOR_LED_OFF LOW
 
 //pins for ultrasonic range finders
-//#define SRF_L 
+#define SRF_L_ECHO    3
+#define SRF_L_TRIGGER 11
+#define SRF_R_ECHO    9
+#define SRF_R_TRIGGER 10
+NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
+NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
+
+//pin for photogate (analog)
+#define PHOTOGATE_PIN 3
 
 void setup() {
   // put your setup code here, to run once:
@@ -72,7 +81,10 @@ void setup() {
 
 void loop() {
   //robot is done, slow blink color sensor LED
-  ledFade();
+  //ledFade();
+  //print photogate output to help identify threshold
+  Serial.println(analogRead(PHOTOGATE_PIN));
+  //ledBlink(1000);
 } //end loop()
 
 
@@ -80,6 +92,21 @@ void loop() {
 void robotMain(){
   //place robot behaviors here
   ledBlink(500);
+  ledBlink(500);
+  //need to find threshold for photogate
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+/*  //go forward until photo gate triggered
+  while(analogRead(
+  //close grabber
+  grabber_servo.write(GRABBER_OPEN);
+  //raise arm
+  arm_servo.write(ARM_UP);
+  //print hue
+  Serial.print(readHue());
+  */
 }
 
 //blink color sensor LED once
@@ -90,6 +117,7 @@ void ledBlink(unsigned long delay_ms) {
   delay(delay_ms/2);
 }
 
+/* not enough PWM outputs for this
 //based on Fade LED example
 void ledFade() {
   int brightness = 0;
@@ -102,7 +130,7 @@ void ledFade() {
     analogWrite(COLOR_LED_PIN, --brightness);
     delay(6);
   }
-}
+} */
 
 void mcInit() {
   //enable output to motor controller
@@ -128,7 +156,6 @@ void mcWrite(byte cmd, byte data) {
   //disable output to motor controller
   digitalWrite(MC_GATE,MC_OFF);
 }
-
 
 //Calculate the hue (color) detected
 //Hypothesis is that this is more immune to changes in lighting than e.g. simply using red/green values.
