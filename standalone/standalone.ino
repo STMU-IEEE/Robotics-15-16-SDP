@@ -1,7 +1,7 @@
 #include <Servo.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"  //color sensor
-#include "Adafruit_L3GD20.h"    //gyro sensor
+#include "Adafruit_L3GD20.h"    //gyro sensor; may also try L3G by Pololu
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 //servos
@@ -19,7 +19,7 @@ Adafruit_L3GD20 gyro;
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //digital output for gating serial TX to motor controller
-#define MC_GATE         2
+#define MC_GATE_PIN     14
 //enable value for motor controller (for NAND gate)
 #define MC_ON           HIGH
 #define MC_OFF          LOW
@@ -30,18 +30,21 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 //Sabertooth initialization value
 #define MC_INIT_BYTE    170
 
-//Sabertooth commands
+//Sabertooth commands (mixed mode)
 #define MC_FORWARD      8
 #define MC_BACKWARDS    9
 #define MC_RIGHT        10
 #define MC_LEFT         11
 
-//color sensor LED
-#define COLOR_LED_PIN   14
+//color sensor LED (turn off to avoid blinding people)
+#define COLOR_LED_PIN   13
 #define COLOR_LED_ON    HIGH
 #define COLOR_LED_OFF   LOW
 
 //pins for ultrasonic range finders
+/* If we need to reduce pin usage, check if possible
+ * to either share echo pins between sensors (need external OR), 
+ * or use shared single trigger/echo pin mode per sensor*/
 #define SRF_L_ECHO      3
 #define SRF_L_TRIGGER   11
 #define SRF_R_ECHO      9
@@ -60,9 +63,9 @@ void setup() {
   // put your setup code here, to run once:
   
   //set pin to gate serial TX to motor controller as output
-  pinMode(MC_GATE,OUTPUT);
+  pinMode(MC_GATE_PIN,OUTPUT);
   //disable motor controller listening to serial TX
-  digitalWrite(MC_GATE,MC_OFF);
+  digitalWrite(MC_GATE_PIN,MC_OFF);
   
   //set serial baud
   Serial.begin(9600);
@@ -84,7 +87,7 @@ void setup() {
   //initialize color sensor
   //based on Adafruit TCS3725 example code
   Serial.print("TCS34725 I2C color sensor ");
-  if (!tcs.begin())
+  if (!tcs.begin())         //issue: prints "44\n" instead of "not"
     Serial.print("not ");
   Serial.println("found");
   
@@ -173,15 +176,17 @@ void ledFade() {
   }
 } */
 
+// For motor controller, may consider SoftwareSerial instead of hardware TX + gate
+
 void mcInit() {
   //enable output to motor controller
-  digitalWrite(MC_GATE,MC_ON);
+  digitalWrite(MC_GATE_PIN,MC_ON);
   //send initialization byte (170)
   Serial.write(MC_INIT_BYTE);
   //wait for TX to finish before disabling output
   Serial.flush();
   //disable output to motor controller
-  digitalWrite(MC_GATE,MC_OFF);
+  digitalWrite(MC_GATE_PIN,MC_OFF);
 }
 
 void mcWrite(byte cmd, byte data) {
@@ -189,13 +194,13 @@ void mcWrite(byte cmd, byte data) {
   byte mc_cmd[4] = { MC_ADDR, cmd, data,
        (byte)((MC_ADDR + cmd + data) & 0b01111111) }; //checksum; use explicit cast to ignore -Wnarrowing
   //enable output to motor controller
-  digitalWrite(MC_GATE,MC_ON);
+  digitalWrite(MC_GATE_PIN,MC_ON);
   //write command to motor controller
   Serial.write(mc_cmd,4);
   //wait for TX to finish before disabling output
   Serial.flush();
   //disable output to motor controller
-  digitalWrite(MC_GATE,MC_OFF);
+  digitalWrite(MC_GATE_PIN,MC_OFF);
 }
 
 //Calculate the hue (color) detected
@@ -204,12 +209,13 @@ void mcWrite(byte cmd, byte data) {
 uint8_t readHue() {
   uint16_t tcs_r, tcs_g, tcs_b, tcs_c;  //red, green, blue, clear
   tcs.getRawData(&tcs_r,&tcs_g,&tcs_b,&tcs_c);
-  CRGB tcs_rgb;
+  CRGB tcs_rgb; //object from FastLED
   /*
   tcs_rgb.red = highByte(tcs_r);
   tcs_rgb.green = highByte(tcs_g);
   tcs_rgb.blue = highByte(tcs_b);*/
-  //scale to 8-bit (only need relative precision for hue)
+  //scale to 8-bit (only need relative precision for hue;
+  // ignore saturation and value)
   Serial.println("Color sensor readings:");
   Serial.print("R:\t");
   Serial.println(tcs_r);
@@ -229,7 +235,7 @@ uint8_t readHue() {
   Serial.println(tcs_rgb.g = tcs_g);
   Serial.print("B:\t");
   Serial.println(tcs_rgb.b = tcs_b);
-  CHSV tcs_hsv = rgb2hsv_approximate(tcs_rgb);
+  CHSV tcs_hsv = rgb2hsv_approximate(tcs_rgb); //convert CRGB object to CHSV
   Serial.print("Hue (8-bit):\t");
   return tcs_hsv.hue;
 }
