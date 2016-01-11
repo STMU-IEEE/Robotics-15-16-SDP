@@ -282,12 +282,12 @@ int photogateAverage() {
    */
 void gyroCalibrate() {
   //"8.1  Measure Gyro Offset at Rest (Zero-rate Level)"
-  for(int n = 0; n < sampleNum; n++){
+/*  for(int n = 0; n < sampleNum; n++){
     gyro.read();
     Serial.println(gyro.g.y);
     dc_offset += gyro.g.y; //assuming this does not overflow
   }
-  dc_offset /= sampleNum;
+  dc_offset /= sampleNum;*/
   Serial.print("DC Offset: ");
   Serial.println(dc_offset);
   for(int n = 0; n < sampleNum; n++)
