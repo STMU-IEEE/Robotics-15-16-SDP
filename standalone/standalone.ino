@@ -69,7 +69,7 @@ int16_t dc_offset = 0;
 float noise = 0;
 
 //enable noise rejection
-#define GYRO_NOISE_THRESHOLD
+//#define GYRO_NOISE_THRESHOLD
 
 void setup() {
   // put your setup code here, to run once:
