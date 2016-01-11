@@ -138,7 +138,7 @@ void robotMain(){
 
   //test gyro
   //spin right 90 degrees
-  mcWrite(MC_RIGHT, 8); //turn slowly
+  mcWrite(MC_RIGHT, 12); //turn slowly
   gyroAngle(90,true);
   mcWrite(MC_RIGHT, 0); //stop turning
   
