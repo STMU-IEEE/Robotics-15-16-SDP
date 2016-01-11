@@ -286,7 +286,7 @@ void gyroCalibrate() {
   }
   dc_offset /= sampleNum;
   Serial.print("DC Offset: ");
-  Serial.println(dc_offset,4); //prints 4 decimal places
+  Serial.println(dc_offset);
   for(int n = 0; n < sampleNum; n++)
   {
     gyro.read();
@@ -296,6 +296,8 @@ void gyroCalibrate() {
       noise = -gyro.g.y - dc_offset;
   }
   noise /= 100; //"gyro returns hundredths of degrees/sec"
+  Serial.print("Noise Level: ");
+  Serial.println(noise,4); //prints 4 decimal places
 }
 
 //target is in interval (0,360), relative to current angle
