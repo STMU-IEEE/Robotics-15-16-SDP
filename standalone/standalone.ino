@@ -141,17 +141,17 @@ void robotMain(){
 
   //test gyro
   //spin right 90 degrees
-  mcWrite(MC_RIGHT, 40); //turn slowly
+  //mcWrite(MC_RIGHT, 40); //turn slowly
   
-  gyroAngle(90,true);
-  mcWrite(MC_RIGHT, 0); //stop turning
+  //gyroAngle(90,true);
+  //mcWrite(MC_RIGHT, 0); //stop turning
 
   //test robot forward/backwards
-  //mcWrite(MC_FORWARD,30);
-  //delay(1000);
-  //mcWrite(MC_BACKWARDS,30);
-  //delay(1000);
-  //mcWrite(MC_BACKWARDS,0);
+  mcWrite(MC_FORWARD,30);
+  delay(1000);
+  mcWrite(MC_BACKWARDS,30);
+  delay(1000);
+  mcWrite(MC_BACKWARDS,0);
   /*
   //lower arm
   arm_servo.write(ARM_DOWN);
@@ -296,7 +296,7 @@ void gyroCalibrate() {
   for(int n = 0; n < sampleNum; n++){
     gyro.read();
     dc_offset_sum += gyro.g.y;
-    Serial.println(dc_offset_sum);
+    //Serial.println(dc_offset_sum);
   }
   dc_offset = dc_offset_sum / sampleNum;
   Serial.print("DC Offset: ");
