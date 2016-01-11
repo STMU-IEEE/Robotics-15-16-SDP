@@ -147,9 +147,9 @@ void robotMain(){
   //mcWrite(MC_RIGHT, 0); //stop turning
 
   //test robot forward/backwards
-  mcWrite(MC_FORWARD,20);
+  mcWrite(MC_FORWARD,30);
   delay(1000);
-  mcWrite(MC_BACKWARDS,20);
+  mcWrite(MC_BACKWARDS,30);
   delay(1000);
   mcWrite(MC_BACKWARDS,0);
   /*
