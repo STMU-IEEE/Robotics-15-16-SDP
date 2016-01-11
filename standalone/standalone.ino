@@ -64,7 +64,7 @@ NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 #define PHOTOGATE_HIGH  12000
 
 //for gyro calibration
-const int sampleNum = 500;
+const int sampleNum = 1000;
 int16_t dc_offset = 0;
 float noise = 0;
 
