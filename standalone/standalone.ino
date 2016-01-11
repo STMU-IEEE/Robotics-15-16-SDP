@@ -10,7 +10,7 @@
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
-#define ARM_UP          25
+#define ARM_UP          28
 #define ARM_DOWN        97
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
