@@ -148,6 +148,7 @@ void robotMain(){
   
   gyroAngle(90,true);
   mcWrite(MC_FORWARD, 0); //stop turning
+  mcWrite(MC_LEFT,0);
 
   //test robot forward/backwards
   /*mcWrite(MC_FORWARD,30);
