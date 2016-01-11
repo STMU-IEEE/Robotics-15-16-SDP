@@ -318,7 +318,7 @@ void gyroCalibrate() {
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target, bool is_counter_clockwise) {
-  const float sampleTime = 0.01; //in s
+  const int sampleTime = 10; //in ms
   unsigned long time1 = millis(),time2; //same type as millis()
   float rate, prev_rate = 0;
   float angle;
@@ -344,12 +344,11 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       //"11  Design Considerations" (p. 10)
       //"Ignore the gyro if our angular velocity does not meet our threshold"
       if(rate >= noise || rate <= -noise)
-        angle += ((prev_rate + rate) * sampleTime) / 2;
+        angle += ((prev_rate + rate) * sampleTime) / 2000;
         
 #else
       //as-is from p. 9
-      angle += ((prev_rate + rate) * sampleTime) / 2; //is 2000 for raw -> degrees or something else?
-  
+      angle += ((prev_rate + rate) * sampleTime) / 2000;
 #endif
       
       //"remember the current speed for the next loop rate integration."
