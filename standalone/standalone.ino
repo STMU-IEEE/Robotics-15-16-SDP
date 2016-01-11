@@ -285,8 +285,8 @@ void gyroCalibrate() {
   int32_t dc_offset_sum = 0; //original type int overflows!
   for(int n = 0; n < sampleNum; n++){
     gyro.read();
-    dc_offset += gyro.g.y;
-    Serial.println(dc_offset);
+    dc_offset_sum += gyro.g.y;
+    Serial.println(dc_offset_sum);
   }
   dc_offset = dc_offset_sum / sampleNum;
   Serial.print("DC Offset: ");
