@@ -319,7 +319,7 @@ void gyroCalibrate() {
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target, bool is_counter_clockwise) {
   const float sampleTime = 0.01; //in s
-  unsigned long time; //same type as millis()
+  unsigned long time1 = millis(),time2; //same type as millis()
   float rate, prev_rate = 0;
   float angle;
   if(is_counter_clockwise)
@@ -331,14 +331,13 @@ void gyroAngle(float target, bool is_counter_clockwise) {
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
     //"Every 10 ms take a sample from the gyro"
-    if(millis() - time > sampleTime)
+    if(millis() - time1 > sampleTime)
     {
-      Serial.print("Time taken: ");
-      Serial.print(time);
-      time = millis(); //"update the time to get the next sample"
+      time2 = millis(); //"update the time to get the next sample"
       gyro.read();
-      Serial.print(" - ");
-      Serial.println(time);
+      Serial.print("Time taken: ");
+      Serial.print(time2-time1);
+      time1 = time2;
       rate = (float)(gyro.g.y - dc_offset) * 0.0074768 ; //originally " / 100", not correct conversion to dps
       
 #ifdef  GYRO_NOISE_THRESHOLD
@@ -363,10 +362,10 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       else if (angle >= 360)
         angle -= 360;
 */        
-      Serial.print("angle: ");
-      Serial.print(angle);
-      Serial.print("\trate: ");
-      Serial.println(rate);
+      //Serial.print("angle: ");
+      //Serial.print(angle);
+      //Serial.print("\trate: ");
+      //Serial.println(rate);
     }
   }
 }
