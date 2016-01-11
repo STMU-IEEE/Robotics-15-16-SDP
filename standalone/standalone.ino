@@ -333,8 +333,12 @@ void gyroAngle(float target, bool is_counter_clockwise) {
     //"Every 10 ms take a sample from the gyro"
     if(millis() - time > sampleTime)
     {
+      Serial.print("Time taken: ");
+      Serial.print(time);
       time = millis(); //"update the time to get the next sample"
       gyro.read();
+      Serial.print(" - ");
+      Serial.println(time);
       rate = (float)(gyro.g.y - dc_offset) * 0.0074768 ; //originally " / 100", not correct conversion to dps
       
 #ifdef  GYRO_NOISE_THRESHOLD
