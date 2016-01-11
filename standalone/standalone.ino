@@ -335,8 +335,8 @@ void gyroAngle(float target, bool is_counter_clockwise) {
     {
       time2 = millis(); //"update the time to get the next sample"
       gyro.read();
-      Serial.print("Time taken: ");
-      Serial.print(time2-time1);
+      //Serial.print("Time taken: ");
+      Serial.println(time2-time1);
       time1 = time2;
       rate = (float)(gyro.g.y - dc_offset) * 0.0074768 ; //originally " / 100", not correct conversion to dps
       
