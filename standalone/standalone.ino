@@ -1,7 +1,10 @@
 #include <Servo.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"  //color sensor
-#include "Adafruit_L3GD20.h"    //gyro sensor; may also try L3G by Pololu
+//#include "Adafruit_L3GD20.h"    //gyro sensor; may also try L3G by Pololu
+//Adafruit library outputs as scaled floats
+//Use Pololu library which outputs unscaled int16_t instead:
+#include "L3G.h"                //gyro sensor
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 //servos
@@ -15,7 +18,7 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
 
-Adafruit_L3GD20 gyro;
+L3G gyro;
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //digital output for gating serial TX to motor controller
@@ -59,6 +62,13 @@ NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 //(readings are roughly 2200 to 20000)
 #define PHOTOGATE_LOW   6000
 #define PHOTOGATE_HIGH  12000
+
+//for gyro calibration
+const int sampleNum = 500;
+int16_t dc_offset = 0;
+float noise = 0;
+
+
 void setup() {
   // put your setup code here, to run once:
   
@@ -87,19 +97,19 @@ void setup() {
   //initialize color sensor
   //based on Adafruit TCS3725 example code
   Serial.print("TCS34725 I2C color sensor ");
-  if (!tcs.begin())         //issue: prints "44\n" instead of "not"
+  if (!tcs.begin())         //issue: prints "44\n" when found
     Serial.print("not ");
   Serial.println("found");
   
   //initialize gyro sensor
   //based on Adafruit L3GD20 example code:
   Serial.print("L3GD20H I2C gyro sensor");
-  if (!gyro.begin(gyro.L3DS20_RANGE_250DPS))
-  //if (!gyro.begin(gyro.L3DS20_RANGE_500DPS))
-  //if (!gyro.begin(gyro.L3DS20_RANGE_2000DPS))
+  if (!gyro.init())
     Serial.print(" not");
   Serial.println(" found");
+  gyro.enableDefault();
 
+  gyroCalibrate();
   
   //perform robot behaviors
   robotMain();
@@ -249,3 +259,100 @@ int photogateAverage() {
   return average;
 }
 
+/* Gyro calibration
+   * based on example by G. C. Hill (2013, EE444 at CSULB) (must inquire terms of reuse)
+   * from lab 5, p. 6: "8  Calibrate the Gyro"
+   * adapted to Adafruit library functions 
+   * 
+   * Note: the time required for this initialization
+   * might be cutting into time for our robot to start moving
+   * Check if rules allow calibration before pressing "go" button
+   * 
+   * gyro -y axis corresponds to robot's +z axis
+   */
+void gyroCalibrate() {
+  //"8.1  Measure Gyro Offset at Rest (Zero-rate Level)"
+  for(int n = 0; n < sampleNum; n++){
+    gyro.read();
+    dc_offset += gyro.g.y; //assuming this does not overflow
+  }
+  dc_offset /= sampleNum;
+  Serial.print("DC Offset: ");
+  Serial.println(dc_offset,4); //prints 4 decimal places
+  for(int n = 0; n < sampleNum; n++)
+  {
+    gyro.read();
+    if((gyro.g.y - dc_offset) > noise)
+      noise = gyro.g.y - dc_offset;
+    else if((gyro.g.y - dc_offset) < -noise)
+      noise = -gyro.g.y - dc_offset;
+  }
+  noise /= 100; //"gyro returns hundredths of degrees/sec"
+}
+
+//target is in interval (0,360), relative to current angle
+//if turning clockwise, use false for is_counter_clockwise
+//Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
+void gyroAngle(float target, bool is_counter_clockwise) {
+  const int sampleTime = 10; //in ms
+  unsigned long time; //same type as millis()
+  int rate, prev_rate = 0;
+  float angle;
+  if(is_counter_clockwise)
+    angle = 0;
+  else
+    angle = 360;
+
+  //Wait for angle to cross target
+  while((is_counter_clockwise && (angle < target)) ||     //increasing angle
+         (!is_counter_clockwise && (angle > target))) {   //decreasing angle
+    //"Every 10 ms take a sample from the gyro"
+    if(millis() - time > sampleTime)
+    {
+      time = millis(); //"update the time to get the next sample"
+      gyro.read();
+      rate = (gyro.g.y - dc_offset) / 100; //optimization/precision: is the "/ 100" necessary?
+      
+#ifdef  GYRO_NOISE_THRESHOLD
+      //"11  Design Considerations" (p. 10)
+      //"Ignore the gyro if our angular velocity does not meet our threshold"
+      if(rate >= noise || rate <= -noise)
+        angle += ((double)(prev_rate + rate) * sampleTime) / 2000;
+        
+#else
+      //as-is from p. 9
+      angle += ((double)(prev_rate + rate) * sampleTime) / 2000; //is 2000 for raw -> degrees or something else?
+  
+#endif
+      
+      //"remember the current speed for the next loop rate integration."
+      prev_rate = rate;
+/*      //originally: "Keep our angle between 0-359 degrees"
+      //but need to allow angle of 360 for clockwise rotation (decreasing angle)
+      //and noise may cause loop to break early without more complex comparisons
+      if (angle < 0)
+        angle += 360;
+      else if (angle >= 360)
+        angle -= 360;
+*/        
+      Serial.print("angle: ");
+      Serial.print(angle);
+      Serial.print("\trate: ");
+      Serial.println(rate);
+    }
+  }
+}
+
+/* The following snippet might not work due to
+ * incorrect order of operations:
+ *   - dc_offset is scaled by (sampleNum - 1) then added 
+ *      but never unscaled by (1 / sampleNum)
+ *   - does (1 / sampleNum) == 0 because of integer division?
+ *      (sampleNum is type int)
+ *      if so: then (1 / sampleNum) * gyro.g.z == 0
+ */
+void gyroRecalibrate() {
+  //"11  Design Considerations" (Hill 2013, p. 10)
+  //"Code to correct for gyro drift when rover is motionless"
+  dc_offset = (sampleNum - 1) * dc_offset + (1 / sampleNum) * gyro.g.z;
+}
