@@ -133,12 +133,19 @@ void robotMain(){
   //place robot behaviors here
   ledBlink(500);
   ledBlink(500);
-  //need to find threshold for photogate
+
+  //test gyro
+  //spin right 90 degrees
+  mcWrite(MC_RIGHT, 8); //turn slowly
+  gyroAngle(90,true);
+  mcWrite(MC_RIGHT, 0); //stop turning
+  
+  /*
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
-/*  //go forward until photo gate triggered */
+  //go forward until photo gate triggered
   while(photogateAverage() > PHOTOGATE_LOW);
   while(photogateAverage() < PHOTOGATE_HIGH)
     //fast toggle LED
@@ -161,6 +168,7 @@ void robotMain(){
   delay(500);
   grabber_servo.write(GRABBER_OPEN);
   delay(500);
+  */
 }
 
 //blink color sensor LED once
