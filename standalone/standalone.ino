@@ -114,7 +114,7 @@ void setup() {
   Serial.println(" found");
   gyro.enableDefault();
 
-  //gyroCalibrate();
+  gyroCalibrate();
   
   //perform robot behaviors
   robotMain();
