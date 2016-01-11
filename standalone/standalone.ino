@@ -82,6 +82,9 @@ void setup() {
   //set serial baud
   Serial.begin(9600);
 
+  Serial.println("Press g to continue");
+  while(Serial.read() != 'g');
+  
   //initialize motor controller baud rate
   mcInit();
   
