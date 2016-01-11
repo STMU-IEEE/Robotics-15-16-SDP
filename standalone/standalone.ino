@@ -143,7 +143,7 @@ void robotMain(){
 
   //test gyro
   //spin right 90 degrees
-  mcWrite(MC_RIGHT, 30); //turn slowly
+  mcWrite(MC_RIGHT, (byte)Serial.parseInt()); //turn slowly
   
   gyroAngle(90,true);
   mcWrite(MC_RIGHT, 0); //stop turning
