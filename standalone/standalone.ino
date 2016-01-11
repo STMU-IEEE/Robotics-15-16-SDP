@@ -147,7 +147,7 @@ void robotMain(){
   mcWrite(MC_RIGHT, (byte)Serial.parseInt()); //turn slowly
   
   gyroAngle(90,true);
-  mcWrite(MC_RIGHT, 0); //stop turning
+  mcWrite(MC_LEFT, 0); //stop turning
 
   //test robot forward/backwards
   /*mcWrite(MC_FORWARD,30);
