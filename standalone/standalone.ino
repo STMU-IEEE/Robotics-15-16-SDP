@@ -87,7 +87,9 @@ void setup() {
   
   //initialize motor controller baud rate
   mcInit();
-  
+  //stop
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_LEFT,0);
   //TODO: see libraries for how to initialize ultrasonic range finders
 
   //Servos
