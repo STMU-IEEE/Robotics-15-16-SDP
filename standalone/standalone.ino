@@ -141,17 +141,17 @@ void robotMain(){
 
   //test gyro
   //spin right 90 degrees
-  //mcWrite(MC_RIGHT, 12); //turn slowly
+  mcWrite(MC_RIGHT, 30); //turn slowly
   
-  //gyroAngle(90,true);
-  //mcWrite(MC_RIGHT, 0); //stop turning
+  gyroAngle(90,true);
+  mcWrite(MC_RIGHT, 0); //stop turning
 
   //test robot forward/backwards
-  mcWrite(MC_FORWARD,30);
-  delay(1000);
-  mcWrite(MC_BACKWARDS,30);
-  delay(1000);
-  mcWrite(MC_BACKWARDS,0);
+  //mcWrite(MC_FORWARD,30);
+  //delay(1000);
+  //mcWrite(MC_BACKWARDS,30);
+  //delay(1000);
+  //mcWrite(MC_BACKWARDS,0);
   /*
   //lower arm
   arm_servo.write(ARM_DOWN);
