@@ -102,7 +102,7 @@ void setup() {
   //initialize color sensor
   //based on Adafruit TCS3725 example code
   Serial.print("TCS34725 I2C color sensor");
-  if(!tcs.begin())         // prints "44\n" when found
+  if(!tcs.begin())         //Adafruit_TCS34725.cpp v1.0.1 prints "44\r\n"
     Serial.print(" not");
   Serial.println(" found");
   
