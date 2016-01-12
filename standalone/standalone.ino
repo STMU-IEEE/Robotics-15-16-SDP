@@ -81,15 +81,16 @@ void setup() {
   
   //set serial baud
   Serial.begin(9600);
-
-  Serial.println("Press g to continue");
-  while(Serial.read() != 'g');
   
   //initialize motor controller baud rate
   mcInit();
   //stop
   mcWrite(MC_FORWARD,0);
   mcWrite(MC_LEFT,0);
+  
+  Serial.println("Press g to continue");
+  while(Serial.read() != 'g');
+  
   //TODO: see libraries for how to initialize ultrasonic range finders
 
   //Servos
