@@ -101,10 +101,10 @@ void setup() {
 
   //initialize color sensor
   //based on Adafruit TCS3725 example code
-  //Serial.print("TCS34725 I2C color sensor ");
-  tcs.begin();         //issue: prints "44\n" when found
-    //Serial.print("not ");
-  //Serial.println("found");
+  Serial.print("TCS34725 I2C color sensor");
+  if(!tcs.begin())         // prints "44\n" when found
+    Serial.print(" not");
+  Serial.println(" found");
   
   //initialize gyro sensor
   //based on Adafruit L3GD20 example code:
