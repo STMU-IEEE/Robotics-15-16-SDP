@@ -342,18 +342,17 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       //Serial.print("Time taken: ");
       Serial.println(time2-time1);
       time1 = time2;
-      rate = ((float)(gyro.g.y - dc_offset) * 7)/800 ; //originally " / 100", not correct conversion to dps
-                                            // 7/800 = 0.00875 (sensitivity "per digit" for 245dps)
+      rate = (float)(gyro.g.y - dc_offset) * 0.00875F ; //convert to dps using sensitivity "per digit" for 245dps (L3GD20H datasheet p. 10)
       
 #ifdef  GYRO_NOISE_THRESHOLD
       //"11  Design Considerations" (p. 10)
       //"Ignore the gyro if our angular velocity does not meet our threshold"
       if(rate >= noise || rate <= -noise)
-        angle += ((prev_rate + rate) * sampleTime) / 2000;
+        angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2;
         
 #else
       //as-is from p. 9
-      angle += ((prev_rate + rate) * sampleTime) / 2000;
+      angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2;
 #endif
       
       //"remember the current speed for the next loop rate integration."
