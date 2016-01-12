@@ -88,9 +88,6 @@ void setup() {
   mcWrite(MC_FORWARD,0);
   mcWrite(MC_LEFT,0);
   
-  Serial.println("Press g to continue");
-  while(Serial.read() != 'g');
-  
   //TODO: see libraries for how to initialize ultrasonic range finders
 
   //Servos
@@ -105,8 +102,8 @@ void setup() {
   //initialize color sensor
   //based on Adafruit TCS3725 example code
   Serial.print("TCS34725 I2C color sensor ");
-  if (!tcs.begin())         //issue: prints "44\n" when found
-    Serial.print("not ");
+  if (!tcs.begin())      {   //issue: prints "44\n" when found
+    Serial.print("not ");}
   Serial.println("found");
   
   //initialize gyro sensor
@@ -116,20 +113,23 @@ void setup() {
     Serial.print(" not");
   Serial.println(" found");
   gyro.enableDefault();
-
+  
   gyroCalibrate();
+
+}
+
+void loop() {
+
+  Serial.println("Press g to continue");
+  while(Serial.read() != 'g');
   
   //perform robot behaviors
   robotMain();
 
   //turn off servos
-  arm_servo.detach();
-  grabber_servo.detach();
-}
-
-void loop() {
-  //robot is done, slow blink color sensor LED
-  //ledFade();
+  //arm_servo.detach();
+  //grabber_servo.detach();
+  
   //print photogate output to help identify threshold
   //Serial.println(photogateAverage());
   ledBlink(1000);
