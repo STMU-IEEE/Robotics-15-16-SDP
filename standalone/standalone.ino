@@ -296,7 +296,7 @@ int photogateAverage() {
    */
 void gyroCalibrate() {
   //"8.1  Measure Gyro Offset at Rest (Zero-rate Level)"
-  int32_t dc_offset_sum = 0; //original type int overflows!
+  int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
     gyro.read();
     dc_offset_sum += gyro.g.y;
@@ -342,7 +342,8 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       //Serial.print("Time taken: ");
       Serial.println(time2-time1);
       time1 = time2;
-      rate = (float)(gyro.g.y - dc_offset) * 0.0074768 ; //originally " / 100", not correct conversion to dps
+      rate = ((float)(gyro.g.y - dc_offset) * 7)/800 ; //originally " / 100", not correct conversion to dps
+                                            // 7/800 = 0.00875 (sensitivity "per digit" for 245dps)
       
 #ifdef  GYRO_NOISE_THRESHOLD
       //"11  Design Considerations" (p. 10)
