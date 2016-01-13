@@ -353,11 +353,13 @@ void gyroAngle(float target, bool is_counter_clockwise) {
   else
     angle = 360;
 
+  Serial.println("gyroAngle");//debug
   //clear gyro FIFO contents
   gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
+  Serial.println("gyro FIFO cleared");//debug
   //enable FIFO stream mode
   gyro.writeReg(L3G::FIFO_CTRL,FM_STREAM_MODE);
-  
+  Serial.println("gyro FIFO stream mode on"); //debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
