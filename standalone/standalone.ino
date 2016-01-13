@@ -161,8 +161,11 @@ void robotMain(){
 
   //test gyro
   //spin right 90 degrees
+  Serial.print("Enter turn speed: ");
   while(Serial.available()<2);
-  mcWrite(MC_RIGHT, (byte)Serial.parseInt()); //turn slowly
+  byte turn_speed = (byte)Serial.parseInt();
+  Serial.println(turn_speed);
+  mcWrite(MC_RIGHT, turn_speed); //turn slowly
   
   gyroAngle(90,true);
   mcWrite(MC_FORWARD, 0); //stop turning
