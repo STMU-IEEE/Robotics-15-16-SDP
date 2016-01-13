@@ -123,7 +123,7 @@ void setup() {
     Serial.print(" not");
   Serial.println(" found");
   gyro.enableDefault();
-  
+
   gyroCalibrate();
 
   //data ready pin as input
@@ -313,6 +313,7 @@ int photogateAverage() {
    */
 void gyroCalibrate() {
   //"8.1  Measure Gyro Offset at Rest (Zero-rate Level)"
+  Serial.print("Gyro DC Offset: ");
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
     gyro.read();
@@ -320,8 +321,9 @@ void gyroCalibrate() {
     //Serial.println(dc_offset_sum);
   }
   dc_offset = dc_offset_sum / sampleNum;
-  Serial.print("DC Offset: ");
   Serial.println(dc_offset);
+  
+  Serial.print("Gyro Noise Level: ");
   for(int n = 0; n < sampleNum; n++)
   {
     gyro.read();
@@ -331,7 +333,6 @@ void gyroCalibrate() {
       noise = -gyro.g.y - dc_offset;
   }
   noise /= 100; //"gyro returns hundredths of degrees/sec"
-  Serial.print("Noise Level: ");
   Serial.println(noise,4); //prints 4 decimal places
 }
 
