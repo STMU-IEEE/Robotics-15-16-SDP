@@ -18,7 +18,9 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
 
-#define GYRO_DRDY_PIN   8               //INT2/data ready pin on L3GD20H
+//#define GYRO_DRDY_PIN   8
+#define GYRO_DRDY_PIN   A5               //INT2/data ready pin on L3GD20H (not level shifted--use analog input)
+
 //bits for gyro registers:
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
 const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
@@ -64,7 +66,7 @@ NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 
 //pin for photogate (analog)
-#define PHOTOGATE_PIN   3
+#define PHOTOGATE_PIN   3 //should this be A3 for clarity?
 
 //15-bit thresholds with hysteresis
 //(readings are roughly 2200 to 20000)
@@ -365,7 +367,8 @@ void gyroAngle(float target, bool is_counter_clockwise) {
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
     //"Every 10 ms take a sample from the gyro"
     //if(millis() - time1 > sampleTime)
-    if(digitalRead(GYRO_DRDY_PIN) == LOW) //skip if FIFO empty (DRDY line HIGH)
+    //if(digitalRead(GYRO_DRDY_PIN) == LOW)
+    if(analogRead(GYRO_DRDY_PIN) < 338) //skip if FIFO empty (DRDY line HIGH/greater than 1.7V)
     {
       //time2 = millis(); //"update the time to get the next sample"
       gyro.read();
