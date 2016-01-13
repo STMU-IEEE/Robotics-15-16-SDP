@@ -18,7 +18,15 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
 
+#define GYRO_DRDY_PIN   8               //INT2/data ready pin on L3GD20H
+//bits for gyro registers:
+const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
+const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
+const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
+const byte FM_BYPASS_MODE  = 0b000 << 5;    //FIFO_CTRL(FM2:0) for bypass mode (FIFO off/reset)
+const byte FM_STREAM_MODE  = 0b010 << 5;    //FIFO_CTRL(FM2:0) for stream mode
 L3G gyro;
+
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //digital output for gating serial TX to motor controller
@@ -80,8 +88,10 @@ void setup() {
   digitalWrite(MC_GATE_PIN,MC_OFF);
   
   //set serial baud
-  Serial.begin(9600);
-  
+  Serial.begin(38400);
+
+  //wait 2s for sabertooth to power up (p. 16)
+  delay(2000);
   //initialize motor controller baud rate
   mcInit();
   //stop
@@ -115,6 +125,13 @@ void setup() {
   gyro.enableDefault();
   
   gyroCalibrate();
+
+  //data ready pin as input
+  pinMode(GYRO_DRDY_PIN,INPUT);
+  //enable gyro FIFO (leave on bypass mode)
+  gyro.writeReg(L3G::CTRL5, FIFO_EN);
+  //enable gyro DRDY line when FIFO empty
+  gyro.writeReg(L3G::CTRL3, INT2_DRDY | INT2_Empty);
 
 }
 
@@ -285,9 +302,8 @@ int photogateAverage() {
 }
 
 /* Gyro calibration
-   * based on example by G. C. Hill (2013, EE444 at CSULB) (must inquire terms of reuse)
+   * based on GyroTest.ino example by G. C. Hill (2013, EE444 at CSULB) (must inquire terms of reuse)
    * from lab 5, p. 6: "8  Calibrate the Gyro"
-   * adapted to Adafruit library functions 
    * 
    * Note: the time required for this initialization
    * might be cutting into time for our robot to start moving
@@ -323,8 +339,9 @@ void gyroCalibrate() {
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target, bool is_counter_clockwise) {
-  const int sampleTime = 10; //in ms
-  unsigned long time1 = millis(),time2; //same type as millis()
+  //const int sampleTime = 10; //in ms
+  const float sampleRate = 189.4F; //in Hz
+  //unsigned long time1 = millis(),time2; //same type as millis()
   float rate, prev_rate = 0;
   float angle;
   if(is_counter_clockwise)
@@ -332,29 +349,34 @@ void gyroAngle(float target, bool is_counter_clockwise) {
   else
     angle = 360;
 
+  //clear gyro FIFO contents
+  gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
+  //enable FIFO stream mode
+  gyro.writeReg(L3G::FIFO_CTRL,FM_STREAM_MODE);
+  
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
     //"Every 10 ms take a sample from the gyro"
-    if(millis() - time1 > sampleTime)
+    //if(millis() - time1 > sampleTime)
+    if(digitalRead(GYRO_DRDY_PIN) == LOW) //skip if FIFO empty (DRDY line HIGH)
     {
-      time2 = millis(); //"update the time to get the next sample"
+      //time2 = millis(); //"update the time to get the next sample"
       gyro.read();
       //Serial.print("Time taken: ");
-      Serial.println(time2-time1);
-      time1 = time2;
+      //Serial.println(time2-time1);
+      //time1 = time2;
       rate = (float)(gyro.g.y - dc_offset) * 0.00875F ; //convert to dps using sensitivity "per digit" for 245dps (L3GD20H datasheet p. 10)
       
 #ifdef  GYRO_NOISE_THRESHOLD
       //"11  Design Considerations" (p. 10)
       //"Ignore the gyro if our angular velocity does not meet our threshold"
-      if(rate >= noise || rate <= -noise)
-        angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2;
-        
-#else
-      //as-is from p. 9
-      angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2;
+      if(rate >= noise || rate <= -noise) 
+          //will make angle += ... conditional        
 #endif
+      
+      //angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2; //as-is from p. 9: numerical integration using trapezoidal average of rates
+      angle += ((prev_rate + rate) / sampleRate) / 2;                   //using output data rate specified by L3GD20H
       
       //"remember the current speed for the next loop rate integration."
       prev_rate = rate;
@@ -366,13 +388,17 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       else if (angle >= 360)
         angle -= 360;
 */        
-      //Serial.print("angle: ");
-      //Serial.print(angle);
-      //Serial.print("\trate: ");
-      //Serial.println(rate);
-    }
-  }
-}
+      Serial.print("angle: ");
+      Serial.print(angle);
+      Serial.print("\trate: ");
+      Serial.println(rate);
+    } //end if
+  } // end while
+
+  //set gyro to bypass mode (disable FIFO)
+  gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
+  
+} //end gyroAngle
 
 /* The following snippet might not work due to
  * incorrect order of operations:
