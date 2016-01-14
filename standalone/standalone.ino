@@ -19,7 +19,7 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_CLOSE   75
 
 //#define GYRO_DRDY_PIN   8
-#define GYRO_DRDY_PIN   A5               //INT2/data ready pin on L3GD20H (not level shifted--use analog input)
+#define GYRO_DRDY_PIN   A2               //INT2/data ready pin on L3GD20H (not level shifted--use analog input)
 
 //bits for gyro registers:
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
