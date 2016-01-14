@@ -172,14 +172,16 @@ void robotMain(){
    * turn around and drop victim
    */
    
-
+  byte straight_speed = 20;
+  byte turn_speed = 16; //slow to minimize error
+  
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
   delay(500);
   //go forward until photo gate triggered
-  mcWrite(MC_FORWARD,30);
+  mcWrite(MC_FORWARD,straight_speed);
   while(photogateAverage() > PHOTOGATE_LOW);
   while(photogateAverage() < PHOTOGATE_HIGH);
   //stop
@@ -197,12 +199,11 @@ void robotMain(){
   //print hue
   Serial.println(readHue());
 
-  mcWrite(MC_BACKWARDS,30);
+  mcWrite(MC_BACKWARDS,straight_speed);
   delay(1000);
   mcWrite(MC_FORWARD, 0); //stop turning
   mcWrite(MC_LEFT,0);
   //spin right 90 degrees
-  byte turn_speed = 16; //slow to minimize error
   mcWrite(MC_RIGHT, turn_speed);
   //make 1 full right turn
   gyroAngle(360);
