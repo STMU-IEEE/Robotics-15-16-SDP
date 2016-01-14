@@ -240,6 +240,8 @@ void ledFade() {
 // For motor controller, may consider SoftwareSerial instead of hardware TX + gate
 
 void mcInit() {
+  //wait for TX to finish before enabling output
+  Serial.flush();
   //enable output to motor controller
   digitalWrite(MC_GATE_PIN,MC_ON);
   //send initialization byte (170)
@@ -254,6 +256,8 @@ void mcWrite(byte cmd, byte data) {
   //compute checksum and place in byte array for transferring
   byte mc_cmd[4] = { MC_ADDR, cmd, data,
        (byte)((MC_ADDR + cmd + data) & 0b01111111) }; //checksum; use explicit cast to ignore -Wnarrowing
+  //wait for TX to finish before enabling output
+  Serial.flush();
   //enable output to motor controller
   digitalWrite(MC_GATE_PIN,MC_ON);
   //write command to motor controller
