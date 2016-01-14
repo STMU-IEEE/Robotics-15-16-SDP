@@ -165,36 +165,27 @@ void robotMain(){
   ledBlink(500);
   ledBlink(500);
 
-  //test gyro
-  //spin right 90 degrees
-  Serial.print("Enter turn speed: ");
-  while(Serial.available()<2);
-  byte turn_speed = (byte)Serial.parseInt();
-  Serial.println(turn_speed);
-  mcWrite(MC_RIGHT, turn_speed); //turn slowly
-  
-  gyroAngle(360*4);
-  mcWrite(MC_FORWARD, 0); //stop turning
-  mcWrite(MC_LEFT,0);
+  /*demo:
+   * drop grabber
+   * go forward until victim detected
+   * pick up and report color
+   * turn around and drop victim
+   */
+   
 
-  //test robot forward/backwards
-  /*mcWrite(MC_FORWARD,30);
-  delay(1000);
-  mcWrite(MC_BACKWARDS,30);
-  delay(1000);
-  mcWrite(MC_BACKWARDS,0);*/
-  /*
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
+  delay(500);
   //go forward until photo gate triggered
+  mcWrite(MC_FORWARD,30);
   while(photogateAverage() > PHOTOGATE_LOW);
   while(photogateAverage() < PHOTOGATE_HIGH)
-    //fast toggle LED
-    digitalWrite(COLOR_LED_PIN, !digitalRead(COLOR_LED_PIN));
   //stop
-  digitalWrite(COLOR_LED_PIN, COLOR_LED_OFF);
+  mcWrite(MC_FORWARD, 0);
+  mcWrite(MC_LEFT,0);
+  
   //close grabber
   grabber_servo.write(GRABBER_CLOSE);
   //wait for grabber to close
@@ -205,13 +196,25 @@ void robotMain(){
   delay(1000);
   //print hue
   Serial.println(readHue());
+
+  mcWrite(MC_BACKWARDS,30);
+  delay(1000);
+  //spin right 90 degrees
+  byte turn_speed = 16; //slow to minimize error
+  mcWrite(MC_RIGHT, turn_speed);
+  //make 1 full right turn
+  gyroAngle(360);
+  mcWrite(MC_FORWARD, 0); //stop turning
+  mcWrite(MC_LEFT,0);
+
   //drop victim
   delay(2000);
   arm_servo.write(ARM_DOWN);
   delay(500);
   grabber_servo.write(GRABBER_OPEN);
   delay(500);
-  */
+  arm_servo.write(ARM_UP);
+  
 }
 
 //blink color sensor LED once
@@ -360,12 +363,6 @@ void gyroAngle(float target) {
   float angle = 0;
   bool is_counter_clockwise = (target > 0);
   Serial.println("gyroAngle");//debug
-  //clear gyro FIFO contents
-  //gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
-  //Serial.println("gyro FIFO cleared");//debug
-  //enable FIFO stream mode
-  //gyro.writeReg(L3G::FIFO_CTRL,FM_STREAM_MODE);
-  //Serial.println("gyro FIFO stream mode on"); //debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
