@@ -199,6 +199,8 @@ void robotMain(){
 
   mcWrite(MC_BACKWARDS,30);
   delay(1000);
+  mcWrite(MC_FORWARD, 0); //stop turning
+  mcWrite(MC_LEFT,0);
   //spin right 90 degrees
   byte turn_speed = 16; //slow to minimize error
   mcWrite(MC_RIGHT, turn_speed);
