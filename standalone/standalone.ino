@@ -371,7 +371,7 @@ void gyroAngle(float target, bool is_counter_clockwise) {
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
     //"Every 10 ms take a sample from the gyro"
     //if(millis() - time1 > sampleTime)
-    if(digitalRead(GYRO_DRDY_PIN) == LOW) //skip if FIFO empty (DRDY line HIGH)
+    if(digitalRead(GYRO_DRDY_PIN) == HIGH) //check for new gyro data
     {
       //time2 = millis(); //"update the time to get the next sample"
       gyro.read();
