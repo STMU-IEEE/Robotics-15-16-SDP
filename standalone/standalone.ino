@@ -400,6 +400,8 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       Serial.print("\trate: ");
       Serial.println(rate);
     } //end if
+    else
+      Serial.println("No data");
   } // end while
 
   //set gyro to bypass mode (disable FIFO)
