@@ -173,7 +173,7 @@ void robotMain(){
   Serial.println(turn_speed);
   mcWrite(MC_RIGHT, turn_speed); //turn slowly
   
-  gyroAngle(90,true);
+  gyroAngle(360);
   mcWrite(MC_FORWARD, 0); //stop turning
   mcWrite(MC_LEFT,0);
 
@@ -349,20 +349,16 @@ void gyroCalibrate() {
   Serial.println(noise,4); //prints 4 decimal places
 }
 
-//target is in interval (0,360), relative to current angle
+//wait until past target relative angle
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
-void gyroAngle(float target, bool is_counter_clockwise) {
+void gyroAngle(float target) {
   //const int sampleTime = 10; //in ms
   const float sampleRate = 189.4F; //in Hz
   //unsigned long time1 = millis(),time2; //same type as millis()
   float rate, prev_rate = 0;
-  float angle;
-  if(is_counter_clockwise)
-    angle = 0;
-  else
-    angle = 360;
-
+  float angle = 0;
+  bool is_counter_clockwise = (target > 0);
   Serial.println("gyroAngle");//debug
   //clear gyro FIFO contents
   //gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
