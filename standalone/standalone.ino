@@ -173,7 +173,7 @@ void robotMain(){
   Serial.println(turn_speed);
   mcWrite(MC_RIGHT, turn_speed); //turn slowly
   
-  gyroAngle(360);
+  gyroAngle(360*4);
   mcWrite(MC_FORWARD, 0); //stop turning
   mcWrite(MC_LEFT,0);
 
