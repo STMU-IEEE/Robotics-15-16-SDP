@@ -92,16 +92,20 @@ void setup() {
   Serial.begin(38400);
 
   //wait 2s for sabertooth to power up (p. 16)
+  Serial.println("\nWaiting for Sabertooth to power up...");
   delay(2000);
   //initialize motor controller baud rate
+  Serial.print("Initializing Sabertooth...");
   mcInit();
   //stop
+  Serial.print("\nStopping motors...");
   mcWrite(MC_FORWARD,0);
   mcWrite(MC_LEFT,0);
   
   //TODO: see libraries for how to initialize ultrasonic range finders
 
   //Servos
+  Serial.println("Attaching servos...");
   grabber_servo.attach(GRABBER_PIN);
   grabber_servo.write(GRABBER_OPEN);
   arm_servo.attach(ARM_PIN);
