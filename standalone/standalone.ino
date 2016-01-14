@@ -181,7 +181,7 @@ void robotMain(){
   //go forward until photo gate triggered
   mcWrite(MC_FORWARD,30);
   while(photogateAverage() > PHOTOGATE_LOW);
-  while(photogateAverage() < PHOTOGATE_HIGH)
+  while(photogateAverage() < PHOTOGATE_HIGH);
   //stop
   mcWrite(MC_FORWARD, 0);
   mcWrite(MC_LEFT,0);
