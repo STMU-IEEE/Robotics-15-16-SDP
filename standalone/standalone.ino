@@ -378,7 +378,8 @@ void gyroAngle(float target) {
       //Serial.print("Time taken: ");
       //Serial.println(time2-time1);
       //time1 = time2;
-      rate = (float)(gyro.g.y - dc_offset) * 0.00875F ; //convert to dps using sensitivity "per digit" for 245dps (L3GD20H datasheet p. 10)
+      //rate = (float)(gyro.g.y - dc_offset) * 0.00875F ; //convert to dps using sensitivity "per digit" for 245dps (L3GD20H datasheet p. 10)
+      rate = (float)(gyro.g.y - dc_offset) * 0.00815534F ; //empirically corrected sensitivity
       
 #ifdef  GYRO_NOISE_THRESHOLD
       //"11  Design Considerations" (p. 10)
