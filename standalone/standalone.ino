@@ -400,10 +400,10 @@ void gyroAngle(float target, bool is_counter_clockwise) {
       else if (angle >= 360)
         angle -= 360;
 */        
-      //Serial.print("angle: ");
-      //Serial.print(angle);
-      //Serial.print("\trate: ");
-      //Serial.println(rate);
+      Serial.print("angle: ");
+      Serial.print(angle);
+      Serial.print("\trate: ");
+      Serial.println(rate);
     } //end if
     //else
       //Serial.println("No data");
