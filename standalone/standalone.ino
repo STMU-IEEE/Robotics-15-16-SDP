@@ -134,9 +134,10 @@ void setup() {
   //data ready pin as input
   pinMode(GYRO_DRDY_PIN,INPUT);
   //enable gyro FIFO (leave on bypass mode)
-  gyro.writeReg(L3G::CTRL5, FIFO_EN);
+  //gyro.writeReg(L3G::CTRL5, FIFO_EN);
   //enable gyro DRDY line when FIFO empty
-  gyro.writeReg(L3G::CTRL3, INT2_DRDY | INT2_Empty);
+  //gyro.writeReg(L3G::CTRL3, INT2_DRDY | INT2_Empty);
+  gyro.writeReg(L3G::CTRL3, INT2_DRDY);  //according to application note AN4506 this should be enough
 
 }
 
@@ -360,11 +361,11 @@ void gyroAngle(float target, bool is_counter_clockwise) {
 
   Serial.println("gyroAngle");//debug
   //clear gyro FIFO contents
-  gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
-  Serial.println("gyro FIFO cleared");//debug
+  //gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
+  //Serial.println("gyro FIFO cleared");//debug
   //enable FIFO stream mode
-  gyro.writeReg(L3G::FIFO_CTRL,FM_STREAM_MODE);
-  Serial.println("gyro FIFO stream mode on"); //debug
+  //gyro.writeReg(L3G::FIFO_CTRL,FM_STREAM_MODE);
+  //Serial.println("gyro FIFO stream mode on"); //debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
@@ -409,7 +410,7 @@ void gyroAngle(float target, bool is_counter_clockwise) {
   } // end while
 
   //set gyro to bypass mode (disable FIFO)
-  gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
+  //gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
   
 } //end gyroAngle
 
