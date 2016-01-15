@@ -144,7 +144,8 @@ void setup() {
 void loop() {
 
   Serial.println("Press g to continue");
-  while(Serial.read() != 'g');
+  while(Serial.read() != 'g')
+    ledBlink(2000);
   
   //perform robot behaviors
   robotMain();
@@ -221,7 +222,8 @@ void robotMain(){
   */
 
   Serial.print("Enter power: ");
-  while(Serial.available() < 2);
+  while(Serial.available() < 2)
+    ledBlink(1000);
   byte speed = Serial.parseInt();
 
   //go forward for 1s
