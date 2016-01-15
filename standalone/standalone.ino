@@ -171,7 +171,8 @@ void robotMain(){
    * pick up and report color
    * turn around and drop victim
    */
-   
+
+   /*
   byte straight_speed = 20;
   byte turn_speed = 16; //slow to minimize error
   
@@ -217,7 +218,30 @@ void robotMain(){
   grabber_servo.write(GRABBER_OPEN);
   delay(500);
   arm_servo.write(ARM_UP);
-  
+  */
+
+  Serial.print("Enter power: ");
+  while(Serial.available() < 2);
+  byte speed = Serial.parseInt();
+
+  //go forward for 1s
+  mcWrite(MC_FORWARD,speed);
+  delay(1000);
+
+  //stop
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_LEFT,0);
+
+  delay(1000);
+
+  //go forward for 1s
+  mcWrite(MC_BACKWARDS,speed);
+  delay(1000);
+
+  //stop
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_LEFT,0);
+
 }
 
 //blink color sensor LED once
