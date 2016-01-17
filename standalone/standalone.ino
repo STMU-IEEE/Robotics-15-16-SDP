@@ -47,6 +47,11 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 #define MC_BACKWARDS    9
 #define MC_RIGHT        10
 #define MC_LEFT         11
+#define MC_TURN_7BIT    13
+
+//Gyro PID global variables
+double gyro_PID_output = 0;
+double gyro_PID_input = 0;
 
 //color sensor LED (turn off to avoid blinding people)
 #define COLOR_LED_PIN   13
