@@ -112,7 +112,7 @@ void setup() {
   mcWrite(MC_LEFT,0);
 
   //Sabertooth can be re-enabled
-  //digitalWrite(MC_SHUTOFF_PIN,HIGH); 
+  digitalWrite(MC_SHUTOFF_PIN,HIGH); 
   
   //Servos
   Serial.println("Attaching servos...");
