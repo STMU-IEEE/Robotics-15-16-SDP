@@ -4,9 +4,10 @@
 //#include "Adafruit_L3GD20.h"    //gyro sensor; may also try L3G by Pololu
 //Adafruit library outputs as scaled floats
 //Use Pololu library which outputs unscaled int16_t instead:
-#include "L3G.h"                //gyro sensor
+#include "L3G.h"                //gyro sensor; import from L3G folder at https://github.com/pololu/l3g-arduino
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
+
 //servos
 #define GRABBER_PIN     5
 #define ARM_PIN         6
