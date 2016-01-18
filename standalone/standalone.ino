@@ -279,6 +279,7 @@ void robotMain(){
   //enable gyro angle and PID updating when DRDY low
   attachInterrupt(digitalPinToInterrupt(GYRO_DRDY_INT_PIN), isr_DRDY, LOW);
   while(!Serial.available());
+  detachInterrupt(digitalPinToInterrupt(GYRO_DRDY_INT_PIN));
 /*
   unsigned long lastMillis = millis();
   byte newTurn = 64;
