@@ -481,7 +481,9 @@ void gyroRecalibrate() {
 //interrupt service handler for DRDY line from gyro
 //to continuously update angle and PID
 void isr_DRDY(){
+  Serial.print("Reading...");
   gyro.read();
+  Serial.print("done");
 
   //debug: see how often the gyro is updating
   unsigned long this_delay = millis() - lastDebugTime;
