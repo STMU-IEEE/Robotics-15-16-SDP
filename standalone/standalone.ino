@@ -50,7 +50,7 @@ double gyro_PID_Ki = 1;
 double gyro_PID_Kd = 1;
 
 //bits for gyro registers (cf. datasheet):
-const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)
+const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)--does not affect DRDY (cf. application note AN4506 p. 22)
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
 const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
 const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
