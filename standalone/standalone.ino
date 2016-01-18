@@ -21,7 +21,7 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_CLOSE   75
 
 //Gyro and PID global variables
-#define GYRO_DRDY_PIN   11                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MOSI/header pin 19)
+#define GYRO_DRDY_PIN   12                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MISO/header pin 21)
 #define GYRO_DRDY_INT_PIN 2                 //should be manually jumpered to drive interrupt (if need to reclaim pin 11, use external level shifter)
 L3G gyro;
 
