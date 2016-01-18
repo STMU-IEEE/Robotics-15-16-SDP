@@ -482,6 +482,7 @@ void gyroRecalibrate() {
 //to continuously update angle and PID
 void isr_DRDY(){
   Serial.print("Reading...");
+  Serial.flush();
   gyro.read();
   Serial.print("done");
 
