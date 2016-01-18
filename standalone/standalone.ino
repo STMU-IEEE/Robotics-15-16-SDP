@@ -89,6 +89,7 @@ void setup() {
   // put your setup code here, to run once:
 
   //shutoff Sabertooth motors until stop commands are sent
+  //(this still takes about 2 seconds from reset to happen)
   pinMode(MC_SHUTOFF_PIN,OUTPUT);
   digitalWrite(MC_SHUTOFF_PIN,LOW); //shutoff is active low
   
