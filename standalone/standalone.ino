@@ -7,6 +7,7 @@
 #include "L3G.h"                //gyro sensor; import from L3G folder at https://github.com/pololu/l3g-arduino
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
+#include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
 
 //servos
 #define GRABBER_PIN     5
@@ -19,16 +20,49 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
 
+//Gyro and PID global variables
 #define GYRO_DRDY_PIN   11                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MOSI/header pin 19)
+#define GYRO_DRDY_INT_PIN 2                 //should be manually jumpered to drive interrupt (if need to reclaim pin 11, use external level shifter)
+L3G gyro;
 
-//bits for gyro registers:
+unsigned long lastDebugTime = 0; //debug
+
+//uncomment to enable noise rejection
+//#define GYRO_NOISE_THRESHOLD
+
+//for gyro calibration routine
+const int sampleNum = 1000;
+int16_t dc_offset = 0;
+float noise = 0;
+
+const float sampleRate = 189.4F; //gyro update rate in Hz
+const float ADJUSTED_SENSITIVITY = 0.009388F; //empirically corrected sensitivity (for turn speed 16)
+int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (data is negated)
+double rate = 0 ;
+double prev_rate = 0;
+
+double gyro_PID_output = 64; //initialize to 64 = stop
+double angle = 0;
+double& gyro_PID_input = angle; //angle is input to PID controller
+double gyro_PID_setpoint = 0;
+double gyro_PID_Kp = 1;
+double gyro_PID_Ki = 1;
+double gyro_PID_Kd = 1;
+
+//bits for gyro registers (cf. datasheet):
+const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
 const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
 const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
 const byte FM_BYPASS_MODE  = 0b000 << 5;    //FIFO_CTRL(FM2:0) for bypass mode (FIFO off/reset)
 const byte FM_STREAM_MODE  = 0b010 << 5;    //FIFO_CTRL(FM2:0) for stream mode
-L3G gyro;
 
+//Gyro PID controller
+PID gyroPID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
+            gyro_PID_Kp, gyro_PID_Ki, gyro_PID_Kd,
+            DIRECT); // change in output corresponds to same-sign change in input
+
+//color sensor
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //digital output for gating serial TX to motor controller
@@ -55,10 +89,6 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 #define MC_LEFT         11
 #define MC_TURN_7BIT    13
 
-//Gyro PID global variables
-double gyro_PID_output = 0;
-double gyro_PID_input = 0;
-
 //color sensor LED (turn off to avoid blinding people)
 #define COLOR_LED_PIN   13
 #define COLOR_LED_ON    HIGH
@@ -82,14 +112,6 @@ NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 //(readings are roughly 2200 to 20000)
 #define PHOTOGATE_LOW   6000
 #define PHOTOGATE_HIGH  12000
-
-//for gyro calibration
-const int sampleNum = 1000;
-int16_t dc_offset = 0;
-float noise = 0;
-
-//enable noise rejection
-//#define GYRO_NOISE_THRESHOLD
 
 void setup() {
   // put your setup code here, to run once:
@@ -150,11 +172,16 @@ void setup() {
 
   //data ready pin as input
   pinMode(GYRO_DRDY_PIN,INPUT);
-  //enable gyro FIFO (leave on bypass mode)
-  //gyro.writeReg(L3G::CTRL5, FIFO_EN);
-  //enable gyro DRDY line when FIFO empty
-  //gyro.writeReg(L3G::CTRL3, INT2_DRDY | INT2_Empty);
-  gyro.writeReg(L3G::CTRL3, INT2_DRDY);  //according to application note AN4506 this should be enough
+  /* enable data ready DRDY line
+   * as active-low interrupt pin
+   * (cf. application note AN4506)*/
+  gyro.writeReg(L3G::CTRL3, H_Lactive | INT2_DRDY);  
+
+  //set PID limits based on 0 = full left, 127 = full right, 64 = stop
+  gyroPID.SetOutputLimits(0, 127);
+
+  //assume PID is computed for every gyro reading -> 189.4Hz
+  gyroPID.SetSampleTime((int)(1000/sampleRate)); //in ms
 
 }
 
@@ -237,30 +264,54 @@ void robotMain(){
   delay(500);
   arm_servo.write(ARM_UP);
   */
-
+/*
   Serial.print("Enter power: ");
   while(Serial.available() < 2)
     ledBlink(1000);
   byte speed = Serial.parseInt();
 
+  gyro_PID_setPoint = 64;
+  //enable PID
+  gyroPID.SetMode(AUTOMATIC);
+*/
+  //debug gyro sample rate
+  lastDebugTime = millis();
+  //enable gyro angle and PID updating when DRDY low
+  attachInterrupt(digitalPinToInterrupt(GYRO_DRDY_INT_PIN), isr_DRDY, LOW);
+  while(!Serial.available());
+/*
+  unsigned long lastMillis = millis();
+  byte newTurn = 64;
+  while(true){ //infinite loop
   //go forward for 1s
   mcWrite(MC_FORWARD,speed);
-  delay(1000);
+  while((millis() - lastMillis()) < 1000))
+    if(newTurn != (byte)gyro_PID_output){
+      newTurn = (byte)gyro_PID_output;
+      Serial.println(gyro_PID_output);
+      mcWrite(MC_TURN_7BIT,newTurn);
+    }
 
   //stop
   mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,0);
-
+  mcWrite(MC_TURN_7BIT,64);
   delay(1000);
 
   //go forward for 1s
   mcWrite(MC_BACKWARDS,speed);
-  delay(1000);
+  while((millis() - lastMillis()) < 1000))
+    if(newTurn != (byte)gyro_PID_output){
+      newTurn = (byte)gyro_PID_output;
+      Serial.println(gyro_PID_output);
+      mcWrite(MC_TURN_7BIT,newTurn);
+    }
 
   //stop
   mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,0);
-
+  mcWrite(MC_TURN_7BIT,64);
+  delay(1000);
+  }
+*/
 }
 
 //blink color sensor LED once
@@ -379,7 +430,7 @@ void gyroCalibrate() {
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
     gyro.read();
-    dc_offset_sum += gyro.g.y;
+    dc_offset_sum += gyro_robot_z;
     //Serial.println(dc_offset_sum);
   }
   dc_offset = dc_offset_sum / sampleNum;
@@ -389,10 +440,10 @@ void gyroCalibrate() {
   for(int n = 0; n < sampleNum; n++)
   {
     gyro.read();
-    if((gyro.g.y - dc_offset) > noise)
-      noise = gyro.g.y - dc_offset;
-    else if((gyro.g.y - dc_offset) < -noise)
-      noise = -gyro.g.y - dc_offset;
+    if((gyro_robot_z - dc_offset) > noise)
+      noise = gyro_robot_z - dc_offset;
+    else if((gyro_robot_z - dc_offset) < -noise)
+      noise = -gyro_robot_z - dc_offset;
   }
   noise /= 100; //"gyro returns hundredths of degrees/sec"
   Serial.println(noise,4); //prints 4 decimal places
@@ -403,59 +454,12 @@ void gyroCalibrate() {
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target) {
   //const int sampleTime = 10; //in ms
-  const float sampleRate = 189.4F; //in Hz
   //unsigned long time1 = millis(),time2; //same type as millis()
-  float rate, prev_rate = 0;
-  float angle = 0;
   bool is_counter_clockwise = (target > 0);
   Serial.println("gyroAngle");//debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
-         (!is_counter_clockwise && (angle > target))) {   //decreasing angle
-    //"Every 10 ms take a sample from the gyro"
-    //if(millis() - time1 > sampleTime)
-    if(digitalRead(GYRO_DRDY_PIN) == HIGH) //check for new gyro data
-    {
-      //time2 = millis(); //"update the time to get the next sample"
-      gyro.read();
-      //Serial.print("Time taken: ");
-      //Serial.println(time2-time1);
-      //time1 = time2;
-      //rate = (float)(gyro.g.y - dc_offset) * 0.00875F ; //convert to dps using sensitivity "per digit" for 245dps (L3GD20H datasheet p. 10)
-      rate = (float)(gyro.g.y - dc_offset) * 0.009388F ; //empirically corrected sensitivity (for turn speed 16)
-      
-#ifdef  GYRO_NOISE_THRESHOLD
-      //"11  Design Considerations" (p. 10)
-      //"Ignore the gyro if our angular velocity does not meet our threshold"
-      if(rate >= noise || rate <= -noise) 
-          //will make angle += ... conditional        
-#endif
-      
-      //angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2; //as-is from p. 9: numerical integration using trapezoidal average of rates
-      angle += ((prev_rate + rate) / sampleRate) / 2;                   //using output data rate specified by L3GD20H
-      
-      //"remember the current speed for the next loop rate integration."
-      prev_rate = rate;
-/*      //originally: "Keep our angle between 0-359 degrees"
-      //but need to allow angle of 360 for clockwise rotation (decreasing angle)
-      //and noise may cause loop to break early without more complex comparisons
-      if (angle < 0)
-        angle += 360;
-      else if (angle >= 360)
-        angle -= 360;
-*/        
-      //Serial.print("angle: ");
-      //Serial.print(angle);
-      //Serial.print("\trate: ");
-      //Serial.println(rate);
-    } //end if
-    //else
-      //Serial.println("No data");
-  } // end while
-
-  //set gyro to bypass mode (disable FIFO)
-  //gyro.writeReg(L3G::FIFO_CTRL,FM_BYPASS_MODE);
-  
+         (!is_counter_clockwise && (angle > target)));    //decreasing angle
 } //end gyroAngle
 
 /* The following snippet might not work due to
@@ -465,9 +469,39 @@ void gyroAngle(float target) {
  *   - does (1 / sampleNum) == 0 because of integer division?
  *      (sampleNum is type int)
  *      if so: then (1 / sampleNum) * gyro.g.z == 0
- */
+
 void gyroRecalibrate() {
   //"11  Design Considerations" (Hill 2013, p. 10)
   //"Code to correct for gyro drift when rover is motionless"
-  dc_offset = (sampleNum - 1) * dc_offset + (1 / sampleNum) * gyro.g.z;
+  dc_offset = (sampleNum - 1) * dc_offset + (1 / sampleNum) * gyro_robot_z;
 }
+*/
+
+//interrupt service handler for DRDY line from gyro
+//to continuously update angle and PID
+void isr_DRDY(){
+  gyro.read();
+
+  //debug: see how often the gyro is updating
+  unsigned long this_delay = millis() - lastDebugTime;
+  lastDebugTime = millis();
+  Serial.println((double)(1000/this_delay)); //in Hz
+  
+  /*
+  rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
+#ifdef  GYRO_NOISE_THRESHOLD
+  //"11  Design Considerations" (p. 10)
+  //"Ignore the gyro if our angular velocity does not meet our threshold"
+  if(rate >= noise || rate <= -noise) 
+    //will make angle += ... conditional
+#endif
+  //angle += ((prev_rate + rate) * ((float)sampleTime / 1000)) / 2; //as-is from p. 9: numerical integration using trapezoidal average of rates
+  angle += ((prev_rate + rate) / sampleRate) / 2;                   //using output data rate specified by L3GD20H
+
+  //"remember the current speed for the next loop rate integration."
+  prev_rate = rate;
+  
+  gyroPID.Compute();
+*/
+}
+
