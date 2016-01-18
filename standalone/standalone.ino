@@ -175,7 +175,7 @@ void setup() {
   /* enable data ready DRDY line
    * as active-low interrupt pin
    * (cf. application note AN4506)*/
-  gyro.writeReg(L3G::CTRL3, H_Lactive | INT2_DRDY);  
+  gyro.writeReg(L3G::CTRL3, INT2_DRDY);  
 
   //set PID limits based on 0 = full left, 127 = full right, 64 = stop
   gyroPID.SetOutputLimits(0, 127);
