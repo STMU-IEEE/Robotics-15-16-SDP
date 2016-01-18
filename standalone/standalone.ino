@@ -32,6 +32,11 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 
 //digital output for gating serial TX to motor controller
 #define MC_GATE_PIN     14
+
+//force Sabertooth stop using emergency shutoff (S2)
+//note: shutoff is active low
+#define MC_SHUTOFF_PIN  8
+
 //enable value for motor controller (for NAND gate)
 #define MC_ON           HIGH
 #define MC_OFF          LOW
@@ -87,6 +92,11 @@ float noise = 0;
 
 void setup() {
   // put your setup code here, to run once:
+
+  //shutoff Sabertooth motors until stop commands are sent
+  //(this still takes about 2 seconds from reset to happen)
+  pinMode(MC_SHUTOFF_PIN,OUTPUT);
+  digitalWrite(MC_SHUTOFF_PIN,LOW); //shutoff is active low
   
   //set pin to gate serial TX to motor controller as output
   pinMode(MC_GATE_PIN,OUTPUT);
@@ -96,7 +106,7 @@ void setup() {
   //set serial baud
   Serial.begin(38400);
 
-  //wait 2s for sabertooth to power up (p. 16)
+  //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
   delay(2000);
   //initialize motor controller baud rate
@@ -106,9 +116,10 @@ void setup() {
   Serial.print("\nStopping motors...");
   mcWrite(MC_FORWARD,0);
   mcWrite(MC_LEFT,0);
-  
-  //TODO: see libraries for how to initialize ultrasonic range finders
 
+  //Sabertooth can be re-enabled
+  digitalWrite(MC_SHUTOFF_PIN,HIGH); 
+  
   //Servos
   Serial.println("Attaching servos...");
   grabber_servo.attach(GRABBER_PIN);
