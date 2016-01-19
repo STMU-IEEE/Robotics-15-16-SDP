@@ -22,10 +22,7 @@ Servo grabber_servo, arm_servo;
 
 //Gyro and PID global variables
 #define GYRO_DRDY_PIN   12                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MISO/header pin 21)
-#define GYRO_DRDY_INT_PIN 2                 //should be manually jumpered to drive interrupt (if need to reclaim pin 11, use external level shifter)
 L3G gyro;
-
-unsigned long lastDebugTime = 0; //debug
 
 //uncomment to enable noise rejection
 //#define GYRO_NOISE_THRESHOLD
@@ -274,12 +271,11 @@ void robotMain(){
   //enable PID
   gyroPID.SetMode(AUTOMATIC);
 */
-  //debug gyro sample rate
-  lastDebugTime = millis();
-  //enable gyro angle and PID updating when DRDY low
-  attachInterrupt(digitalPinToInterrupt(GYRO_DRDY_INT_PIN), isr_DRDY, LOW);
-  while(!Serial.available());
-  detachInterrupt(digitalPinToInterrupt(GYRO_DRDY_INT_PIN));
+  //enable gyro angle and PID updating when DRDY
+  while(!Serial.available())
+    if(digitalRead(GYRO_DRDY_PIN) == HIGH)
+      updateAngle();
+
 /*
   unsigned long lastMillis = millis();
   byte newTurn = 64;
@@ -478,18 +474,18 @@ void gyroRecalibrate() {
 }
 */
 
-//interrupt service handler for DRDY line from gyro
-//to continuously update angle and PID
-void isr_DRDY(){
-  Serial.print("Reading...");
-  Serial.flush();
+void updateAngle(){
+
+  //static unsigned long lastDebugTime = millis();
+  //Serial.print("Reading...");
+  //Serial.flush();
   gyro.read();
-  Serial.print("done");
+  //Serial.print("done");
 
   //debug: see how often the gyro is updating
-  unsigned long this_delay = millis() - lastDebugTime;
-  lastDebugTime = millis();
-  Serial.println((double)(1000/this_delay)); //in Hz
+  //unsigned long this_delay = millis() - lastDebugTime;
+  //lastDebugTime = millis();
+  //Serial.println((double)(1000/this_delay)); //in Hz
   
   /*
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
@@ -506,6 +502,6 @@ void isr_DRDY(){
   prev_rate = rate;
   
   gyroPID.Compute();
-*/
+  */
 }
 
