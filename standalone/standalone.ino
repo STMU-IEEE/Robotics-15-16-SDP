@@ -477,7 +477,7 @@ void gyroRecalibrate() {
 void updateAngle(){
 
   //static unsigned long lastDebugTime = millis();
-  Serial.print("Reading...");
+  //Serial.print("Reading...");
   //Serial.flush();
   gyro.read();
   //Serial.print("done");
