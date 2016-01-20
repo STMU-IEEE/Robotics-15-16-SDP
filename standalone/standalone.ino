@@ -478,7 +478,7 @@ void updateAngle(){
 
   static double sum = 0;
   static unsigned long n = 0;
-  static unsigned long lastDebugTime = millis();
+  static unsigned long lastDebugTime = 5; //use estimate
   //Serial.print("Reading...");
   //Serial.flush();
   gyro.read();
