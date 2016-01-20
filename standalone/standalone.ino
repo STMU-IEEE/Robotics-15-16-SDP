@@ -37,8 +37,8 @@ const float SAMPLE_RATE = 183.3F; //measured gyro rate
 //float sampleRate = 183.3F; //may be able to measure during calibration
 
 //const float ADJUSTED_SENSITIVITY = 0.009388F; //empirically corrected sensitivity (for turn speed 16)
-const float ADJUSTED_SENSITIVITY = 0.0097F; //compensate for measured gyro
-//const float ADJUSTED_SENSITIVITY = //will need to measure and compensate for drift
+//const float ADJUSTED_SENSITIVITY = 0.0097F; //compensate for measured gyro
+const float ADJUSTED_SENSITIVITY = 0.0099F; //compensate for drift
 int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (data is negated)
 
 double rate = 0;
