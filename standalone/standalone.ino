@@ -487,11 +487,10 @@ void updateAngle(){
   //debug: see how often the gyro is updating
   unsigned long this_delay = millis() - lastDebugTime;
   lastDebugTime = millis();
-  if(n == 0)
+  if(n++ == 0)
     return;
   sum += (double)this_delay;
-  n++;
-  Serial.println(1000/((double)sum/n)); //in Hz
+  Serial.println(1000/(sum/(n-1))); //in Hz
   
   /*
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
