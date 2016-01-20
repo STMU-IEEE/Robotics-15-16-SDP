@@ -478,7 +478,7 @@ void updateAngle(){
 
   static double sum = 0;
   static unsigned long n = 0;
-  static unsigned long lastDebugTime = 5; //use estimate
+  static unsigned long lastDebugTime; //use estimate
   //Serial.print("Reading...");
   //Serial.flush();
   gyro.read();
@@ -487,6 +487,8 @@ void updateAngle(){
   //debug: see how often the gyro is updating
   unsigned long this_delay = millis() - lastDebugTime;
   lastDebugTime = millis();
+  if(n == 0)
+    return;
   sum += (double)this_delay;
   n++;
   Serial.println(1000/((double)sum/n)); //in Hz
