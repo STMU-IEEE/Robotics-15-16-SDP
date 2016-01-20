@@ -428,8 +428,10 @@ void gyroRecalibrate() {
 */
 
 void updateAngle(){
-
+  
+  digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
   gyro.read();
+  digitalWrite(COLOR_LED_PIN,LOW);//debug LED
   
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
 #ifdef  GYRO_NOISE_THRESHOLD
