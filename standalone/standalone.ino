@@ -38,7 +38,7 @@ const float SAMPLE_RATE = 183.3F; //measured gyro rate
 
 //const float ADJUSTED_SENSITIVITY = 0.009388F; //empirically corrected sensitivity (for turn speed 16)
 const float ADJUSTED_SENSITIVITY = 0.0097F; //compensate for measured gyro
-
+//const float ADJUSTED_SENSITIVITY = //will need to measure and compensate for drift
 int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (data is negated)
 
 double rate = 0;
@@ -48,7 +48,7 @@ double gyro_PID_output = 64; //initialize to 64 = stop
 double angle = 0;
 double& gyro_PID_input = angle; //angle is input to PID controller
 double gyro_PID_setpoint = 0;
-double gyro_PID_Kp = 0.5;
+double gyro_PID_Kp = 0;
 double gyro_PID_Ki = 0;
 double gyro_PID_Kd = 0;
 
@@ -249,7 +249,7 @@ void robotMain(){
       byte newTurn = (byte)gyro_PID_output;
       Serial.print(gyro_PID_input); //angle
       Serial.print("\t");
-      Serial.println(gyro_PID_output - 64); //relative turning speed
+      Serial.println(newTurn);
       mcWrite(MC_TURN_7BIT,newTurn);
     }
   }
@@ -377,6 +377,7 @@ void gyroCalibrate() {
   Serial.print("Gyro DC Offset: ");
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
+    while(digitalRead(GYRO_DRDY_PIN) == LOW); //wait for new reading
     gyro.read();
     dc_offset_sum += gyro_robot_z;
     //Serial.println(dc_offset_sum);
