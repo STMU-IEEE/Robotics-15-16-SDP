@@ -476,16 +476,16 @@ void gyroRecalibrate() {
 
 void updateAngle(){
 
-  //static unsigned long lastDebugTime = millis();
+  static unsigned long lastDebugTime = millis();
   //Serial.print("Reading...");
   //Serial.flush();
   gyro.read();
   //Serial.print("done");
 
   //debug: see how often the gyro is updating
-  //unsigned long this_delay = millis() - lastDebugTime;
-  //lastDebugTime = millis();
-  //Serial.println((double)(1000/this_delay)); //in Hz
+  unsigned long this_delay = millis() - lastDebugTime;
+  lastDebugTime = millis();
+  Serial.println((double)(1000/this_delay)); //in Hz
   
   /*
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
