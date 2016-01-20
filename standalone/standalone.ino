@@ -489,7 +489,7 @@ void updateAngle(){
   lastDebugTime = millis();
   sum += (double)this_delay;
   n++;
-  Serial.println((double)sum/n); //in Hz
+  Serial.println(1000/((double)sum/n)); //in Hz
   
   /*
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
