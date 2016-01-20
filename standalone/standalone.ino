@@ -48,7 +48,7 @@ double gyro_PID_output = 64; //initialize to 64 = stop
 double angle = 0;
 double& gyro_PID_input = angle; //angle is input to PID controller
 double gyro_PID_setpoint = 0;
-double gyro_PID_Kp = 1;
+double gyro_PID_Kp = 0.1;
 double gyro_PID_Ki = 1;
 double gyro_PID_Kd = 1;
 
