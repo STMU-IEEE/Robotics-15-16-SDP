@@ -48,7 +48,7 @@ double gyro_PID_output = 64; //initialize to 64 = stop
 double angle = 0;
 double& gyro_PID_input = angle; //angle is input to PID controller
 double gyro_PID_setpoint = 0;
-double gyro_PID_Kp = 0;
+double gyro_PID_Kp = 0.5;
 double gyro_PID_Ki = 0;
 double gyro_PID_Kd = 0;
 
@@ -247,9 +247,9 @@ void robotMain(){
     if(digitalRead(GYRO_DRDY_PIN) == HIGH){
       updateAngle();
       byte newTurn = (byte)gyro_PID_output;
-      Serial.print(gyro_PID_input); //angle
-      Serial.print("\t");
-      Serial.println(newTurn);
+      //Serial.print(gyro_PID_input); //angle
+      //Serial.print("\t");
+      //Serial.println(newTurn);
       mcWrite(MC_TURN_7BIT,newTurn);
     }
   }
