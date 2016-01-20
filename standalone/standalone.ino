@@ -180,8 +180,12 @@ void setup() {
   gyro.writeReg(L3G::CTRL3, INT2_DRDY);  
 
   //set PID limits based on 0 = full left, 127 = full right, 64 = stop
-  gyroPID.SetOutputLimits(0, 127);
+  //gyroPID.SetOutputLimits(0, 127);
 
+  //constrain to safer values:
+  byte turn_range = 16;
+  gyroPID.SetOutputLimits(64 - (turn_range/2), 64 + (turn_range/2));
+  
   //assume PID is computed for every gyro reading
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
 
