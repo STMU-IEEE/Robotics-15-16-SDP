@@ -48,9 +48,9 @@ double gyro_PID_output = 64; //initialize to 64 = stop
 double angle = 0;
 double& gyro_PID_input = angle; //angle is input to PID controller
 double gyro_PID_setpoint = 0;
-double gyro_PID_Kp = 0.1;
-double gyro_PID_Ki = 1;
-double gyro_PID_Kd = 0.1;
+double gyro_PID_Kp = 0;
+double gyro_PID_Ki = 0;
+double gyro_PID_Kd = 0;
 
 //bits for gyro registers (cf. datasheet):
 const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)--does not affect DRDY (cf. application note AN4506 p. 22)
