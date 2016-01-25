@@ -391,7 +391,9 @@ void gyroCalibrate() {
   Serial.print("Gyro Noise Level: ");
   for(int n = 0; n < sampleNum; n++)
   {
+    digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
     gyro.read();
+    digitalWrite(COLOR_LED_PIN,LOW);//debug LED
     if((gyro_robot_z - dc_offset) > noise)
       noise = gyro_robot_z - dc_offset;
     else if((gyro_robot_z - dc_offset) < -noise)
