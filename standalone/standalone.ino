@@ -171,13 +171,13 @@ void setup() {
   Serial.println(" found");
   gyro.enableDefault();
 
-  gyroCalibrate();
-
   //data ready pin as input
   pinMode(GYRO_DRDY_PIN,INPUT);
   /* enable data ready DRDY line
    * (cf. application note AN4506)*/
   gyro.writeReg(L3G::CTRL3, INT2_DRDY);  
+
+  gyroCalibrate();
 
   //set PID limits based on 0 = full left, 127 = full right, 64 = stop
   //gyroPID.SetOutputLimits(0, 127);
