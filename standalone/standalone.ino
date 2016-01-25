@@ -378,7 +378,9 @@ void gyroCalibrate() {
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
     while(digitalRead(GYRO_DRDY_PIN) == LOW); //wait for new reading
+    digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
     gyro.read();
+    digitalWrite(COLOR_LED_PIN,LOW);//debug LED
     dc_offset_sum += gyro_robot_z;
     //Serial.println(dc_offset_sum);
   }
