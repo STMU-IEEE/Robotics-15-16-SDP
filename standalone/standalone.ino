@@ -9,8 +9,8 @@
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 
 //servos
-#define GRABBER_PIN     5
-#define ARM_PIN         6
+#define GRABBER_PIN     9
+#define ARM_PIN         10
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
