@@ -8,9 +8,18 @@
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 
+//pin assignments for Arduino MEGA
+#define MC_SHUTOFF_PIN  8		//active low Sabertooth shutoff (S2)
+#define GRABBER_PIN     9		//servo 1 on Adafruit motor shield
+#define ARM_PIN         10		//servo 2 on Adafruit motor shield
+#define SRF_L_ECHO      11
+#define SRF_L_TRIGGER   11
+#define SRF_R_ECHO      12
+#define SRF_R_TRIGGER   12
+#define COLOR_LED_PIN   13		//to avoid blinding people; same as onboard LED
+#define PHOTOGATE_PIN   A3		//pin for photogate (analog)
+
 //servos
-#define GRABBER_PIN     9
-#define ARM_PIN         10
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
@@ -19,7 +28,20 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   75
 
-#define GYRO_DRDY_PIN   11                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MOSI/header pin 19)
+//Gyro and PID global variables
+L3G gyro;
+
+//uncomment to enable noise rejection
+//#define GYRO_NOISE_THRESHOLD
+
+//for gyro calibration routine
+const int sampleNum = 1000;
+int16_t dc_offset = 0;
+float noise = 0;
+
+//const float sampleRate = 189.4F; //gyro update rate in Hz from datasheet
+const float SAMPLE_RATE = 183.3F; //measured gyro rate
+//float sampleRate = 183.3F; //may be able to measure during calibration
 
 //bits for gyro registers:
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
@@ -27,20 +49,12 @@ const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
 const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
 const byte FM_BYPASS_MODE  = 0b000 << 5;    //FIFO_CTRL(FM2:0) for bypass mode (FIFO off/reset)
 const byte FM_STREAM_MODE  = 0b010 << 5;    //FIFO_CTRL(FM2:0) for stream mode
-L3G gyro;
+const byte ZYXDA           =     1 << 3;    //STATUS(ZYXDA), aka XYZDA; data ready flag
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //use separate serial port for Sabertooth (RX only)
 HardwareSerial& mcSerial = Serial1;
-
-//force Sabertooth stop using emergency shutoff (S2)
-//note: shutoff is active low
-#define MC_SHUTOFF_PIN  8
-
-//enable value for motor controller (for NAND gate)
-#define MC_ON           HIGH
-#define MC_OFF          LOW
 
 //Sabertooth address from DIP switches
 #define MC_ADDR         128
@@ -54,24 +68,10 @@ HardwareSerial& mcSerial = Serial1;
 #define MC_RIGHT        10
 #define MC_LEFT         11
 
-//color sensor LED (turn off to avoid blinding people)
-#define COLOR_LED_PIN   13
-#define COLOR_LED_ON    HIGH
-#define COLOR_LED_OFF   LOW
-
-//pins for ultrasonic range finders
-/* If we need to reduce pin usage, check if possible
- * to either share echo pins between sensors (need external OR), 
- * or use shared single trigger/echo pin mode per sensor*/
-#define SRF_L_ECHO      3
-#define SRF_L_TRIGGER   11
-#define SRF_R_ECHO      9
-#define SRF_R_TRIGGER   10
+//ultrasonic range finders
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 
-//pin for photogate (analog)
-#define PHOTOGATE_PIN   3 //should this be A3 for clarity?
 
 //15-bit thresholds with hysteresis
 //(readings are roughly 2200 to 20000)
@@ -204,7 +204,7 @@ void robotMain(){
   delay(500);
   //raise arm
   arm_servo.write(ARM_UP);
-  digitalWrite(COLOR_LED_PIN,COLOR_LED_ON);
+  digitalWrite(COLOR_LED_PIN, HIGH);
   delay(1000);
   //print hue
   Serial.println(readHue());
@@ -256,9 +256,9 @@ void robotMain(){
 
 //blink color sensor LED once
 void ledBlink(unsigned long delay_ms) {
-  digitalWrite(COLOR_LED_PIN,COLOR_LED_ON);
+  digitalWrite(COLOR_LED_PIN, HIGH);
   delay(delay_ms/2);
-  digitalWrite(COLOR_LED_PIN,COLOR_LED_OFF);
+  digitalWrite(COLOR_LED_PIN, LOW);
   delay(delay_ms/2);
 }
 
@@ -338,6 +338,13 @@ int photogateAverage() {
   return average;
 }
 
+//A more readable way to test gyro status
+//poll status register ZYXDA bit for new data
+//instead of DRDY line, check corresponding status register
+bool gyroDataReady(){
+  return (gyro.readReg(L3G::STATUS) & ZYXDA) == ZYXDA;
+}
+
 /* Gyro calibration
    * based on GyroTest.ino example by G. C. Hill (2013, EE444 at CSULB) (must inquire terms of reuse)
    * from lab 5, p. 6: "8  Calibrate the Gyro"
@@ -353,6 +360,8 @@ void gyroCalibrate() {
   Serial.print("Gyro DC Offset: ");
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
+    while(gyroDataReady()); //wait for new reading
+    digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
     gyro.read();
     dc_offset_sum += gyro.g.y;
     //Serial.println(dc_offset_sum);
@@ -389,7 +398,7 @@ void gyroAngle(float target) {
          (!is_counter_clockwise && (angle > target))) {   //decreasing angle
     //"Every 10 ms take a sample from the gyro"
     //if(millis() - time1 > sampleTime)
-    if(digitalRead(GYRO_DRDY_PIN) == HIGH) //check for new gyro data
+    if(gyroDataReady()) //check for new gyro data
     {
       //time2 = millis(); //"update the time to get the next sample"
       gyro.read();
