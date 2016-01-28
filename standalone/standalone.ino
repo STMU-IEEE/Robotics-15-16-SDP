@@ -21,7 +21,6 @@ Servo grabber_servo, arm_servo;
 #define GRABBER_CLOSE   75
 
 //Gyro and PID global variables
-#define GYRO_DRDY_PIN   12                  //INT2/data ready pin on L3GD20H (level shifted using Alamode by connecting to RPi GPIO MISO/header pin 21)
 L3G gyro;
 
 //uncomment to enable noise rejection
@@ -59,6 +58,7 @@ const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
 const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
 const byte FM_BYPASS_MODE  = 0b000 << 5;    //FIFO_CTRL(FM2:0) for bypass mode (FIFO off/reset)
 const byte FM_STREAM_MODE  = 0b010 << 5;    //FIFO_CTRL(FM2:0) for stream mode
+const byte ZYXDA           =     1 << 3;    //STATUS(ZYXDA), aka XYZDA; data ready flag
 
 //Gyro PID controller
 PID gyroPID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
@@ -167,12 +167,6 @@ void setup() {
   Serial.println(" found");
   gyro.enableDefault();
 
-  //data ready pin as input
-  pinMode(GYRO_DRDY_PIN,INPUT);
-  /* enable data ready DRDY line
-   * (cf. application note AN4506)*/
-  gyro.writeReg(L3G::CTRL3, INT2_DRDY);  
-
   gyroCalibrate();
 
   //set PID limits based on 0 = full left, 127 = full right, 64 = stop
@@ -240,7 +234,7 @@ void robotMain(){
     }
     
     //update angle, PID, and turning with new gyro reading
-    if(digitalRead(GYRO_DRDY_PIN) == HIGH){
+    if(gyroDataReady()){
       updateAngle();
       byte newTurn = (byte)gyro_PID_output;
       //Serial.print(gyro_PID_input); //angle
@@ -342,6 +336,13 @@ int photogateAverage() {
   return average;
 }
 
+//A more readable way to test gyro status
+//poll status register ZYXDA bit for new data
+//instead of DRDY line, check corresponding status register
+bool gyroDataReady(){
+  return (gyro.readReg(L3G::STATUS) & ZYXDA) == ZYXDA;
+}
+
 /* Gyro calibration
    * based on GyroTest.ino example by G. C. Hill (2013, EE444 at CSULB) (must inquire terms of reuse)
    * from lab 5, p. 6: "8  Calibrate the Gyro"
@@ -357,7 +358,7 @@ void gyroCalibrate() {
   Serial.print("Gyro DC Offset: ");
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
-    while(digitalRead(GYRO_DRDY_PIN) == LOW); //wait for new reading
+    while(gyroDataReady()); //wait for new reading
     digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
     gyro.read();
     digitalWrite(COLOR_LED_PIN,LOW);//debug LED
