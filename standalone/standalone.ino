@@ -9,9 +9,18 @@
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
 
+//pin assignments for Arduino MEGA
+#define MC_SHUTOFF_PIN  8		//active low Sabertooth shutoff (S2)
+#define GRABBER_PIN     9		//servo 1 on Adafruit motor shield
+#define ARM_PIN         10		//servo 2 on Adafruit motor shield
+#define SRF_L_ECHO      11
+#define SRF_L_TRIGGER   11
+#define SRF_R_ECHO      12
+#define SRF_R_TRIGGER   12
+#define COLOR_LED_PIN   13		//to avoid blinding people; same as onboard LED
+#define PHOTOGATE_PIN   A3		//pin for photogate (analog)
+
 //servos
-#define GRABBER_PIN     9
-#define ARM_PIN         10
 Servo grabber_servo, arm_servo;
 
 /*********servo angles from testing*********/
@@ -71,14 +80,6 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 //use separate serial port for Sabertooth (RX only)
 HardwareSerial& mcSerial = Serial1;
 
-//force Sabertooth stop using emergency shutoff (S2)
-//note: shutoff is active low
-#define MC_SHUTOFF_PIN  8
-
-//enable value for motor controller (for NAND gate)
-#define MC_ON           HIGH
-#define MC_OFF          LOW
-
 //Sabertooth address from DIP switches
 #define MC_ADDR         128
 
@@ -92,24 +93,10 @@ HardwareSerial& mcSerial = Serial1;
 #define MC_LEFT         11
 #define MC_TURN_7BIT    13
 
-//color sensor LED (turn off to avoid blinding people)
-#define COLOR_LED_PIN   13
-#define COLOR_LED_ON    HIGH
-#define COLOR_LED_OFF   LOW
-
-//pins for ultrasonic range finders
-/* If we need to reduce pin usage, check if possible
- * to either share echo pins between sensors (need external OR), 
- * or use shared single trigger/echo pin mode per sensor*/
-#define SRF_L_ECHO      3
-#define SRF_L_TRIGGER   11
-#define SRF_R_ECHO      9
-#define SRF_R_TRIGGER   10
+//ultrasonic range finders
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 
-//pin for photogate (analog)
-#define PHOTOGATE_PIN   3 //should this be A3 for clarity?
 
 //15-bit thresholds with hysteresis
 //(readings are roughly 2200 to 20000)
@@ -211,7 +198,38 @@ void robotMain(){
   
   //PID demo: go back and forth, report angle
   
+  /*
+  //close grabber
+  grabber_servo.write(GRABBER_CLOSE);
+  //wait for grabber to close
+  delay(500);
+  //raise arm
+  arm_servo.write(ARM_UP);
+  digitalWrite(COLOR_LED_PIN, HIGH);
+  delay(1000);
+  //print hue
+  Serial.println(readHue());
 
+  mcWrite(MC_BACKWARDS,straight_speed);
+  delay(1000);
+  mcWrite(MC_FORWARD, 0); //stop turning
+  mcWrite(MC_LEFT,0);
+  //spin right 90 degrees
+  mcWrite(MC_RIGHT, turn_speed);
+  //make 1 full right turn
+  gyroAngle(360);
+  mcWrite(MC_FORWARD, 0); //stop turning
+  mcWrite(MC_LEFT,0);
+
+  //drop victim
+  delay(2000);
+  arm_servo.write(ARM_DOWN);
+  delay(500);
+  grabber_servo.write(GRABBER_OPEN);
+  delay(500);
+  arm_servo.write(ARM_UP);
+  */
+  
   Serial.print("Enter power: ");
   while(Serial.available() < 2)
     ledBlink(1000);
@@ -254,9 +272,9 @@ void robotMain(){
 
 //blink color sensor LED once
 void ledBlink(unsigned long delay_ms) {
-  digitalWrite(COLOR_LED_PIN,COLOR_LED_ON);
+  digitalWrite(COLOR_LED_PIN, HIGH);
   delay(delay_ms/2);
-  digitalWrite(COLOR_LED_PIN,COLOR_LED_OFF);
+  digitalWrite(COLOR_LED_PIN, LOW);
   delay(delay_ms/2);
 }
 
@@ -359,7 +377,7 @@ void gyroCalibrate() {
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
     while(gyroDataReady()); //wait for new reading
-    digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
+    digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
     gyro.read();
     digitalWrite(COLOR_LED_PIN,LOW);//debug LED
     dc_offset_sum += gyro_robot_z;
@@ -393,11 +411,14 @@ void gyroCalibrate() {
 void gyroAngle(float target) {
   //const int sampleTime = 10; //in ms
   //unsigned long time1 = millis(),time2; //same type as millis()
+  angle = 0;
   bool is_counter_clockwise = (target > 0);
   Serial.println("gyroAngle");//debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
-         (!is_counter_clockwise && (angle > target)));    //decreasing angle
+        (!is_counter_clockwise && (angle > target)))     //decreasing angle
+    		if(gyroDataReady())
+    			updateAngle();
 } //end gyroAngle
 
 /* The following snippet might not work due to
@@ -417,9 +438,9 @@ void gyroRecalibrate() {
 
 void updateAngle(){
   
-  digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
+  digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
   gyro.read();
-  digitalWrite(COLOR_LED_PIN,LOW);//debug LED
+  digitalWrite(COLOR_LED_PIN, LOW);//debug LED
   
   rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
 #ifdef  GYRO_NOISE_THRESHOLD
