@@ -10,7 +10,6 @@
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
 
 //pin assignments for Arduino MEGA
-#define MC_SHUTOFF_PIN  8		//active low Sabertooth shutoff (S2)
 #define GRABBER_PIN     9		//servo 1 on Adafruit motor shield
 #define ARM_PIN         10		//servo 2 on Adafruit motor shield
 #define SRF_L_ECHO      11
@@ -18,6 +17,7 @@
 #define SRF_R_ECHO      12
 #define SRF_R_TRIGGER   12
 #define COLOR_LED_PIN   13		//to avoid blinding people; same as onboard LED
+#define MC_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
 #define PHOTOGATE_PIN   A3		//pin for photogate (analog)
 
 //servos
@@ -78,7 +78,7 @@ PID gyroPID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //use separate serial port for Sabertooth (RX only)
-HardwareSerial& mcSerial = Serial1;
+HardwareSerial& mcSerial = Serial2;
 
 //Sabertooth address from DIP switches
 #define MC_ADDR         128
@@ -376,7 +376,7 @@ void gyroCalibrate() {
   Serial.print("Gyro DC Offset: ");
   int32_t dc_offset_sum = 0; //original type "int" overflows!
   for(int n = 0; n < sampleNum; n++){
-    while(gyroDataReady()); //wait for new reading
+    while(!gyroDataReady()); //wait for new reading
     digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
     gyro.read();
     digitalWrite(COLOR_LED_PIN,LOW);//debug LED
