@@ -56,11 +56,6 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS347
 //use separate serial port for Sabertooth (RX only)
 HardwareSerial& mcSerial = Serial1;
 
-
-//enable value for motor controller (for NAND gate)
-#define MC_ON           HIGH
-#define MC_OFF          LOW
-
 //Sabertooth address from DIP switches
 #define MC_ADDR         128
 
