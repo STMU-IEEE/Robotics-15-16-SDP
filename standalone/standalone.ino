@@ -31,8 +31,8 @@ L3G gyro;
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
-//digital output for gating serial TX to motor controller
-#define MC_GATE_PIN     14
+//use separate serial port for Sabertooth (RX only)
+HardwareSerial& mcSerial = Serial1;
 
 //force Sabertooth stop using emergency shutoff (S2)
 //note: shutoff is active low
@@ -94,14 +94,10 @@ void setup() {
   pinMode(MC_SHUTOFF_PIN,OUTPUT);
   digitalWrite(MC_SHUTOFF_PIN,LOW); //shutoff is active low
   
-  //set pin to gate serial TX to motor controller as output
-  pinMode(MC_GATE_PIN,OUTPUT);
-  //disable motor controller listening to serial TX
-  digitalWrite(MC_GATE_PIN,MC_OFF);
-  
   //set serial baud
   Serial.begin(38400);
-
+  mcSerial.begin(38400);
+  
   //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
   delay(2000);
@@ -284,32 +280,16 @@ void ledFade() {
 // For motor controller, may consider SoftwareSerial instead of hardware TX + gate
 
 void mcInit() {
-  //wait for TX to finish before enabling output
-  Serial.flush();
-  //enable output to motor controller
-  digitalWrite(MC_GATE_PIN,MC_ON);
   //send initialization byte (170)
-  Serial.write(MC_INIT_BYTE);
-  //wait for TX to finish before disabling output
-  Serial.flush();
-  //disable output to motor controller
-  digitalWrite(MC_GATE_PIN,MC_OFF);
+  mcSerial.write(MC_INIT_BYTE);
 }
 
 void mcWrite(byte cmd, byte data) {
   //compute checksum and place in byte array for transferring
   byte mc_cmd[4] = { MC_ADDR, cmd, data,
        (byte)((MC_ADDR + cmd + data) & 0b01111111) }; //checksum; use explicit cast to ignore -Wnarrowing
-  //wait for TX to finish before enabling output
-  Serial.flush();
-  //enable output to motor controller
-  digitalWrite(MC_GATE_PIN,MC_ON);
   //write command to motor controller
-  Serial.write(mc_cmd,4);
-  //wait for TX to finish before disabling output
-  Serial.flush();
-  //disable output to motor controller
-  digitalWrite(MC_GATE_PIN,MC_OFF);
+  mcSerial.write(mc_cmd,4);
 }
 
 //Calculate the hue (color) detected
