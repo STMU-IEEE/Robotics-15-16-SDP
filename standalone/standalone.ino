@@ -113,7 +113,7 @@ void setup() {
   
   //set serial baud
   Serial.begin(38400);
-  mcSerial.begin(38400);
+  mcSerial.begin(9600);
   
   //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
