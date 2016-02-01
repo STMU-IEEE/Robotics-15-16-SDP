@@ -266,12 +266,8 @@ void robotMain(){
         lastMCUpdate = millis();
         byte newTurn = (byte)gyro_PID_output; 
         mcWrite(MC_TURN_7BIT,newTurn);
-        Serial.println(newTurn);
       }
-      //Serial.print(gyro_PID_input); //angle
-      //Serial.print("\t");
-      //Serial.println(newTurn);
-      Serial.println(angle);
+      
     }
   }
 
