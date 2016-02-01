@@ -113,7 +113,7 @@ void setup() {
   
   //set serial baud
   Serial.begin(38400);
-  mcSerial.begin(9600);
+  mcSerial.begin(2400);
   
   //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
@@ -176,7 +176,7 @@ void loop() {
   
   //perform robot behaviors
   robotMain();
-
+  //testMC();
   //turn off servos
   //arm_servo.detach();
   //grabber_servo.detach();
@@ -186,7 +186,14 @@ void loop() {
   ledBlink(1000);
 } //end loop()
 
-
+void testMC()
+{
+      mcWrite(MC_FORWARD,50);
+      delay(1000);
+      mcWrite(MC_BACKWARDS,50);
+      delay(1000);
+      mcWrite(MC_FORWARD,0);
+}
 
 void robotMain(){
   //place robot behaviors here
@@ -239,8 +246,9 @@ void robotMain(){
   gyro_PID_setpoint = 0;
   angle = 0;
   //start PID
+  unsigned long lastMCUpdate = millis(); //cap rate at which commands are sent
   gyroPID.SetMode(AUTOMATIC);
-
+    
   while(!Serial.available()){ //press key to stop
     
     //change forwards/backwards every 5 seconds
@@ -250,15 +258,20 @@ void robotMain(){
     else{
       mcWrite(MC_BACKWARDS,speed);
     }
-    
+
     //update angle, PID, and turning with new gyro reading
     if(gyroDataReady()){
       updateAngle();
-      byte newTurn = (byte)gyro_PID_output;
+      if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
+        lastMCUpdate = millis();
+        byte newTurn = (byte)gyro_PID_output; 
+        mcWrite(MC_TURN_7BIT,newTurn);
+        Serial.println(newTurn);
+      }
       //Serial.print(gyro_PID_input); //angle
       //Serial.print("\t");
       //Serial.println(newTurn);
-      mcWrite(MC_TURN_7BIT,newTurn);
+      Serial.println(angle);
     }
   }
 
@@ -278,34 +291,25 @@ void ledBlink(unsigned long delay_ms) {
   delay(delay_ms/2);
 }
 
-/* not enough PWM outputs for this
-//based on Fade LED example
-void ledFade() {
-  int brightness = 0;
-  while(brightness < 255) {
-    // set the brightness of pin 9:
-    analogWrite(COLOR_LED_PIN, ++brightness);
-    delay(6);
-  }
-  while(brightness > 0) {
-    analogWrite(COLOR_LED_PIN, --brightness);
-    delay(6);
-  }
-} */
-
-// For motor controller, may consider SoftwareSerial instead of hardware TX + gate
-
 void mcInit() {
+  //wait until buffer empty
+  //mcSerial.flush();
   //send initialization byte (170)
   mcSerial.write(MC_INIT_BYTE);
+  //wait until buffer empty
+  //mcSerial.flush();
 }
 
 void mcWrite(byte cmd, byte data) {
   //compute checksum and place in byte array for transferring
   byte mc_cmd[4] = { MC_ADDR, cmd, data,
        (byte)((MC_ADDR + cmd + data) & 0b01111111) }; //checksum; use explicit cast to ignore -Wnarrowing
+  //wait until buffer empty
+  //mcSerial.flush();
   //write command to motor controller
   mcSerial.write(mc_cmd,4);
+  //wait until buffer empty
+  //mcSerial.flush();
 }
 
 //Calculate the hue (color) detected
