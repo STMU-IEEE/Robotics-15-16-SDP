@@ -152,6 +152,8 @@ void robotMain(){
   //place robot behaviors here
   ledBlink(500);
   ledBlink(500);
+  while(true)
+    srfTest();
 }
 
 //blink color sensor LED once

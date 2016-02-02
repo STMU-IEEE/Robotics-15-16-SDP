@@ -16,7 +16,10 @@
 //1 reserved for Serial TX --> USB
 #define MOTOR_L_ENC_A   2
 #define MOTOR_L_ENC_B   3
-//4-8 open
+//4-5 open
+#define SRF_F_ECHO      6
+#define SRF_F_TRIGGER   7
+//8 open
 #define GRABBER_PIN     9    //servo 1 on Adafruit motor shield
 #define ARM_PIN         10    //servo 2 on Adafruit motor shield
 #define SRF_L_ECHO      11
@@ -32,11 +35,7 @@
 //20 reserved for SDA
 //21 reserved for SCL
 #define MC_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
-//23-43 open
-#define SRF_F_TRIGGER   44
-//45 open
-#define SRF_F_ECHO      46
-//46-53 open 
+//23-53 open 
 //pins 54 to 69 correspond to pins A0 to A15 on Arduino Mega
 #define PHOTOGATE_PIN   A3    //pin for photogate (analog)
 //A4 shorted to SDA by Adafruit motor shield
