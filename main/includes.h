@@ -9,13 +9,13 @@
 #include "FastLED.h"            //for rgb2hsv_approximate()
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
-
+#include "Encoder.h"            //for quadrature encoders on 
 
 /*********************     Pin assignments for Arduino Mega     ************************/
 //0 reserved for Serial RX --> USB
 //1 reserved for Serial TX --> USB
-#define MOTOR_L_ENC_A   2
-#define MOTOR_L_ENC_B   3
+#define MOTOR_L_ENCODER_A   2
+#define MOTOR_L_ENCODER_B   3
 //4-5 open
 #define SRF_F_ECHO      6
 #define SRF_F_TRIGGER   7
@@ -30,8 +30,8 @@
 //14-15 open
 //16 reserved for Serial2 TX --> Sabertooth S1
 //17 reserved for Serial2 RX
-#define MOTOR_R_ENC_A   18
-#define MOTOR_R_ENC_B   19
+#define MOTOR_R_ENCODER_A   18
+#define MOTOR_R_ENCODER_B   19
 //20 reserved for SDA
 //21 reserved for SCL
 #define MC_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
@@ -87,3 +87,7 @@ enum victim_color: int8_t {
 #define MC_RIGHT        10
 #define MC_LEFT         11
 #define MC_TURN_7BIT    13
+
+/*********************** Motor encoders ***************************/
+//encoder 
+#define MOTOR_TURNS

@@ -56,6 +56,10 @@ NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 NewPing srf_F = NewPing(SRF_F_TRIGGER, SRF_F_ECHO);
 
+//motor quadrature encoders
+Encoder motor_L_encoder(MOTOR_L_ENCODER_A, MOTOR_L_ENCODER_B);
+Encoder motor_R_encoder(MOTOR_R_ENCODER_A, MOTOR_R_ENCODER_B);
+
 void setup() {
   // put your setup code here, to run once:
 
@@ -152,8 +156,7 @@ void robotMain(){
   //place robot behaviors here
   ledBlink(500);
   ledBlink(500);
-  while(true)
-    srfTest();
+  encoderTest();
 }
 
 //blink color sensor LED once
@@ -184,8 +187,4 @@ void mcWrite(byte cmd, byte data) {
   //wait until buffer empty
   //mcSerial.flush();
 }
-
-
-
-
 
