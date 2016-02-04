@@ -19,8 +19,8 @@ void testGyroPID() {
   gyro_PID_output = 64;
   gyro_PID_setpoint = 0;
   angle = 0;
+  
   //start PID
-  unsigned long lastMCUpdate = millis(); //cap rate at which commands are sent
   gyroPID.SetMode(AUTOMATIC);
     
   while(!Serial.available()){ //press key to stop
@@ -30,16 +30,7 @@ void testGyroPID() {
     } else {
       mcWrite(MC_BACKWARDS,speed);
     }
-
-    //update angle, PID, and turning with new gyro reading
-    if(gyroDataReady()){
-      updateAngle();
-      if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
-        lastMCUpdate = millis();
-        byte newTurn = (byte)gyro_PID_output; 
-        mcWrite(MC_TURN_7BIT,newTurn);
-      }
-    }
+    followGyro();
   }
   
   //stop
@@ -48,6 +39,48 @@ void testGyroPID() {
 
   //stop PID
   gyroPID.SetMode(MANUAL);
+}
+
+/* Usage for this function: 
+ *  
+ *  //initialize PID
+ *  angle = 0;             //start with angle 0
+ *  gyro_PID_setpoint = 0; //keep angle at 0
+ *  gyro_PID_output = 64; //start without turning
+ *  
+ *  //go forward (or backwards)
+ *  mcWrite(MC_FORWARD, your_speed);
+ *  mcWrite(MC_TURN_7BIT, 64);
+ *  
+ *  //enable PID
+ *  gyroPID.SetMode(AUTOMATIC); 
+ *  
+ *  //wait for some other condition
+ *  while(your_condition())
+ *    followGyro();
+ *  
+ *  //stop
+ *  mcWrite(MC_FORWARD, 0);
+ *  mcWrite(MC_TURN_7BIT, 64);
+ *  
+ *  //disable PID
+ *  gyroPID.SetMode(MANUAL);
+ *  
+ * (would consider using function pointer for your_condition(), but types of any parameters would need to be known)  */
+ 
+bool followGyro() {
+  bool was_updated;
+  static unsigned long lastMCUpdate = 0; //cap rate at which commands are sent
+  //update angle, PID, and turning with new gyro reading
+  if(gyroDataReady()){
+    was_updated = updateAngle();
+    if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
+      lastMCUpdate = millis();
+      byte newTurn = (byte)gyro_PID_output; 
+      mcWrite(MC_TURN_7BIT,newTurn);
+    }
+  }
+  return was_updated;
 }
 
 //A more readable way to test gyro status
@@ -101,14 +134,14 @@ void gyroCalibrate() {
 
 }
 
-//wait until past target relative angle
+//wait until past target angle (initialize angle before calling!)
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target) {
   //const int sampleTime = 10; //in ms
   //unsigned long time1 = millis(),time2; //same type as millis()
-  angle = 0;
-  bool is_counter_clockwise = (target > 0);
+  //angle = 0;
+  bool is_counter_clockwise = (target > angle);
   Serial.println("gyroAngle");//debug
   //Wait for angle to cross target
   while((is_counter_clockwise && (angle < target)) ||     //increasing angle
@@ -132,7 +165,7 @@ void gyroRecalibrate() {
 }
 */
 
-void updateAngle(){
+bool updateAngle(){
   
   digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
   gyro.read();
@@ -151,7 +184,7 @@ void updateAngle(){
   //"remember the current speed for the next loop rate integration."
   prev_rate = rate;
   
-  gyroPID.Compute();
+  return gyroPID.Compute();
 }
 
 /* code for (continuously) measuring gyro sample rate if needed:

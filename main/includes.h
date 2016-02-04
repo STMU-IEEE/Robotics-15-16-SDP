@@ -89,5 +89,7 @@ enum victim_color: int8_t {
 #define MC_TURN_7BIT    13
 
 /*********************** Motor encoders ***************************/
-//encoder 
-#define MOTOR_TURNS
+//encoder counts per revolution for 50:1 motor (Pololu #2824)
+// 50 * 64 = 3200
+#define MOTOR_COUNTS_PER_REVOLUTION 3200
+

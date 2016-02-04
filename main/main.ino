@@ -57,6 +57,7 @@ NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 NewPing srf_F = NewPing(SRF_F_TRIGGER, SRF_F_ECHO);
 
 //motor quadrature encoders
+//positive counting == clockwise rotation
 Encoder motor_L_encoder(MOTOR_L_ENCODER_A, MOTOR_L_ENCODER_B);
 Encoder motor_R_encoder(MOTOR_R_ENCODER_A, MOTOR_R_ENCODER_B);
 
@@ -69,7 +70,7 @@ void setup() {
   digitalWrite(MC_SHUTOFF_PIN,LOW); //shutoff is active low
   
   //set serial baud
-  Serial.begin(38400);
+  Serial.begin(115200);
   mcSerial.begin(2400);
   
   //wait 2s for Sabertooth to power up (p. 16)
@@ -131,32 +132,22 @@ void loop() {
   while(Serial.read() != 'g')
     ledBlink(2000);
   
-  //perform robot behaviors
-  robotMain();
-  //testMC();
-  //turn off servos
-  //arm_servo.detach();
-  //grabber_servo.detach();
+  leaveStartingArea();
   
-  //print photogate output to help identify threshold
-  //Serial.println(photogateAverage());
-  ledBlink(1000);
 } //end loop()
 
 void testMC()
 {
-      mcWrite(MC_FORWARD,50);
+      mcWrite(MC_FORWARD,25);
       delay(1000);
-      mcWrite(MC_BACKWARDS,50);
+      mcWrite(MC_BACKWARDS,25);
       delay(1000);
       mcWrite(MC_FORWARD,0);
-}
-
-void robotMain(){
-  //place robot behaviors here
-  ledBlink(500);
-  ledBlink(500);
-  encoderTest();
+      mcWrite(MC_RIGHT, 25);
+      delay(1000);
+      mcWrite(MC_LEFT, 25);
+      delay(1000);
+      mcWrite(MC_LEFT, 0);
 }
 
 //blink color sensor LED once
@@ -186,5 +177,90 @@ void mcWrite(byte cmd, byte data) {
   mcSerial.write(mc_cmd,4);
   //wait until buffer empty
   //mcSerial.flush();
+}
+
+void leaveStartingArea() {
+  Serial.println("Zeroing encoders...");
+  motor_L_encoder.write(0);
+  motor_R_encoder.write(0);
+
+  //initialize PID
+  angle = 0;             //start with angle 0
+  gyro_PID_setpoint = 0; //keep angle at 0
+  gyro_PID_output = 64; //start without turning
+  
+  //wait 50ms between readings
+  unsigned long lastSRF = 0;
+
+  //for debugging
+  unsigned long srf_reading;
+  
+  //go forward
+  mcWrite(MC_FORWARD, 25);
+  mcWrite(MC_TURN_7BIT, 64);
+
+  //start PID
+  gyroPID.SetMode(AUTOMATIC);
+  
+  //wait until opening to lane 2 on left
+  while(true){
+    if(millis() - lastSRF > 50){
+      lastSRF = millis();
+      srf_reading = srf_L.ping_cm();
+      Serial.println(srf_reading);
+    }
+    if(srf_reading > 36)
+      break;
+    followGyro();
+  }
+
+  //save encoder value for opening
+  int32_t encoder_opening = motor_L_encoder.read();
+  Serial.println("-----   -----");
+
+  while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
+    followGyro();
+  
+  //wait until opening to lane 2 on left 
+  while(true){
+    if(millis() - lastSRF > 50){
+      lastSRF = millis();
+      srf_reading = srf_L.ping_cm();
+      Serial.println(srf_reading);
+    }
+    if(srf_reading < 25)
+      break;
+    followGyro();
+  }
+  
+  //save encoder value for wall
+  int32_t encoder_wall = motor_L_encoder.read();
+  
+  Serial.print("Opening:\t");
+  Serial.println(encoder_opening);
+  Serial.print("Wall:\t");
+  Serial.println(encoder_wall);
+
+  //reverse to middle of opening
+  mcWrite(MC_BACKWARDS,25);
+  while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
+    followGyro();
+
+  Serial.print("Stop:\t");
+  Serial.println(motor_L_encoder.read());
+    
+  //turn left 90 degrees
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_LEFT,15);
+  gyroAngle(-90);
+  
+  //stop
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_LEFT,0);
+  
+  //stop PID
+  gyroPID.SetMode(MANUAL);
+
+  
 }
 
