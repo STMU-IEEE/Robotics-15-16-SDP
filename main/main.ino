@@ -17,7 +17,8 @@ const float SAMPLE_RATE = 183.3F; //measured gyro rate
 
 //const float ADJUSTED_SENSITIVITY = 0.009388F; //empirically corrected sensitivity (for turn speed 16)
 //const float ADJUSTED_SENSITIVITY = 0.0097F; //compensate for measured gyro
-const float ADJUSTED_SENSITIVITY = 0.0099F; //compensate for drift
+//const float ADJUSTED_SENSITIVITY = 0.0099F; //compensate for drift
+const float ADJUSTED_SENSITIVITY = 0.008956528F; //compensated 02/04/16
 int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (data is negated)
 
 double rate = 0;
@@ -90,7 +91,7 @@ void setup() {
   //Servos
   Serial.println("Attaching servos...");
   grabber_servo.attach(GRABBER_PIN);
-  grabber_servo.write(GRABBER_OPEN);
+  grabber_servo.write(GRABBER_MIN);
   arm_servo.attach(ARM_PIN);
   arm_servo.write(ARM_UP);
   
@@ -133,6 +134,8 @@ void loop() {
     ledBlink(2000);
   
   leaveStartingArea();
+  //testGyroTurn();
+  //testSwing();
   
 } //end loop()
 
@@ -148,6 +151,14 @@ void testMC()
       mcWrite(MC_LEFT, 25);
       delay(1000);
       mcWrite(MC_LEFT, 0);
+}
+
+void testSwing(){
+  mcWrite(MC_FORWARD,16);
+  mcWrite(MC_RIGHT, 16);
+  delay(2000);
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_RIGHT, 0);
 }
 
 //blink color sensor LED once
@@ -251,13 +262,55 @@ void leaveStartingArea() {
     
   //turn left 90 degrees
   mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,15);
+  mcWrite(MC_LEFT,16);
   gyroAngle(-90);
+
   
+  //go forward toward wall
+  gyro_PID_setpoint = -90;
+  mcWrite(MC_FORWARD, 20);
+   while(true){
+    if(millis() - lastSRF > 50){
+      lastSRF = millis();
+      srf_reading = srf_F.ping_cm();
+      Serial.println(srf_reading);
+    }
+    if(srf_reading < 3)
+      break;
+    followGyro();
+  }
+  
+  //turn right 45 degrees in place
+  mcWrite(MC_FORWARD,0);
+  mcWrite(MC_RIGHT,16);
+  gyroAngle(-45);
+  
+  mcWrite(MC_FORWARD, 10);
+  mcWrite(MC_RIGHT,10);
+  gyroAngle(0);
+
+  //now facing E city victim
+
+  //go forward until wall on right
+  gyro_PID_setpoint = 0;
+  mcWrite(MC_FORWARD, 20);
+  arm_servo.write(ARM_DOWN);
+  grabber_servo.write(GRABBER_OPEN);
+  while(photogateAverage() > PHOTOGATE_LOW){
+    followGyro();
+  }
+  Serial.println("Approaching victim...");
+  while(photogateAverage() < PHOTOGATE_HIGH){
+    followGyro();
+  }
   //stop
   mcWrite(MC_FORWARD,0);
   mcWrite(MC_LEFT,0);
   
+  Serial.println("Grabbing victim...");
+  grabber_servo.write(GRABBER_CLOSE);
+  delay(500);
+  arm_servo.write(ARM_UP);
   //stop PID
   gyroPID.SetMode(MANUAL);
 

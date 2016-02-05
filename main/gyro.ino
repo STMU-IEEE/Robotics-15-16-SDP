@@ -3,8 +3,9 @@ void testGyroTurn() {
   //spin right
   mcWrite(MC_FORWARD, 0);
   mcWrite(MC_RIGHT, turn_speed);
-  //make 1 full right turn
-  gyroAngle(360);
+  //make 5 full right turns
+  angle = 0;
+  gyroAngle(360*5);
   mcWrite(MC_FORWARD, 0); //stop turning
   mcWrite(MC_LEFT,0);
 }
