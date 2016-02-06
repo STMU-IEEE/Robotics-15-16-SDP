@@ -60,6 +60,9 @@ NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 NewPing srf_F = NewPing(SRF_F_TRIGGER, SRF_F_ECHO);
 
+//use to wait 50ms between readings; update using millis()
+unsigned long lastSRF = 0;
+
 //motor quadrature encoders
 //positive counting == clockwise rotation
 Encoder motor_L_encoder(MOTOR_L_ENCODER_A, MOTOR_L_ENCODER_B);
@@ -157,11 +160,6 @@ void leaveStartingArea() {
   gyro_PID_setpoint = 0; //keep angle at 0
   gyro_PID_output = 0; //start without turning
   
-  //wait 50ms between readings
-  unsigned long lastSRF = 0;
-
-  //for debugging
-  unsigned long srf_reading;
   
   //go forward
   ST.drive(25);
