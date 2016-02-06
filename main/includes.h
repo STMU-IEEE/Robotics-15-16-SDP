@@ -7,7 +7,8 @@
 //Use Pololu library which outputs unscaled int16_t instead:
 #include "L3G.h"                //gyro sensor; import from L3G folder at https://github.com/pololu/l3g-arduino
 #include "FastLED.h"            //for rgb2hsv_approximate()
-#include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
+#include "NewPing.h"            //for ultrasonic range finders; import from
+                                //https://bitbucket.org/teckel12/arduino-new-ping/downloads/NewPing_v1.7.zip
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
 #include "Encoder.h"            //for quadrature encoders on 
 #include "Sabertooth.h"         //Dimension Engineering library; import from Sabertooth folder of
