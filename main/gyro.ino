@@ -1,13 +1,12 @@
 void testGyroTurn() {
   byte turn_speed = 16; //slow to minimize error
   //spin right
-  mcWrite(MC_FORWARD, 0);
-  mcWrite(MC_RIGHT, turn_speed);
+  ST.drive(0);
+  ST.turn(turn_speed);
   //make 5 full right turns
   angle = 0;
   gyroAngle(360*5);
-  mcWrite(MC_FORWARD, 0); //stop turning
-  mcWrite(MC_LEFT,0);
+  ST.stop();
 }
 
 //PID demo: go back and forth, report angle
@@ -27,16 +26,15 @@ void testGyroPID() {
   while(!Serial.available()){ //press key to stop
     //change forwards/backwards every 5 seconds
     if((millis() / 5000) % 2){
-      mcWrite(MC_FORWARD,speed);
+      ST.drive(speed);
     } else {
-      mcWrite(MC_BACKWARDS,speed);
+      ST.drive(-speed);
     }
     followGyro();
   }
   
   //stop
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_TURN_7BIT,64);
+  ST.stop();
 
   //stop PID
   gyroPID.SetMode(MANUAL);
@@ -78,7 +76,7 @@ bool followGyro() {
     if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
       lastMCUpdate = millis();
       byte newTurn = (byte)gyro_PID_output; 
-      mcWrite(MC_TURN_7BIT,newTurn);
+      ST.drive(newTurn);
     }
   }
   return was_updated;

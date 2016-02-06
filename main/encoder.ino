@@ -26,8 +26,8 @@ void encoderDistanceTest() {
   gyro_PID_output = 64; //start without turning
   
   //go forward (or backwards)
-  mcWrite(MC_BACKWARDS, 25);
-  mcWrite(MC_TURN_7BIT, 64);
+  ST.drive(25);
+  ST.turn(0);
 
   //wait for n full turns forward
   while(motor_L_encoder.read() <= n * MOTOR_COUNTS_PER_REVOLUTION)
@@ -35,8 +35,7 @@ void encoderDistanceTest() {
       Serial.println(gyro_PID_output);
     
   //stop
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,0);
+  ST.stop();
   
   //stop PID
   gyroPID.SetMode(MANUAL);

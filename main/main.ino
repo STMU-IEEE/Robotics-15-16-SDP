@@ -24,13 +24,14 @@ int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (da
 double rate = 0;
 double prev_rate = 0;
 
-double gyro_PID_output = 64; //initialize to 64 = stop
+double gyro_PID_output = 0; //turning power: initialize to 0 = stop
 double angle = 0;
 double& gyro_PID_input = angle; //angle is input to PID controller
-double gyro_PID_setpoint = 0;
-double gyro_PID_Kp = 0.5;
-double gyro_PID_Ki = 0;
-double gyro_PID_Kd = 0;
+double gyro_PID_setpoint = 0;   //angle to keep
+//tuning parameters
+double gyro_PID_Kp = 1.0;
+double gyro_PID_Ki = 0.0;
+double gyro_PID_Kd = 0.0;
 
 //bits for gyro registers (cf. datasheet):
 const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)--does not affect DRDY (cf. application note AN4506 p. 22)
@@ -50,7 +51,9 @@ PID gyroPID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
 //use separate serial port for Sabertooth (RX only)
-HardwareSerial& mcSerial = Serial2;
+HardwareSerial& STSerial = Serial2;
+//Sabertooth 2x25 v1.02 motor controller
+Sabertooth ST(ST_ADDR, STSerial);
 
 //ultrasonic range finders
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
@@ -67,26 +70,26 @@ void setup() {
 
   //shutoff Sabertooth motors until stop commands are sent
   //(this still takes about 2 seconds from reset to happen)
-  pinMode(MC_SHUTOFF_PIN,OUTPUT);
-  digitalWrite(MC_SHUTOFF_PIN,LOW); //shutoff is active low
+  pinMode(ST_SHUTOFF_PIN,OUTPUT);
+  digitalWrite(ST_SHUTOFF_PIN,LOW); //shutoff is active low
   
   //set serial baud
   Serial.begin(115200);
-  mcSerial.begin(2400);
+  STSerial.begin(2400); //problems communicating at >2400bps?
   
   //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
   delay(2000);
-  //initialize motor controller baud rate
+  //initialize motor controller baud rate--already waited for startup
   Serial.print("Initializing Sabertooth...");
-  mcInit();
+  ST.autobaud(false);
+  
   //stop
   Serial.print("\nStopping motors...");
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,0);
+  ST.stop();
 
   //Sabertooth can be re-enabled
-  digitalWrite(MC_SHUTOFF_PIN,HIGH); 
+  digitalWrite(ST_SHUTOFF_PIN,HIGH); 
   
   //Servos
   Serial.println("Attaching servos...");
@@ -115,12 +118,9 @@ void setup() {
 
   gyroCalibrate();
 
-  //set PID limits based on 0 = full left, 127 = full right, 64 = stop
-  //gyroPID.SetOutputLimits(0, 127);
-
-  //constrain to safer values:
+  //constrain turning power to safer values:
   byte turn_range = 16;
-  gyroPID.SetOutputLimits(64 - (turn_range/2), 64 + (turn_range/2));
+  gyroPID.SetOutputLimits(turn_range/2, turn_range/2);
   
   //assume PID is computed for every gyro reading
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
@@ -139,55 +139,12 @@ void loop() {
   
 } //end loop()
 
-void testMC()
-{
-      mcWrite(MC_FORWARD,25);
-      delay(1000);
-      mcWrite(MC_BACKWARDS,25);
-      delay(1000);
-      mcWrite(MC_FORWARD,0);
-      mcWrite(MC_RIGHT, 25);
-      delay(1000);
-      mcWrite(MC_LEFT, 25);
-      delay(1000);
-      mcWrite(MC_LEFT, 0);
-}
-
-void testSwing(){
-  mcWrite(MC_FORWARD,16);
-  mcWrite(MC_RIGHT, 16);
-  delay(2000);
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_RIGHT, 0);
-}
-
 //blink color sensor LED once
 void ledBlink(unsigned long delay_ms) {
   digitalWrite(COLOR_LED_PIN, HIGH);
   delay(delay_ms/2);
   digitalWrite(COLOR_LED_PIN, LOW);
   delay(delay_ms/2);
-}
-
-void mcInit() {
-  //wait until buffer empty
-  //mcSerial.flush();
-  //send initialization byte (170)
-  mcSerial.write(MC_INIT_BYTE);
-  //wait until buffer empty
-  //mcSerial.flush();
-}
-
-void mcWrite(byte cmd, byte data) {
-  //compute checksum and place in byte array for transferring
-  byte mc_cmd[4] = { MC_ADDR, cmd, data,
-       (byte)((MC_ADDR + cmd + data) & 0b01111111) }; //checksum; use explicit cast to ignore -Wnarrowing
-  //wait until buffer empty
-  //mcSerial.flush();
-  //write command to motor controller
-  mcSerial.write(mc_cmd,4);
-  //wait until buffer empty
-  //mcSerial.flush();
 }
 
 void leaveStartingArea() {
@@ -198,7 +155,7 @@ void leaveStartingArea() {
   //initialize PID
   angle = 0;             //start with angle 0
   gyro_PID_setpoint = 0; //keep angle at 0
-  gyro_PID_output = 64; //start without turning
+  gyro_PID_output = 0; //start without turning
   
   //wait 50ms between readings
   unsigned long lastSRF = 0;
@@ -207,8 +164,8 @@ void leaveStartingArea() {
   unsigned long srf_reading;
   
   //go forward
-  mcWrite(MC_FORWARD, 25);
-  mcWrite(MC_TURN_7BIT, 64);
+  ST.drive(25);
+  ST.turn(0);
 
   //start PID
   gyroPID.SetMode(AUTOMATIC);
@@ -253,7 +210,7 @@ void leaveStartingArea() {
   Serial.println(encoder_wall);
 
   //reverse to middle of opening
-  mcWrite(MC_BACKWARDS,25);
+  ST.drive(-25);
   while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
     followGyro();
 
@@ -261,14 +218,14 @@ void leaveStartingArea() {
   Serial.println(motor_L_encoder.read());
     
   //turn left 90 degrees
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,16);
+  ST.drive(0);
+  ST.turn(-16);
   gyroAngle(-90);
 
   
   //go forward toward wall
   gyro_PID_setpoint = -90;
-  mcWrite(MC_FORWARD, 20);
+  ST.drive(20);
    while(true){
     if(millis() - lastSRF > 50){
       lastSRF = millis();
@@ -281,19 +238,20 @@ void leaveStartingArea() {
   }
   
   //turn right 45 degrees in place
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_RIGHT,16);
+  ST.drive(0);
+  ST.turn(16);
   gyroAngle(-45);
   
-  mcWrite(MC_FORWARD, 10);
-  mcWrite(MC_RIGHT,10);
+  ST.drive(10);
+  ST.turn(10);
   gyroAngle(0);
 
   //now facing E city victim
 
   //go forward until wall on right
   gyro_PID_setpoint = 0;
-  mcWrite(MC_FORWARD, 20);
+  ST.turn(0);
+  ST.drive(20);
   arm_servo.write(ARM_DOWN);
   grabber_servo.write(GRABBER_OPEN);
   while(photogateAverage() > PHOTOGATE_LOW){
@@ -304,8 +262,7 @@ void leaveStartingArea() {
     followGyro();
   }
   //stop
-  mcWrite(MC_FORWARD,0);
-  mcWrite(MC_LEFT,0);
+  ST.stop();
   
   Serial.println("Grabbing victim...");
   grabber_servo.write(GRABBER_CLOSE);

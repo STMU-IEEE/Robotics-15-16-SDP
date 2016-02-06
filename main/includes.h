@@ -10,10 +10,12 @@
 #include "NewPing.h"            //for ultrasonic range finders; import from NewPing_v1.7.zip
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
 #include "Encoder.h"            //for quadrature encoders on 
-
+#include "Sabertooth.h"         //Dimension Engineering library; import from Sabertooth folder of
+                                //http://www.dimensionengineering.com/software/SabertoothArduinoLibraries.zip
+                                
 /*********************     Pin assignments for Arduino Mega     ************************/
-//0 reserved for Serial RX --> USB
-//1 reserved for Serial TX --> USB
+//0 reserved for Serial RX --> USB TX
+//1 reserved for Serial TX --> USB RX
 #define MOTOR_L_ENCODER_A   2
 #define MOTOR_L_ENCODER_B   3
 //4-5 open
@@ -34,7 +36,7 @@
 #define MOTOR_R_ENCODER_B   19
 //20 reserved for SDA
 //21 reserved for SCL
-#define MC_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
+#define ST_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
 //23-53 open 
 //pins 54 to 69 correspond to pins A0 to A15 on Arduino Mega
 #define PHOTOGATE_PIN   A3    //pin for photogate (analog)
@@ -77,17 +79,7 @@ enum victim_color: int8_t {
 
 /*************************   Sabertooth     *********************/
 //Sabertooth address from DIP switches
-#define MC_ADDR         128
-
-//Sabertooth initialization value
-#define MC_INIT_BYTE    170
-
-//Sabertooth commands (mixed mode)
-#define MC_FORWARD      8
-#define MC_BACKWARDS    9
-#define MC_RIGHT        10
-#define MC_LEFT         11
-#define MC_TURN_7BIT    13
+#define ST_ADDR         128
 
 /*********************** Motor encoders ***************************/
 //encoder counts per revolution for 50:1 motor (Pololu #2824)

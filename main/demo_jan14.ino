@@ -16,12 +16,11 @@ void demo_jan14() {
   grabber_servo.write(GRABBER_OPEN);
   delay(500);
   //go forward until photo gate triggered
-  mcWrite(MC_FORWARD,straight_speed);
+  ST.drive(straight_speed);
   while(photogateAverage() > PHOTOGATE_LOW);
   while(photogateAverage() < PHOTOGATE_HIGH);
   //stop
-  mcWrite(MC_FORWARD, 0);
-  mcWrite(MC_LEFT,0);
+  ST.stop();
   
   //close grabber
   grabber_servo.write(GRABBER_CLOSE);
@@ -34,16 +33,14 @@ void demo_jan14() {
   //print hue
   Serial.println(readHue());
 
-  mcWrite(MC_BACKWARDS,straight_speed);
+  ST.drive(-straight_speed);
   delay(1000);
-  mcWrite(MC_FORWARD, 0); //stop turning
-  mcWrite(MC_LEFT,0);
+  ST.stop();
   //spin right 90 degrees
-  mcWrite(MC_RIGHT, turn_speed);
+  ST.turn(turn_speed);
   //make 1 full right turn
   gyroAngle(360);
-  mcWrite(MC_FORWARD, 0); //stop turning
-  mcWrite(MC_LEFT,0);
+  ST.stop();
 
   //drop victim
   delay(2000);
