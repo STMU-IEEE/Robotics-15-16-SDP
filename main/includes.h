@@ -38,7 +38,11 @@
 //20 reserved for SDA
 //21 reserved for SCL
 #define ST_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
-//23-53 open 
+//23-39 open
+#define GO_PIN          40    //button to start/resume robot
+//41-51 open
+#define STOP_PIN        52    //button to stop robot
+//53 open 
 //pins 54 to 69 correspond to pins A0 to A15 on Arduino Mega
 #define PHOTOGATE_PIN   A3    //pin for photogate (analog)
 //A4 shorted to SDA by Adafruit motor shield

@@ -75,6 +75,11 @@ void setup() {
   //(this still takes about 2 seconds from reset to happen)
   pinMode(ST_SHUTOFF_PIN,OUTPUT);
   digitalWrite(ST_SHUTOFF_PIN,LOW); //shutoff is active low
+
+  //configure stop pin
+  pinMode(STOP_PIN, INPUT_PULLUP);
+  //configure go pin
+  pinMode(GO_PIN, INPUT_PULLUP);
   
   //set serial baud
   Serial.begin(115200);
