@@ -127,28 +127,16 @@ void setup() {
   
   //assume PID is computed for every gyro reading
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
-
 }
 
 void loop() {
-
   Serial.println("Press g to continue");
   while(Serial.read() != 'g')
     ledBlink(2000);
   
-  leaveStartingArea();
-  //testGyroTurn();
-  //testSwing();
-  
+  //leaveStartingArea();
+  wallFollower(srf_L);
 } //end loop()
-
-//blink color sensor LED once
-void ledBlink(unsigned long delay_ms) {
-  digitalWrite(COLOR_LED_PIN, HIGH);
-  delay(delay_ms/2);
-  digitalWrite(COLOR_LED_PIN, LOW);
-  delay(delay_ms/2);
-}
 
 void leaveStartingArea() {
   Serial.println("Zeroing encoders...");
@@ -160,71 +148,26 @@ void leaveStartingArea() {
   gyro_PID_setpoint = 0; //keep angle at 0
   gyro_PID_output = 0; //start without turning
   
-  
   //go forward
   ST.drive(25);
   ST.turn(0);
 
   //start PID
   gyroPID.SetMode(AUTOMATIC);
-  
-  //wait until opening to lane 2 on left
-  while(true){
-    if(millis() - lastSRF > 50){
-      lastSRF = millis();
-      srf_reading = srf_L.ping_cm();
-      Serial.println(srf_reading);
-    }
-    if(srf_reading > 36)
-      break;
-    followGyro();
-  }
 
-  //save encoder value for opening
-  int32_t encoder_opening = motor_L_encoder.read();
-  Serial.println("-----   -----");
-
-  while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
-    followGyro();
+  //go to opening to lane 2
+  findOpening(srf_L);
   
-  //wait until opening to lane 2 on left 
-  while(true){
-    if(millis() - lastSRF > 50){
-      lastSRF = millis();
-      srf_reading = srf_L.ping_cm();
-      Serial.println(srf_reading);
-    }
-    if(srf_reading < 25)
-      break;
-    followGyro();
-  }
-  
-  //save encoder value for wall
-  int32_t encoder_wall = motor_L_encoder.read();
-  
-  Serial.print("Opening:\t");
-  Serial.println(encoder_opening);
-  Serial.print("Wall:\t");
-  Serial.println(encoder_wall);
-
-  //reverse to middle of opening
-  ST.drive(-25);
-  while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
-    followGyro();
-
-  Serial.print("Stop:\t");
-  Serial.println(motor_L_encoder.read());
-    
   //turn left 90 degrees
   ST.drive(0);
   ST.turn(-16);
   gyroAngle(-90);
-
   
   //go forward toward wall
   gyro_PID_setpoint = -90;
   ST.drive(20);
-   while(true){
+  while(true){
+    static unsigned long srf_reading = MAX_SENSOR_DISTANCE;
     if(millis() - lastSRF > 50){
       lastSRF = millis();
       srf_reading = srf_F.ping_cm();
@@ -268,7 +211,5 @@ void leaveStartingArea() {
   arm_servo.write(ARM_UP);
   //stop PID
   gyroPID.SetMode(MANUAL);
-
-  
 }
 
