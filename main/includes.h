@@ -13,7 +13,7 @@
 #include "Encoder.h"            //for quadrature encoders on 
 #include "Sabertooth.h"         //Dimension Engineering library; import from Sabertooth folder of
                                 //http://www.dimensionengineering.com/software/SabertoothArduinoLibraries.zip
-                                
+#include "EnableInterrupt.h"    //for STOP button: import from https://bintray.com/artifact/download/greygnome/generic/enableinterrupt-0.9.4.zip          
 /*********************     Pin assignments for Arduino Mega     ************************/
 //0 reserved for Serial RX --> USB TX
 //1 reserved for Serial TX --> USB RX

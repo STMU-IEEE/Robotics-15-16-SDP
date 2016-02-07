@@ -34,6 +34,26 @@ void srfTest() {
   Serial.println(" cm");
 }
 
+int srfOffset(){
+  unsigned long timeNow;
+  do
+    timeNow = millis();
+  while(timeNow - lastSRF < 50);
+  lastSRF = timeNow;
+  unsigned int uS_R = srf_R.ping();
+
+  do
+    timeNow = millis();
+  while(timeNow - lastSRF < 50);
+  lastSRF = timeNow;
+  unsigned int uS_FR = srf_FR.ping(); 
+  Serial.print("Offset: ");
+  int result = (int)(uS_FR - uS_R);
+  Serial.print(result);
+  Serial.println(" uS");
+  return result;
+}
+
 //follows wall for 10s forwards and backwards
 void wallFollower(NewPing& srf){
   ST.drive(30);
