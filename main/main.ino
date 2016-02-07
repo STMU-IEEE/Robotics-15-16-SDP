@@ -59,6 +59,7 @@ Sabertooth ST(ST_ADDR, STSerial);
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 NewPing srf_F = NewPing(SRF_F_TRIGGER, SRF_F_ECHO);
+NewPing srf_FR = NewPing(SRF_FR_TRIGGER, SRF_FR_ECHO);
 
 //use to wait 50ms between readings; update using millis()
 unsigned long lastSRF = 0;

@@ -40,7 +40,10 @@
 #define ST_SHUTOFF_PIN  22    //active low Sabertooth shutoff (S2)
 //23-39 open
 #define GO_PIN          40    //button to start/resume robot
-//41-51 open
+//41-43 open
+#define SRF_FR_TRIGGER  44
+#define SRF_FR_ECHO     45
+//46-51 open
 #define STOP_PIN        52    //button to stop robot
 //53 open 
 //pins 54 to 69 correspond to pins A0 to A15 on Arduino Mega
