@@ -14,7 +14,7 @@ void testMC()
 
 void testSwing(){
   ST.drive(16);
-  ST.drive(16);
+  ST.turn(16);
   delay(2000);
   ST.stop();
 }
