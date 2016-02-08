@@ -68,7 +68,7 @@ void followSRF(NewPing& srf, bool is_driving_backwards){
     const int TURN_POWER = 2;
     if(&srf == &srf_L)
       turn_sign = is_driving_backwards ? -1 : 1;
-    else if (&srf == &srf_R);
+    else if (&srf == &srf_R)
       turn_sign = is_driving_backwards ? 1 : -1;
     //else: not a valid srf???
     
