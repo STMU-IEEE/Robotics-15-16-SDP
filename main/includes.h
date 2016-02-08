@@ -1,5 +1,3 @@
-
-
 /********************     Libraries      *******************/
 #include <Servo.h>
 #include <Wire.h>
@@ -15,7 +13,8 @@
 #include "Encoder.h"            //for quadrature encoders on motors: import from "Manage Libraries…"
 #include "Sabertooth.h"         //Dimension Engineering library; import from Sabertooth folder of
                                 //http://www.dimensionengineering.com/software/SabertoothArduinoLibraries.zip
-#include "EnableInterrupt.h"    //for STOP button: import from "Manage Libraries…"
+//EnableInterrupt cannot be compiled with Encoder library: conflicting interrupt handlers
+//#include "EnableInterrupt.h"    //for STOP button: import from "Manage Libraries…"
 /*********************     Pin assignments for Arduino Mega     ************************/
 //0 reserved for Serial RX --> USB TX
 //1 reserved for Serial TX --> USB RX

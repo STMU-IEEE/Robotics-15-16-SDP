@@ -82,8 +82,8 @@ void setup() {
   //configure go pin
   pinMode(GO_PIN, INPUT_PULLUP);
  
-  enableInterrupt(STOP_PIN, STOP, FALLING);
-  enableInterrupt(GO_PIN, GO, FALLING);
+  //enableInterrupt(STOP_PIN, STOP, FALLING);
+  //enableInterrupt(GO_PIN, GO, FALLING);
   
   //set serial baud
   Serial.begin(115200);
@@ -137,6 +137,8 @@ void setup() {
   //assume PID is computed for every gyro reading
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
 }
+
+/*
 //Interrupt functions for STOP AND GO buttons 
 void GO() {
  While(DigitalRead(GO_PIN) == HIGH){
@@ -152,6 +154,7 @@ void STOP() {
   if(DigitalRead(STOP_PIN) == LOW)
    Serial.println("stop motors");
  }
+*/
 
 void loop() {
   Serial.println("Press g to continue");
