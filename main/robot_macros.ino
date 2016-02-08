@@ -157,11 +157,11 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 		
 		const int target_distance = 9; //in cm
 		//compare readings
-		if(		(srf_center.convert_cm(t2) < target_distance)
+		if(		(NewPing::convert_cm(t2) < target_distance)
 			&&	(t1 < t2))
 			//turn away from wall
 			ST.turn(-turn_power);
-		else if((srf_center.convert_cm(t2) > target_distance)
+		else if((NewPing::convert_cm(t2) > target_distance)
 			&&	(t1 > t2))
 			//turn toward wall
 			ST.turn(turn_power);
