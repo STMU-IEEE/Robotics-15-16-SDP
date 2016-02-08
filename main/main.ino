@@ -162,8 +162,8 @@ void loop() {
     ledBlink(2000);
   
   //leaveStartingArea();
-  //wallFollower(srf_L);
-  
+  wallFollower(srf_FR,srf_R);
+  /*
   int i, sum = 0;
   for(i = 0; i < 100; i++)
     sum += srfOffset();
@@ -171,8 +171,8 @@ void loop() {
   Serial.print("Average offset: ");
   Serial.print(averageOffset);
   Serial.println(" uS");
-  
-//  srfTest();
+  */
+  //srfTest();
 } //end loop()
 
 void leaveStartingArea() {
