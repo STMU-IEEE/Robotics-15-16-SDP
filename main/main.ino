@@ -157,10 +157,8 @@ void STOP() {
 */
 
 void loop() {
-  Serial.println("Press g to continue");
-  while(Serial.read() != 'g')
-    ledBlink(2000);
-  
+  Serial.println("Press GO to continue");
+  while(digitalRead(GO_PIN) != LOW);
   //leaveStartingArea();
   wallFollower(srf_FR,srf_R);
   /*
