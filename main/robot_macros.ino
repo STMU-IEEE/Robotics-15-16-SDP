@@ -85,3 +85,89 @@ void followSRF(NewPing& srf, bool is_driving_backwards){
       ST.turn(TURN_POWER * turn_sign);
   }
 }
+
+/*
+Better(?) wall following algorithm using two sensors
+(no idea if described somewhere online already)
+
+Accounts for two problematic cases in old algorithm:
+ -	sensor says "too far" but already facing toward wall,
+ 	turning more toward wall causing robot to crash
+ -	sensor says "too close" but already facing away from wall,
+ 	turning more away causing robot to stray from path
+ 	(and maybe into wall on other side)
+ 
+ New algorithm accounts for orientation of robot relative to wall;
+ these cases are now handled by keeping robot straight instead of turning,
+ which *should* cause robot to converge to desired distance from wall.
+ 
+ t1 is distance of front sensor, t2 is distance of center sensor
+ t2 is adjusted by T2_OFFSET_X, where
+ 	srf_1.ping() - (srf_2.ping() + D2_OFFSET_X) == 0
+ when the robot is oriented parallel to the wall,
+ and X is either L or R representing each side of the robot.
+ (Theoretically, D2_OFFSET is positive if center sensor is closer
+ due to standoff mount, etc., but it has been observed to still be negative,
+ about ~100uS below the expected amount.
+ A slight change in orientation greatly affects t1-t2,
+ probably such that T2_OFFSET_X is negligible.)
+ 
+ Table of cases:
+ 			
+						|   t1 < t2         |   t1 > t2        |
+						|   (facing wall)   |   (facing away)  |
+						|                   |                  |
+		----------------+-------------------+------------------+
+						|                   |                  |
+		 t2 < target    |   turn away       |   go straight    |
+		 (too close)    |                   |                  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 t2 > target    |   go straight     |   turn toward    |
+		 (too far)      |                   |                  |
+		 ---------------+-------------------+------------------+
+ 
+*/
+void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards){
+	unsigned long timeNow = millis();
+	if(timeNow - lastSRF >= 50){
+		lastSRF = timeNow;
+		//depending on which sensor is given, turn the robot left or right
+		//by changing sign of drive power
+		int turn_power;
+		unsigned int t2_offset;
+		const int TURN_AMOUNT = 2; //adjust if needed
+		if      (&srf_center == &srf_L){
+			turn_power = is_driving_backwards ? -TURN_AMOUNT : TURN_AMOUNT;
+			t2_offset = T2_OFFSET_L;
+		}
+		else if (&srf_center == &srf_R){
+			turn_power = is_driving_backwards ? TURN_AMOUNT : -TURN_AMOUNT;
+			t2_offset = T2_OFFSET_R;
+		}
+		//else: not a valid srf???
+		
+		//take readings
+		unsigned int t2 = srf_center.ping() + t2_offset;
+		do{
+			timeNow = millis();
+		} while(timeNow - lastSRF < 50);
+		unsigned int t1 = srf_front.ping();
+		
+		const int target_distance = 9; //in cm
+		//compare readings
+		if(		(srf_center.convert_cm(t2) < target_distance)
+			&&	(t1 < t2))
+			//turn away from wall
+			ST.turn(-turn_power);
+		else if((srf_center.convert_cm(t2) > target_distance)
+			&&	(t1 > t2))
+			//turn toward wall
+			ST.turn(turn_power);
+		else
+			//go straight
+			ST.turn(0);
+	}
+}
+
