@@ -31,6 +31,7 @@ void loop() {
   unsigned int t1 = sonar1.ping();
   delay(50);                     // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
   unsigned int t2 = sonar2.ping() + offset;
+  delay(50);                     // Wait 50ms between pings (about 20 pings/sec). 29ms should be the shortest delay between pings.
   
   //compute difference
   unsigned int difference_us = abs((int)(t1 - t2));
