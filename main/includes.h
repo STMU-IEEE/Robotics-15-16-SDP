@@ -3,19 +3,19 @@
 /********************     Libraries      *******************/
 #include <Servo.h>
 #include <Wire.h>
-#include "Adafruit_TCS34725.h"  //color sensor
+#include "Adafruit_TCS34725.h"  //color sensor; import from "Manage Libraries…"
 //#include "Adafruit_L3GD20.h"    //gyro sensor; may also try L3G by Pololu
 //Adafruit library outputs as scaled floats
 //Use Pololu library which outputs unscaled int16_t instead:
 #include "L3G.h"                //gyro sensor; import from L3G folder at https://github.com/pololu/l3g-arduino
-#include "FastLED.h"            //for rgb2hsv_approximate()
+#include "FastLED.h"            //for rgb2hsv_approximate(); import from "Manage Libraries…"
 #include "NewPing.h"            //for ultrasonic range finders; import from
                                 //https://bitbucket.org/teckel12/arduino-new-ping/downloads/NewPing_v1.7.zip
 #include "PID_v1.h"             //import from https://github.com/br3ttb/Arduino-PID-Library/
-#include "Encoder.h"            //for quadrature encoders on 
+#include "Encoder.h"            //for quadrature encoders on motors: import from "Manage Libraries…"
 #include "Sabertooth.h"         //Dimension Engineering library; import from Sabertooth folder of
                                 //http://www.dimensionengineering.com/software/SabertoothArduinoLibraries.zip
-#include "EnableInterrupt.h"    //for STOP button: import from https://bintray.com/artifact/download/greygnome/generic/enableinterrupt-0.9.4.zip          
+#include "EnableInterrupt.h"    //for STOP button: import from "Manage Libraries…"
 /*********************     Pin assignments for Arduino Mega     ************************/
 //0 reserved for Serial RX --> USB TX
 //1 reserved for Serial TX --> USB RX
