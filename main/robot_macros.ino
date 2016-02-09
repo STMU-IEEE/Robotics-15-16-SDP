@@ -69,7 +69,7 @@ void get_E_city(){
    ST.drive(35);
   while(photogateAverage() > PHOTOGATE_LOW){
     
-    wallFollower(srf_FR,srf_R);
+   followSRFs(srf_FR,srf_R,false,9);// its moving foward and the minimum distance is 9cm
     
   }
   
