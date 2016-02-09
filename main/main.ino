@@ -87,7 +87,7 @@ void setup() {
   
   //set serial baud
   Serial.begin(115200);
-  STSerial.begin(2400); //problems communicating at >2400bps?
+  STSerial.begin(38400); //problems communicating regardless of baud rate?
   
   //wait 2s for Sabertooth to power up (p. 16)
   Serial.println("\nWaiting for Sabertooth to power up...");
@@ -160,7 +160,8 @@ void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
   //leaveStartingArea();
-  wallFollower(srf_FR,srf_R);
+  //wallFollower(srf_FR,srf_R);
+  testMC();
   /*
   int i, sum = 0;
   for(i = 0; i < 100; i++)
