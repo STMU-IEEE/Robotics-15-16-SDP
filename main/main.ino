@@ -60,6 +60,7 @@ NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
 NewPing srf_R = NewPing(SRF_R_TRIGGER, SRF_R_ECHO);
 NewPing srf_F = NewPing(SRF_F_TRIGGER, SRF_F_ECHO);
 NewPing srf_FR = NewPing(SRF_FR_TRIGGER, SRF_FR_ECHO);
+NewPing srf_FL = NewPing(SRF_FL_TRIGGER, SRF_FL_ECHO);
 
 //use to wait 50ms between readings; update using millis()
 unsigned long lastSRF = 0;
@@ -142,7 +143,7 @@ void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
   //leaveStartingArea();
-  wallFollower(srf_FR,srf_R);
+  wallFollower(srf_FL,srf_L);
   //testMC();
   /*
   int i, sum = 0;
@@ -154,7 +155,7 @@ void loop() {
   Serial.println(" uS");
   */
   //while(digitalRead(STOP_PIN) != LOW)
-	//  srfTest();
+	  //srfTest();
 } //end loop()
 
 /*

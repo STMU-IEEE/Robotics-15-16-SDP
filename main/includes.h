@@ -23,7 +23,8 @@
 //4-5 open
 #define SRF_F_ECHO      6
 #define SRF_F_TRIGGER   7
-//8 open
+#define SRF_FL_TRIGGER  8
+#define SRF_FL_ECHO     8
 #define GRABBER_PIN     9    //servo 1 on Adafruit motor shield
 #define ARM_PIN         10    //servo 2 on Adafruit motor shield
 #define SRF_L_ECHO      11
