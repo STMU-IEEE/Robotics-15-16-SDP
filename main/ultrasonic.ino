@@ -65,15 +65,16 @@ int srfOffset(){
 
 //follows wall for 10s forwards and backwards
 void wallFollower(NewPing& srf_front, NewPing& srf_center){
-  const int drive_power = 35;
+  const int8_t drive_power = 35;
+  const unsigned int test_distance = 13;
   ST.drive(drive_power);
   unsigned long start = millis();
   while(millis() - start < 10000)
-    followSRFs(srf_front,srf_center,false);
+    followSRFs(srf_front,srf_center,false,test_distance);
   ST.drive(-drive_power);
   start = millis();
   while(millis() - start < 10000)
-    followSRFs(srf_front,srf_center,true);
+    followSRFs(srf_front,srf_center,true,test_distance);
   ST.stop();
 }
 

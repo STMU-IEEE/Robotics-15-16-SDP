@@ -179,7 +179,8 @@ Accounts for two problematic cases in old algorithm:
 		 ---------------+-------------------+------------------+
  
 */
-void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards){
+void followSRFs(NewPing& srf_front, NewPing& srf_center,
+				bool is_driving_backwards, unsigned int target_distance){
 	unsigned long timeNow = millis();
 	if(timeNow - lastSRF >= 50){
 		//depending on which sensor is given, turn the robot left or right
@@ -213,7 +214,6 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 		Serial.print("d2: ");
 		Serial.println(d2);
 		
-		const int target_distance = 13; //in cm
 		//compare readings
 		if(!is_driving_backwards){
 			if(		(d2 < target_distance)
