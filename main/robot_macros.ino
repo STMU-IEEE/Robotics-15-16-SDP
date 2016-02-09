@@ -147,74 +147,76 @@ Accounts for two problematic cases in old algorithm:
  probably such that T2_OFFSET_X is negligible.)
  
  Table of cases:
- 		
- 		Forward, right wall:
-						|   t1 < t2         |   t1 > t2        |
-						|   (facing wall)   |   (facing away)  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 < target    |   turn away (-)   |   go straight    |
-		 (too close)    |                   |                  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 > target    |   go straight     |   turn toward (+)|
-		 (too far)      |                   |                  |
-		 ---------------+-------------------+------------------+
-		 
-		 
-		 Backwards, right wall:
- 						|   t1 < t2         |   t1 > t2        |
-						|   (facing away)   |   (facing wall)  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 < target    |   go straight     |   turn toward (-)|
-		 (too close)    |                   |                  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 > target    |    turn away (+)  |   go straight    |
-		 (too far)      |                   |                  |
-		 ---------------+-------------------+------------------+
-		 
-		 
-		 
-		 Forward, left wall:
-						|   t1 < t2         |   t1 > t2        |
-						|   (facing wall)   |   (facing away)  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 < target    |   turn away (+)   |   go straight    |
-		 (too close)    |                   |                  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 > target    |   go straight     |   turn toward (-)|
-		 (too far)      |                   |                  |
-		 ---------------+-------------------+------------------+
-		 
-		 
-		 Backwards, left wall:
- 						|   t1 < t2         |   t1 > t2        |
-						|   (facing away)   |   (facing wall)  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 < target    |   go straight     |   turn toward (+)|
-		 (too close)    |                   |                  |
-						|                   |                  |
-		 ---------------+-------------------+------------------+
-						|                   |                  |
-		 d2 > target    |    turn away (-)  |   go straight    |
-		 (too far)      |                   |                  |
-		 ---------------+-------------------+------------------+
+        
+        Forward, right wall:
+                        |   t1 < t2         |   t1 > t2        |
+                        |   (facing wall)   |   (facing away)  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 < target    |   turn away (-)   |   go straight    |
+         (too close)    |                   |                  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 > target    |   go straight     |   turn toward (+)|
+         (too far)      |                   |                  |
+         ---------------+-------------------+------------------+
+         
+         
+         Backwards, right wall:
+                        |   t1 < t2         |   t1 > t2        |
+                        |   (facing away)   |   (facing wall)  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 < target    |   go straight     |   turn toward (-)|
+         (too close)    |                   |                  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 > target    |    turn away (+)  |   go straight    |
+         (too far)      |                   |                  |
+         ---------------+-------------------+------------------+
+         
+         
+         
+         Forward, left wall:
+                        |   t1 < t2         |   t1 > t2        |
+                        |   (facing wall)   |   (facing away)  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 < target    |   turn away (+)   |   go straight    |
+         (too close)    |                   |                  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 > target    |   go straight     |   turn toward (-)|
+         (too far)      |                   |                  |
+         ---------------+-------------------+------------------+
+         
+         
+         Backwards, left wall:
+                        |   t1 < t2         |   t1 > t2        |
+                        |   (facing away)   |   (facing wall)  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 < target    |   go straight     |   turn toward (+)|
+         (too close)    |                   |                  |
+                        |                   |                  |
+         ---------------+-------------------+------------------+
+                        |                   |                  |
+         d2 > target    |    turn away (-)  |   go straight    |
+         (too far)      |                   |                  |
+         ---------------+-------------------+------------------+
  
 */
-void followSRFs(NewPing& srf_front, NewPing& srf_center,
-				bool is_driving_backwards, unsigned int target_distance){
+//The following declaration Must Be On One Line
+//in order for the prototype to be generated.
+//cf. https://github.com/arduino/arduino-builder/issues/80
+void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards, unsigned int target_distance){
 	unsigned long timeNow = millis();
 	if(timeNow - lastSRF >= 50){
 		//depending on which sensor is given, turn the robot left or right
@@ -290,4 +292,5 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center,
 		}
 	}
 }
+
 
