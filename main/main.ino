@@ -138,24 +138,6 @@ void setup() {
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
 }
 
-/*
-//Interrupt functions for STOP AND GO buttons 
-void GO() {
- While(DigitalRead(GO_PIN) == HIGH){
-  Serial.println("do nothing");
-  if(DigitalRead(GO_PIN) == LOW)
-   Serial.println("reset motors");
- }
-
-// In the loop we just display interruptCount. The value is updated by the interrupt routine.
-void STOP() {
- While(DigitalRead(STOP_PIN) == HIGH){
-  Serial.println("do nothing");
-  if(DigitalRead(STOP_PIN) == LOW)
-   Serial.println("stop motors");
- }
-*/
-
 void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
@@ -173,6 +155,24 @@ void loop() {
   */
   //srfTest();
 } //end loop()
+
+/*
+//Interrupt functions for STOP AND GO buttons 
+void GO() {
+ While(DigitalRead(GO_PIN) == HIGH){
+  Serial.println("do nothing");
+  if(DigitalRead(GO_PIN) == LOW)
+   Serial.println("reset motors");
+ }
+
+// In the loop we just display interruptCount. The value is updated by the interrupt routine.
+void STOP() {
+ While(DigitalRead(STOP_PIN) == HIGH){
+  Serial.println("do nothing");
+  if(DigitalRead(STOP_PIN) == LOW)
+   Serial.println("stop motors");
+ }
+*/
 
 void leaveStartingArea() {
   Serial.println("Zeroing encoders...");
