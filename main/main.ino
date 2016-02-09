@@ -142,8 +142,8 @@ void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
   //leaveStartingArea();
-  //wallFollower(srf_FR,srf_R);
-  testMC();
+  wallFollower(srf_FR,srf_R);
+  //testMC();
   /*
   int i, sum = 0;
   for(i = 0; i < 100; i++)
@@ -153,7 +153,8 @@ void loop() {
   Serial.print(averageOffset);
   Serial.println(" uS");
   */
-  //srfTest();
+  //while(digitalRead(STOP_PIN) != LOW)
+	//  srfTest();
 } //end loop()
 
 /*

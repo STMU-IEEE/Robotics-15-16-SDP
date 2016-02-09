@@ -113,18 +113,68 @@ Accounts for two problematic cases in old algorithm:
  probably such that T2_OFFSET_X is negligible.)
  
  Table of cases:
- 			
+ 		
+ 		Forward, right wall:
 						|   t1 < t2         |   t1 > t2        |
 						|   (facing wall)   |   (facing away)  |
 						|                   |                  |
-		----------------+-------------------+------------------+
+		 ---------------+-------------------+------------------+
 						|                   |                  |
-		 t2 < target    |   turn away       |   go straight    |
+		 d2 < target    |   turn away (-)   |   go straight    |
 		 (too close)    |                   |                  |
 						|                   |                  |
 		 ---------------+-------------------+------------------+
 						|                   |                  |
-		 t2 > target    |   go straight     |   turn toward    |
+		 d2 > target    |   go straight     |   turn toward (+)|
+		 (too far)      |                   |                  |
+		 ---------------+-------------------+------------------+
+		 
+		 
+		 Backwards, right wall:
+ 						|   t1 < t2         |   t1 > t2        |
+						|   (facing away)   |   (facing wall)  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 < target    |   go straight     |   turn toward (-)|
+		 (too close)    |                   |                  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 > target    |    turn away (+)  |   go straight    |
+		 (too far)      |                   |                  |
+		 ---------------+-------------------+------------------+
+		 
+		 
+		 
+		 Forward, left wall:
+						|   t1 < t2         |   t1 > t2        |
+						|   (facing wall)   |   (facing away)  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 < target    |   turn away (+)   |   go straight    |
+		 (too close)    |                   |                  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 > target    |   go straight     |   turn toward (-)|
+		 (too far)      |                   |                  |
+		 ---------------+-------------------+------------------+
+		 
+		 
+		 Backwards, left wall:
+ 						|   t1 < t2         |   t1 > t2        |
+						|   (facing away)   |   (facing wall)  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 < target    |   go straight     |   turn toward (+)|
+		 (too close)    |                   |                  |
+						|                   |                  |
+		 ---------------+-------------------+------------------+
+						|                   |                  |
+		 d2 > target    |    turn away (-)  |   go straight    |
 		 (too far)      |                   |                  |
 		 ---------------+-------------------+------------------+
  
@@ -132,42 +182,78 @@ Accounts for two problematic cases in old algorithm:
 void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards){
 	unsigned long timeNow = millis();
 	if(timeNow - lastSRF >= 50){
-		lastSRF = timeNow;
 		//depending on which sensor is given, turn the robot left or right
 		//by changing sign of drive power
 		int turn_power;
 		unsigned int t2_offset;
-		const int TURN_AMOUNT = 2; //adjust if needed
+		const int TURN_AMOUNT = 5; //adjust if needed
 		if      (&srf_center == &srf_L){
-			turn_power = is_driving_backwards ? -TURN_AMOUNT : TURN_AMOUNT;
+			turn_power = is_driving_backwards ? TURN_AMOUNT : -TURN_AMOUNT;
 			t2_offset = T2_OFFSET_L;
 		}
 		else if (&srf_center == &srf_R){
-			turn_power = is_driving_backwards ? TURN_AMOUNT : -TURN_AMOUNT;
+			turn_power = is_driving_backwards ? -TURN_AMOUNT : TURN_AMOUNT;
 			t2_offset = T2_OFFSET_R;
 		}
 		//else: not a valid srf???
 		
 		//take readings
+		lastSRF = timeNow;
 		unsigned int t2 = srf_center.ping() + t2_offset;
 		do{
 			timeNow = millis();
 		} while(timeNow - lastSRF < 50);
+		lastSRF = timeNow;
 		unsigned int t1 = srf_front.ping();
 		
-		const int target_distance = 9; //in cm
+		Serial.print("d1: ");
+		Serial.println(srf_center.convert_cm(t1));
+		
+		unsigned int d2 = srf_center.convert_cm(t2);
+		Serial.print("d2: ");
+		Serial.println(d2);
+		
+		const int target_distance = 13; //in cm
 		//compare readings
-		if(		(NewPing::convert_cm(t2) < target_distance)
-			&&	(t1 < t2))
-			//turn away from wall
-			ST.turn(-turn_power);
-		else if((NewPing::convert_cm(t2) > target_distance)
-			&&	(t1 > t2))
-			//turn toward wall
-			ST.turn(turn_power);
-		else
-			//go straight
-			ST.turn(0);
+		if(!is_driving_backwards){
+			if(		(d2 < target_distance)
+				&&	(t1 < t2)){
+				//turn away from wall
+				ST.turn(-turn_power);
+				Serial.println("Away");
+			}
+			else if((d2 > target_distance)
+				&&	(t1 > t2)){
+				//turn toward wall
+				ST.turn(turn_power);
+				Serial.println("Toward");
+			}
+			else{
+				//go straight
+				ST.turn(0);
+				Serial.println("Straight");
+			}
+		}
+		else{
+			//backwards
+			if(		(d2 > target_distance)
+				&&	(t1 < t2)){
+				//turn away from wall
+				ST.turn(turn_power);
+				Serial.println("Away");
+			}
+			else if((d2 < target_distance)
+				&&	(t1 > t2)){
+				//turn toward wall
+				ST.turn(-turn_power);
+				Serial.println("Toward");
+			}
+			else{
+				//go straight
+				ST.turn(0);
+				Serial.println("Straight");
+			}
+		}
 	}
 }
 

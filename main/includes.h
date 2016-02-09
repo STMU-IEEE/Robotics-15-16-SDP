@@ -74,7 +74,7 @@
 /********************    Ultrasonic sensors   *******************/
 //offsets for sensors on each side when parallel (uS)
 #define T2_OFFSET_L		0
-#define T2_OFFSET_R		0
+#define T2_OFFSET_R		-62
 
 /*******************     Color sensor    ************************/
 //8-bit known hues measured for each victim

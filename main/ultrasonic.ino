@@ -1,6 +1,7 @@
 void srfTest() {
   //static int8_t nextSensor = 0;
   unsigned long timeNow;
+  /*
   do
     timeNow = millis();
   while(timeNow - lastSRF < 50);
@@ -8,7 +9,7 @@ void srfTest() {
   Serial.print("Left ping: ");
   Serial.print(srf_L.ping_cm());
   Serial.println("cm");   
-
+	*/
   do
     timeNow = millis();
   while(timeNow - lastSRF < 50);
@@ -16,7 +17,7 @@ void srfTest() {
   Serial.print("Right ping: ");
   Serial.print(srf_R.ping_cm());
   Serial.println(" cm");
-  
+  /*
   do
     timeNow = millis();
   while(timeNow - lastSRF < 50);
@@ -24,7 +25,7 @@ void srfTest() {
   Serial.print("Front ping: ");
   Serial.print(srf_F.ping_cm());
   Serial.println(" cm");
-  
+  */
   do
     timeNow = millis();
   while(timeNow - lastSRF < 50);
@@ -56,11 +57,12 @@ int srfOffset(){
 
 //follows wall for 10s forwards and backwards
 void wallFollower(NewPing& srf_front, NewPing& srf_center){
-  ST.drive(30);
+  const int drive_power = 35;
+  ST.drive(drive_power);
   unsigned long start = millis();
   while(millis() - start < 10000)
     followSRFs(srf_front,srf_center,false);
-  ST.drive(-30);
+  ST.drive(-drive_power);
   start = millis();
   while(millis() - start < 10000)
     followSRFs(srf_front,srf_center,true);
