@@ -59,6 +59,40 @@ void findOpening(NewPing srf){
   //Serial.println(motor_L_encoder.read());
 }
 
+void get_E_city(){
+ 
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+  delay(500);
+   ST.drive(35);
+  while(photogateAverage() > PHOTOGATE_LOW){
+    
+    wallFollower(srf_FR,srf_R);
+    
+  }
+  
+  while(photogateAverage() < PHOTOGATE_HIGH);
+    
+
+    //stop
+  ST.stop();
+
+  //close grabber
+  grabber_servo.write(GRABBER_CLOSE);
+  //wait for grabber to close
+  delay(500);
+  //raise arm
+  arm_servo.write(ARM_UP);
+
+  /*do
+  {
+  }while(srf_R.convert_cm(last_SRF_R<number);
+  */
+}
+
+
 void followSRF(NewPing& srf, bool is_driving_backwards){
   unsigned long timeNow = millis();
   if(timeNow - lastSRF >= 50){
