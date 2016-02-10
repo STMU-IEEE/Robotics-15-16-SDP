@@ -70,7 +70,7 @@ void get_E_city(){
    ST.drive(35);
   while(photogateAverage() > PHOTOGATE_LOW){
     
-   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 9cm
+   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
     
   }
   
