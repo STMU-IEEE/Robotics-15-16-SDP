@@ -88,7 +88,8 @@ void get_E_city(){
   delay(1000);
   testColor();
 
-   
+   ST.drive(-35);
+   followSRFs(srf_FR,srf_R,true,9);// its moving backwards and the minimum distance is 9cm
    
   /*do
   {

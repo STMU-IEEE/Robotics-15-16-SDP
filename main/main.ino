@@ -142,8 +142,8 @@ void setup() {
 void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
-  leaveStartingArea();
-  //get_E_city();
+  //leaveStartingArea();
+  get_E_city();
   //wallFollower(srf_FL,srf_L);
   //testMC();
   /*
@@ -226,8 +226,9 @@ void leaveStartingArea() {
   ST.turn(10);
   gyroAngle(0);
 
-  //now facing E city victim
-
+  ST.stop(); //now facing E city victim
+  
+  /*
   //go forward until wall on right
   gyro_PID_setpoint = 0;
   ST.turn(0);
@@ -249,6 +250,6 @@ void leaveStartingArea() {
   delay(500);
   arm_servo.write(ARM_UP);
   //stop PID
-  gyroPID.SetMode(MANUAL);
+  gyroPID.SetMode(MANUAL);*/
 }
 
