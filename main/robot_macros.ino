@@ -60,7 +60,8 @@ void findOpening(NewPing srf){
 }
 
 void get_E_city(){
- 
+
+
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
@@ -69,7 +70,7 @@ void get_E_city(){
    ST.drive(35);
   while(photogateAverage() > PHOTOGATE_LOW){
     
-   followSRFs(srf_FR,srf_R,false,9);// its moving foward and the minimum distance is 9cm
+   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 9cm
     
   }
   
@@ -89,8 +90,12 @@ void get_E_city(){
   testColor();
 
    ST.drive(-35);
-   followSRFs(srf_FR,srf_R,true,9);// its moving backwards and the minimum distance is 9cm
-   
+   unsigned long start = millis();
+   start = millis();
+   while(millis() - start < 8000){
+   followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+   }
+    ST.stop();
   /*do
   {
   }while(srf_R.convert_cm(last_SRF_R<number);
