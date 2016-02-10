@@ -143,7 +143,8 @@ void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
   //leaveStartingArea();
-  wallFollower(srf_FL,srf_L);
+  get_E_city();
+  //wallFollower(srf_FL,srf_L);
   //testMC();
   /*
   int i, sum = 0;
