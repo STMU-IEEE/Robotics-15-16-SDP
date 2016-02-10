@@ -87,6 +87,9 @@ void get_E_city(){
   arm_servo.write(ARM_UP);
   delay(1000);
   testColor();
+
+   
+   
   /*do
   {
   }while(srf_R.convert_cm(last_SRF_R<number);
