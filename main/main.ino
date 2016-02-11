@@ -65,6 +65,14 @@ NewPing srf_FL = NewPing(SRF_FL_TRIGGER, SRF_FL_ECHO);
 //use to wait 50ms between readings; update using millis()
 unsigned long last_SRF_trigger = 0;
 
+//keep last reading (in microseconds) available for use globally
+unsigned int last_SRF_L_echo;
+unsigned int last_SRF_R_echo;
+unsigned int last_SRF_F_echo;
+unsigned int last_SRF_FL_echo;
+unsigned int last_SRF_FR_echo;
+
+
 //motor quadrature encoders
 //positive counting == clockwise rotation
 Encoder motor_L_encoder(MOTOR_L_ENCODER_A, MOTOR_L_ENCODER_B);

@@ -234,25 +234,31 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 		int turn_power;
 		unsigned int t2_offset;
 		const int TURN_AMOUNT = 5; //adjust if needed
+		unsigned int *last_SRF_front_echo, *last_SRF_center_echo;
 		if      (&srf_center == &srf_L){
 			turn_power = is_driving_backwards ? TURN_AMOUNT : -TURN_AMOUNT;
 			t2_offset = T2_OFFSET_L;
+			last_SRF_front_echo = &last_SRF_FL_echo;
+			last_SRF_center_echo = &last_SRF_L_echo;
 		}
 		else if (&srf_center == &srf_R){
 			turn_power = is_driving_backwards ? -TURN_AMOUNT : TURN_AMOUNT;
 			t2_offset = T2_OFFSET_R;
+			last_SRF_front_echo = &last_SRF_FR_echo;
+			last_SRF_center_echo = &last_SRF_R_echo;
 		}
 		//else: not a valid srf???
 		
 		//take readings
 		last_SRF_trigger = timeNow;
-		unsigned int t2 = srf_center.ping() + t2_offset;
+		*last_SRF_center_echo = srf_center.ping();
+		unsigned int t2 = *last_SRF_center_echo + t2_offset;
 		do{
 			timeNow = millis();
 		} while(timeNow - last_SRF_trigger < 50);
 		last_SRF_trigger = timeNow;
-		unsigned int t1 = srf_front.ping();
-		
+		*last_SRF_front_echo = srf_front.ping();
+		unsigned int& t1 = *last_SRF_front_echo;
 		Serial.print("d1: ");
 		Serial.println(srf_center.convert_cm(t1));
 		
