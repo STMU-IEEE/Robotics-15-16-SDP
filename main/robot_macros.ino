@@ -59,6 +59,82 @@ void findOpening(NewPing srf){
   //Serial.println(motor_L_encoder.read());
 }
 
+void leaveStartingArea() {
+  Serial.println("Zeroing encoders...");
+  motor_L_encoder.write(0);
+  motor_R_encoder.write(0);
+
+  //initialize PID
+  angle = 0;             //start with angle 0
+  gyro_PID_setpoint = 0; //keep angle at 0
+  gyro_PID_output = 0; //start without turning
+  
+  //go forward
+  ST.drive(25);
+  ST.turn(0);
+
+  //start PID
+  gyroPID.SetMode(AUTOMATIC);
+
+  //go to opening to lane 2
+  findOpening(srf_L);
+  
+  //turn left 90 degrees
+  ST.drive(0);
+  ST.turn(-16);
+  gyroAngle(-90);
+  
+  //go forward toward wall
+  gyro_PID_setpoint = -90;
+  ST.drive(20);
+  while(true){
+    static unsigned long srf_reading = MAX_SENSOR_DISTANCE;
+    if(millis() - last_SRF_trigger > 50){
+      last_SRF_trigger = millis();
+      srf_reading = srf_F.ping_cm();
+      Serial.println(srf_reading);
+    }
+    if(srf_reading < 3)
+      break;
+    followGyro();
+  }
+  
+  //turn right 45 degrees in place
+  ST.drive(0);
+  ST.turn(16);
+  gyroAngle(-45);
+  
+  ST.drive(10);
+  ST.turn(10);
+  gyroAngle(0);
+
+  ST.stop(); //now facing E city victim
+  
+  /*
+  //go forward until wall on right
+  gyro_PID_setpoint = 0;
+  ST.turn(0);
+  ST.drive(20);
+  arm_servo.write(ARM_DOWN);
+  grabber_servo.write(GRABBER_OPEN);
+  while(photogateAverage() > PHOTOGATE_LOW){
+    followGyro();
+  }
+  Serial.println("Approaching victim...");
+  while(photogateAverage() < PHOTOGATE_HIGH){
+    followGyro();
+  }
+  //stop
+  ST.stop();
+  
+  Serial.println("Grabbing victim...");
+  grabber_servo.write(GRABBER_CLOSE);
+  delay(500);
+  arm_servo.write(ARM_UP);
+  //stop PID
+  gyroPID.SetMode(MANUAL);*/
+}
+
 void get_E_city(){
 
 
