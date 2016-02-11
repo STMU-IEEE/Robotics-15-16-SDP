@@ -63,7 +63,7 @@ NewPing srf_FR = NewPing(SRF_FR_TRIGGER, SRF_FR_ECHO);
 NewPing srf_FL = NewPing(SRF_FL_TRIGGER, SRF_FL_ECHO);
 
 //use to wait 50ms between readings; update using millis()
-unsigned long lastSRF = 0;
+unsigned long last_SRF_trigger = 0;
 
 //motor quadrature encoders
 //positive counting == clockwise rotation
@@ -207,8 +207,8 @@ void leaveStartingArea() {
   ST.drive(20);
   while(true){
     static unsigned long srf_reading = MAX_SENSOR_DISTANCE;
-    if(millis() - lastSRF > 50){
-      lastSRF = millis();
+    if(millis() - last_SRF_trigger > 50){
+      last_SRF_trigger = millis();
       srf_reading = srf_F.ping_cm();
       Serial.println(srf_reading);
     }

@@ -13,8 +13,8 @@ void findOpening(NewPing srf){
   //wait until opening to lane 2 on left
   while(true){
     timeNow = millis();
-    if(timeNow - lastSRF >= 50){
-      lastSRF = timeNow;
+    if(timeNow - last_SRF_trigger >= 50){
+      last_SRF_trigger = timeNow;
       srf_reading = srf.ping_cm();
       //Serial.println(srf_reading);
     }
@@ -32,8 +32,8 @@ void findOpening(NewPing srf){
   //wait until opening to lane 2 on left 
   while(true){
     timeNow = millis();
-    if(timeNow - lastSRF >= 50){
-      lastSRF = timeNow;
+    if(timeNow - last_SRF_trigger >= 50){
+      last_SRF_trigger = timeNow;
       srf_reading = srf.ping_cm();
       //Serial.println(srf_reading);
     }
@@ -105,8 +105,8 @@ void get_E_city(){
 
 void followSRF(NewPing& srf, bool is_driving_backwards){
   unsigned long timeNow = millis();
-  if(timeNow - lastSRF >= 50){
-    lastSRF = timeNow;
+  if(timeNow - last_SRF_trigger >= 50){
+    last_SRF_trigger = timeNow;
     //depending on which sensor is given, turn the robot left or right (change sign of drive power)
     int turn_sign;
     const int TURN_POWER = 2;
@@ -228,7 +228,7 @@ Accounts for two problematic cases in old algorithm:
 //cf. https://github.com/arduino/arduino-builder/issues/80
 void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards, unsigned int target_distance){
 	unsigned long timeNow = millis();
-	if(timeNow - lastSRF >= 50){
+	if(timeNow - last_SRF_trigger >= 50){
 		//depending on which sensor is given, turn the robot left or right
 		//by changing sign of drive power
 		int turn_power;
@@ -245,12 +245,12 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 		//else: not a valid srf???
 		
 		//take readings
-		lastSRF = timeNow;
+		last_SRF_trigger = timeNow;
 		unsigned int t2 = srf_center.ping() + t2_offset;
 		do{
 			timeNow = millis();
-		} while(timeNow - lastSRF < 50);
-		lastSRF = timeNow;
+		} while(timeNow - last_SRF_trigger < 50);
+		last_SRF_trigger = timeNow;
 		unsigned int t1 = srf_front.ping();
 		
 		Serial.print("d1: ");
