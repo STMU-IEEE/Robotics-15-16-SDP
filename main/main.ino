@@ -172,13 +172,15 @@ void ISR_STOP() {
 	//disable Sabertooth
 	digitalWrite(ST_SHUTOFF_PIN, LOW);
 	//detach servos
-	
+	grabber_servo.detach();
+	arm_servo.detach();
 	//wait for GO to be pressed
 	while(digitalRead(GO_PIN) != LOW);
 	//enable Sabertooth
 	digitalWrite(ST_SHUTOFF_PIN, HIGH);
 	//reattach servos
-	
+	grabber_servo.attach(GRABBER_PIN);
+	arm_servo.attach(ARM_PIN);
 }
 
 
