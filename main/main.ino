@@ -169,9 +169,16 @@ void loop() {
 
 //Interrupt functions for STOP buttons 
 void ISR_STOP() {
+	//disable Sabertooth
 	digitalWrite(ST_SHUTOFF_PIN, LOW);
+	//detach servos
+	
+	//wait for GO to be pressed
 	while(digitalRead(GO_PIN) != LOW);
+	//enable Sabertooth
 	digitalWrite(ST_SHUTOFF_PIN, HIGH);
+	//reattach servos
+	
 }
 
 
