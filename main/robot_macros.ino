@@ -7,21 +7,21 @@ void ledBlink(unsigned long delay_ms) {
 }
 
 //assumes driving, gyro PID enabled (mode == AUTOMATIC)
-void findOpening(NewPing srf){  
+void findOpening(NewPing& srf){ 
+  Serial.println("findOpening");
   unsigned long timeNow;
   unsigned long srf_reading;
-  //wait until opening to lane 2 on left
-  while(true){
-    timeNow = millis();
-    if(timeNow - last_SRF_trigger >= 50){
-      last_SRF_trigger = timeNow;
-      srf_reading = srf.ping_cm();
-      //Serial.println(srf_reading);
-    }
-    if(srf_reading > 36)
-      break;
-    followGyro();
-  }
+  
+	//wait until opening
+	do {
+		timeNow = millis();
+		if(timeNow - last_SRF_trigger >= 50){
+			last_SRF_trigger = timeNow;
+			srf_reading = srf.ping_cm();
+			//Serial.println(srf_reading);
+		}
+		followGyro();
+	} while(srf_reading <= 36);
 
   //save encoder value for opening
   int32_t encoder_opening = motor_L_encoder.read();
@@ -29,18 +29,17 @@ void findOpening(NewPing srf){
   while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
     followGyro();
   
-  //wait until opening to lane 2 on left 
-  while(true){
-    timeNow = millis();
-    if(timeNow - last_SRF_trigger >= 50){
-      last_SRF_trigger = timeNow;
-      srf_reading = srf.ping_cm();
-      //Serial.println(srf_reading);
-    }
-    if(srf_reading < 25)
-      break;
+	//wait until wall
+	do {
+		timeNow = millis();
+		if(timeNow - last_SRF_trigger >= 50){
+			last_SRF_trigger = timeNow;
+			srf_reading = srf.ping_cm();
+			//Serial.println(srf_reading);
+		}
     followGyro();
-  }
+	} while (srf_reading >= 25);
+
     //save encoder value for wall
   int32_t encoder_wall = motor_L_encoder.read();
   
