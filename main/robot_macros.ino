@@ -384,4 +384,24 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 	}
 }
 
-
+void find_actual_baud(){
+	long options[] = {2400,9600,19200,38400};
+	int32_t starting_position = motor_L_encoder.read();
+	int32_t new_position;
+	int i;
+	for(i = 0; i < 4; i++){
+		STSerial.flush();
+		STSerial.begin(options[i]);
+		ST.drive(20);
+		ST.turn(0);
+		delay(200);
+		ST.stop();
+		new_position = motor_L_encoder.read();
+		if(abs(new_position - starting_position) > 50){
+			Serial.print("Actual baud is ");
+			Serial.println(options[i]);
+			return;
+		}
+	}
+	Serial.println("Did not move");
+}

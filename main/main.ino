@@ -111,6 +111,8 @@ void setup() {
   //Sabertooth can be re-enabled
   digitalWrite(ST_SHUTOFF_PIN,HIGH); 
   
+  find_actual_baud();
+  
   //Servos
   Serial.println("Attaching servos...");
   grabber_servo.attach(GRABBER_PIN);
