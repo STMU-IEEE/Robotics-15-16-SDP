@@ -30,10 +30,15 @@ void findOpening(NewPing& srf, int drive_speed){
 	int32_t encoder_opening = motor_L_encoder.read();
 	Serial.println(encoder_opening);
 	
+	int32_t last_encoder_reading;
 	Serial.println("Advancing 1/2 turn...");
-	while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
+	do {
+		last_encoder_reading = motor_L_encoder.read();
 		followGyro();
-	
+	} while(((drive_speed < 0) ? (last_encoder_reading - encoder_opening) //if going backwards
+	                           : (encoder_opening - last_encoder_reading) //if going forward
+	        ) < (MOTOR_COUNTS_PER_REVOLUTION / 2));
+	                        
 	//wait until wall
 	Serial.println("Looking for wall...");
 	do {
@@ -55,9 +60,12 @@ void findOpening(NewPing& srf, int drive_speed){
 	//reverse to middle of opening
 	Serial.println("Going to opening...");
 	ST.drive(-drive_speed);
-	while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
+	do {
+		last_encoder_reading = motor_L_encoder.read();
 		followGyro();
-
+	} while((drive_speed < 0) ? last_encoder_reading > ((encoder_opening + encoder_wall)/ 2)
+	                          : last_encoder_reading < ((encoder_opening + encoder_wall)/ 2));
+	
 	ST.stop();
 }
 
