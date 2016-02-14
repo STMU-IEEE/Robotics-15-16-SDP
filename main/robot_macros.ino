@@ -144,9 +144,7 @@ void leaveStartingArea() {
   gyroPID.SetMode(MANUAL);*/
 }
 
-void get_E_city(){
-
-
+victim_color get_E_city(){
 	//lower arm
 	arm_servo.write(ARM_DOWN);
 	//open grabber
@@ -168,7 +166,8 @@ void get_E_city(){
 	//raise arm
 	arm_servo.write(ARM_UP);
 	delay(1000);
-	testColor();
+	victim_color result = getColor();
+	delay(5000);//debugging: read results
 	
 	ST.drive(-35);
 	
@@ -184,6 +183,8 @@ void get_E_city(){
 	ST.turn(10);
 	gyroAngle(90);
 	ST.stop();
+	
+	return result;
 }
 
 
