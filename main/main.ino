@@ -151,7 +151,8 @@ void setup() {
 void loop() {
   Serial.println("Press GO to continue");
   while(digitalRead(GO_PIN) != LOW);
-  //leaveStartingArea();
+  
+  leaveStartingArea();
   get_E_city();
   //wallFollower(srf_FL,srf_L);
   //testMC();
