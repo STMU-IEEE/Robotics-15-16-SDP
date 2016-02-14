@@ -147,44 +147,43 @@ void leaveStartingArea() {
 void get_E_city(){
 
 
-  //lower arm
-  arm_servo.write(ARM_DOWN);
-  //open grabber
-  grabber_servo.write(GRABBER_OPEN);
-  delay(500);
-   ST.drive(35);
-  while(photogateAverage() > PHOTOGATE_LOW){
-    
-   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
-    
-  }
-  
-  while(photogateAverage() < PHOTOGATE_HIGH);
-    
-
-    //stop
-  ST.stop();
-
-  //close grabber
-  grabber_servo.write(GRABBER_CLOSE);
-  //wait for grabber to close
-  delay(500);
-  //raise arm
-  arm_servo.write(ARM_UP);
-  delay(1000);
-  testColor();
-
-   ST.drive(-35);
-   unsigned long start = millis();
-   start = millis();
-   while(millis() - start < 8000){
-   followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-   }
-    ST.stop();
-  /*do
-  {
-  }while(srf_R.convert_cm(last_SRF_R<number);
-  */
+	//lower arm
+	arm_servo.write(ARM_DOWN);
+	//open grabber
+	grabber_servo.write(GRABBER_OPEN);
+	//delay(500);
+	ST.drive(35);
+	while(photogateAverage() > PHOTOGATE_LOW){
+		followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
+	}
+	while(photogateAverage() < PHOTOGATE_HIGH);
+	
+	//stop
+	ST.stop();
+	
+	//close grabber
+	grabber_servo.write(GRABBER_CLOSE);
+	//wait for grabber to close
+	delay(500);
+	//raise arm
+	arm_servo.write(ARM_UP);
+	delay(1000);
+	testColor();
+	
+	ST.drive(-35);
+	
+	//go until opening to lane 1
+	do {
+		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
+	
+	findOpening(srf_R, -25);
+	
+	//turn facing lane 1
+	ST.drive(0);
+	ST.turn(10);
+	gyroAngle(90);
+	ST.stop();
 }
 
 
