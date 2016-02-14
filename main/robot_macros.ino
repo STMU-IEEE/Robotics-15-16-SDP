@@ -415,3 +415,48 @@ void find_actual_baud(){
 	}
 	Serial.println("Did not move");
 }
+
+void dropoff_E_city_Y(){
+	//keep turning toward yellow dropoff
+	ST.drive(-5); //swing to avoid collision with dropoff box
+	ST.turn(10);
+	gyroAngle(180);
+	ST.stop();
+	
+	//go further into dropoff for 1st victim
+	gyro_PID_setpoint = 180;
+	ST.drive(15);
+	do {
+    	if(millis() - last_SRF_trigger > 50){
+			last_SRF_trigger = millis();
+			last_SRF_F_echo = srf_F.ping_cm();
+			Serial.println(last_SRF_F_echo);
+		}
+		followGyro();
+    } while (last_SRF_F_echo >= 17); //need enough room to drop arm
+    
+    //drop victim
+    arm_servo.write(ARM_DOWN);
+    delay(300);
+    grabber_servo.write(GRABBER_OPEN);
+    delay(300);
+    arm_servo.write(ARM_UP);
+    delay(300);
+    grabber_servo.write(GRABBER_CLOSE);
+    
+    //back up to opening
+    ST.drive(-35);
+	
+	//go until opening to lane 1
+	do {
+		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
+	
+	findOpening(srf_R, -25);
+	
+	//turn facing lane 3
+	ST.drive(0);
+	ST.turn(-10);
+	gyroAngle(90);
+	ST.stop();
+}

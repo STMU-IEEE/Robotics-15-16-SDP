@@ -149,24 +149,32 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Press GO to continue");
-  while(digitalRead(GO_PIN) != LOW);
-  
-  leaveStartingArea();
-  get_E_city();
-  //wallFollower(srf_FL,srf_L);
-  //testMC();
-  /*
-  int i, sum = 0;
-  for(i = 0; i < 100; i++)
-    sum += srfOffset();
-  int averageOffset = sum / i;
-  Serial.print("Average offset: ");
-  Serial.print(averageOffset);
-  Serial.println(" uS");
-  */
-  //while(digitalRead(STOP_PIN) != LOW)
-	  //srfTest();
+	Serial.println("Press GO to continue");
+	while(digitalRead(GO_PIN) != LOW);
+	
+  	leaveStartingArea();
+	victim_color E_city = get_E_city();
+	if(E_city == yellow)
+		dropoff_E_city_Y();
+		
+	//else //red
+		//dropoff_E_city_R // will be part of usual dropoff red victim case
+		//get_to_W_city_from_R
+	//should now be facing wall between lane 1 and 2 by W opening to lane 3 
+	
+	//wallFollower(srf_FL,srf_L);
+	//testMC();
+	/*
+	int i, sum = 0;
+	for(i = 0; i < 100; i++)
+		sum += srfOffset();
+	int averageOffset = sum / i;
+	Serial.print("Average offset: ");
+	Serial.print(averageOffset);
+	Serial.println(" uS");
+	*/
+	//while(digitalRead(STOP_PIN) != LOW)
+		//srfTest();
 } //end loop()
 
 
