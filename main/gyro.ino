@@ -75,8 +75,10 @@ bool followGyro() {
     was_updated = updateAngle();
     if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
       lastMCUpdate = millis();
-      byte newTurn = (byte)gyro_PID_output; 
-      ST.drive(newTurn);
+      int newTurn = gyro_PID_output; 
+      Serial.print("New turn speed: ");
+      Serial.println(newTurn);
+      ST.turn(newTurn);
     }
   }
   return was_updated;

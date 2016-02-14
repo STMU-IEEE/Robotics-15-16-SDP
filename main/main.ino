@@ -139,8 +139,8 @@ void setup() {
   gyroCalibrate();
 
   //constrain turning power to safer values:
-  byte turn_range = 16;
-  gyroPID.SetOutputLimits(turn_range/2, turn_range/2);
+  int turn_range = 16;
+  gyroPID.SetOutputLimits(-turn_range/2, turn_range/2);
   
   //assume PID is computed for every gyro reading
   gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
