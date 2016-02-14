@@ -1,5 +1,9 @@
-void testColor() {
-  hue2color(readHue());
+victim_color getColor() {
+	digitalWrite(COLOR_LED_PIN,HIGH);
+	delay(700); //wait for at least 1 new reading to occur 
+	victim_color result = hue2color(readHue());
+	digitalWrite(COLOR_LED_PIN,LOW);
+	return result;
 }
 
 //Calculate hue (color) detected, returned as 8-bit value (not on 360 degree scale!)
