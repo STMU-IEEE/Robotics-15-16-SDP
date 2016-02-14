@@ -16,6 +16,7 @@
                                  
 //Do not use external interrupt pins with EnableInterrupt:
 //already used by encoders (conflicting with Encoder.h's interrupt handlers)
+//cf. https://github.com/GreyGnome/EnableInterrupt/wiki/Usage#conflicting-isrs-with-other-libraries
 #define EI_NOTEXTERNAL
 #include "EnableInterrupt.h"    //for STOP button: import from "Manage Libraries…"
 /*********************     Pin assignments for Arduino Mega     ************************/
