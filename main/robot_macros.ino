@@ -77,10 +77,6 @@ void leaveStartingArea() {
   gyro_PID_setpoint = 0; //keep angle at 0
   gyro_PID_output = 0; //start without turning
   
-  //go forward
-  ST.drive(25);
-  ST.turn(0);
-
   //start PID
   gyroPID.SetMode(AUTOMATIC);
 
@@ -95,17 +91,14 @@ void leaveStartingArea() {
   //go forward toward wall
   gyro_PID_setpoint = -90;
   ST.drive(20);
-  while(true){
-    static unsigned long srf_reading = MAX_SENSOR_DISTANCE;
+  do {
     if(millis() - last_SRF_trigger > 50){
       last_SRF_trigger = millis();
-      srf_reading = srf_F.ping_cm();
-      Serial.println(srf_reading);
+      last_SRF_F_echo = srf_F.ping_cm();
+      Serial.println(last_SRF_F_echo);
     }
-    if(srf_reading < 3)
-      break;
     followGyro();
-  }
+  } while (last_SRF_F_echo >= 3);
   
   //turn right 45 degrees in place
   ST.drive(0);
@@ -116,7 +109,13 @@ void leaveStartingArea() {
   ST.turn(10);
   gyroAngle(0);
 
-  ST.stop(); //now facing E city victim
+	Serial.println("Advancing 2 turns...");
+	gyro_PID_setpoint = 0;
+	motor_L_encoder.write(0);
+	while(motor_L_encoder.read() > -MOTOR_COUNTS_PER_REVOLUTION / 2)
+		followGyro(); 
+
+	ST.stop();//now facing E city victim
   
   /*
   //go forward until wall on right
