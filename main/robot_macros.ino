@@ -8,10 +8,10 @@ void ledBlink(unsigned long delay_ms) {
 
 //assumes driving, gyro PID enabled (mode == AUTOMATIC)
 void findOpening(NewPing& srf, int drive_speed){ 
-  Serial.println("findOpening");
-  unsigned long timeNow;
-  unsigned long srf_reading;
-  
+	Serial.println("findOpening");
+	unsigned long timeNow;
+	unsigned long srf_reading;
+	
 	//wait until opening
 	Serial.println("Looking for opening...");
 	ST.drive(drive_speed);
@@ -25,17 +25,17 @@ void findOpening(NewPing& srf, int drive_speed){
 		followGyro();
 	} while(srf_reading <= 36);
 
-  //save encoder value for opening
+	//save encoder value for opening
 	Serial.print("L encoder position: ");
-  int32_t encoder_opening = motor_L_encoder.read();
+	int32_t encoder_opening = motor_L_encoder.read();
 	Serial.println(encoder_opening);
 	
 	Serial.println("Advancing 1/2 turn...");
-  while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
-    followGyro();
-  
-	Serial.println("Looking for wall...");
+	while(motor_L_encoder.read() > (encoder_opening - (MOTOR_COUNTS_PER_REVOLUTION / 2)))
+		followGyro();
+	
 	//wait until wall
+	Serial.println("Looking for wall...");
 	do {
 		timeNow = millis();
 		if(timeNow - last_SRF_trigger >= 50){
@@ -43,28 +43,22 @@ void findOpening(NewPing& srf, int drive_speed){
 			srf_reading = srf.ping_cm();
 			//Serial.println(srf_reading);
 		}
-    followGyro();
+		followGyro();
 	} while (srf_reading >= 25);
 
-    //save encoder value for wall
-    Serial.print("Wall encoder position: ");
-  int32_t encoder_wall = motor_L_encoder.read();
+	//save encoder value for wall
+	Serial.print("Wall encoder position: ");
+	int32_t encoder_wall = motor_L_encoder.read();
 	Serial.println(encoder_wall);
-  
-  //Serial.print("Opening:\t");
-  //Serial.println(encoder_opening);
-  //Serial.print("Wall:\t");
-  //Serial.println(encoder_wall);
+	
 
 	//reverse to middle of opening
 	Serial.println("Going to opening...");
-  ST.drive(-drive_speed);
-  while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
-    followGyro();
+	ST.drive(-drive_speed);
+	while(motor_L_encoder.read() < ((encoder_opening + encoder_wall)/ 2))
+		followGyro();
 
-  //Serial.print("Stop:\t");
-  ST.stop();
-  //Serial.println(motor_L_encoder.read());
+	ST.stop();
 }
 
 void leaveStartingArea() {
