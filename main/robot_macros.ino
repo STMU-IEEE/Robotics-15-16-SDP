@@ -312,7 +312,7 @@ Accounts for two problematic cases in old algorithm:
 //The following declaration Must Be On One Line
 //in order for the prototype to be generated.
 //cf. https://github.com/arduino/arduino-builder/issues/80
-void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards, unsigned int target_distance){
+bool followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwards, unsigned int target_distance){
 	unsigned long timeNow = millis();
 	if(timeNow - last_SRF_trigger >= 50){
 		//depending on which sensor is given, turn the robot left or right
@@ -392,7 +392,10 @@ void followSRFs(NewPing& srf_front, NewPing& srf_center, bool is_driving_backwar
 				Serial.println("Straight");
 			}
 		}
-	}
+		return true;
+	}//end if(timeNow - last_SRF_trigger >= 50)
+	else
+		return false;
 }
 
 void find_actual_baud(){
