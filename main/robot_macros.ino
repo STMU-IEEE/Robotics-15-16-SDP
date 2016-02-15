@@ -90,7 +90,11 @@ void leaveStartingArea() {
   ST.drive(0);
   ST.turn(-16);
   gyroAngle(-90);
-  
+
+}
+
+void L1_to_L2(){
+
   //go forward toward wall
   gyro_PID_setpoint = -90;
   ST.drive(20);
