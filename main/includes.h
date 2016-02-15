@@ -63,7 +63,7 @@
 #define ARM_DOWN        97
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   72
-#define GRABBER_MIN     50
+#define GRABBER_MIN     50 //do not use when holding a victim
  
 /*************************   Photogate     *********************/
 //15-bit thresholds with hysteresis
