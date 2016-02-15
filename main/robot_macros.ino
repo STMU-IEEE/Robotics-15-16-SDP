@@ -424,6 +424,73 @@ void find_actual_baud(){
 	Serial.println("Did not move");
 }
 
+void dropoff_R(){
+	
+	
+	//go forward toward wall
+  gyro_PID_setpoint = 90;
+  ST.turn(0);
+  ST.drive(20);
+	
+	do {
+    if(millis() - last_SRF_trigger > 50){
+      last_SRF_trigger = millis();
+      last_SRF_F_echo = srf_F.ping_cm();
+      Serial.println(last_SRF_F_echo);
+    }
+    followGyro();
+  } while (last_SRF_F_echo >= 6);
+  
+  ST.stop();
+   //turn left 90 degrees in place
+  ST.drive(0);
+  ST.turn(-16);
+  gyroAngle(angle-90);
+  
+  ST.turn(0);
+  ST.drive(30);
+  
+  
+  
+  do {
+    	while(!followSRFs(srf_FR,srf_R,false,11));// its moving forward and the minimum distance is 11cm
+  		
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_F_echo = srf_F.ping();
+		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
+		
+    } while (srf_F.convert_cm(last_SRF_F_echo) >= 17); //need enough room to drop arm
+    
+  ST.stop();
+   //drop victim
+    arm_servo.write(ARM_DOWN);
+    delay(300);
+    grabber_servo.write(GRABBER_OPEN);
+    delay(300);
+    arm_servo.write(ARM_UP);
+    delay(300);
+    grabber_servo.write(GRABBER_CLOSE);
+    ST.turn(0);
+    ST.drive(-30);
+     do {
+    	while(!followSRFs(srf_FR,srf_R,true,11));// its moving backwards and the minimum distance is 11cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_L_echo = srf_L.ping();
+		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
+		
+    } while (srf_L.convert_cm(last_SRF_L_echo) < 36); //find L1-L2 opening
+ 
+    findOpening(srf_L, -25);
+    
+    angle = 0;
+    ST.drive(0);
+    ST.turn(-16);
+    gyroAngle(-90);
+    ST.stop();
+
+}
 void dropoff_E_city_Y(){
 	//backup to prevent hitting drop off
 	motor_L_encoder.write(0);
