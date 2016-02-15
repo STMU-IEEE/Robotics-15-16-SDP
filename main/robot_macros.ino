@@ -456,7 +456,10 @@ void dropoff_E_city_Y(){
     arm_servo.write(ARM_UP);
     delay(300);
     grabber_servo.write(GRABBER_CLOSE);
-    
+
+}
+
+void depart_from_Y(){
     //back up to opening
     ST.drive(-35);
 	
