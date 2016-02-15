@@ -186,7 +186,7 @@ victim_color get_E_city(){
 	//turn facing lane 1
 	ST.drive(0);
 	ST.turn(10);
-	gyroAngle(90);
+	gyroAngle(angle+90);
 	ST.stop();
 	
 	return result;
