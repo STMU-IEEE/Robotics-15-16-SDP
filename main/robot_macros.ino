@@ -425,8 +425,13 @@ void find_actual_baud(){
 }
 
 void dropoff_E_city_Y(){
+	//backup to prevent hitting drop off
+	motor_L_encoder.write(0);
+	ST.drive(-10); //swing to avoid collision with dropoff box
+	ST.turn(0);
+	while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION / 4);
 	//keep turning toward yellow dropoff
-	ST.drive(-5); //swing to avoid collision with dropoff box
+	ST.drive(0);
 	ST.turn(10);
 	gyroAngle(180);
 	ST.stop();
@@ -460,9 +465,14 @@ void dropoff_E_city_Y(){
 		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
 	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
 	
-	findOpening(srf_R, -25);
+	//findOpening(srf_R, -25);
 	
 	//turn facing lane 3
+	ST.drive(-10);
+	ST.turn(-10);
+	gyroAngle(angle-90);
+	ST.stop();
+}
 	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(90);
