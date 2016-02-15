@@ -476,8 +476,75 @@ void depart_from_Y(){
 	gyroAngle(angle-90);
 	ST.stop();
 }
+victim_color get_W_city(){
+	//go backward from wall
+	ST.turn(0);
+	ST.drive(-20);
+	do {
+		if(millis() - last_SRF_trigger > 50){
+		  last_SRF_trigger = millis();
+		  last_SRF_F_echo = srf_F.ping_cm();
+		  Serial.println(last_SRF_F_echo);
+		}
+		followGyro();
+	} while (last_SRF_F_echo < 20);
+	
+	//turn facing W city victim
+	ST.turn(10);
+	ST.drive(-10);
+	gyroAngle(angle+90);
+	
+	//go until wall on right
+	ST.turn(0);
+	ST.drive(20);
+	motor_L_encoder.write(0);
+	gyro_PID_setpoint = angle;
+	while( -motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)/2)
+		followGyro();
+	
+	//follow wall on left until victim
+	//lower arm
+	arm_servo.write(ARM_DOWN);
+	//open grabber
+	grabber_servo.write(GRABBER_OPEN);
+	//delay(500);
+	while(photogateAverage() > PHOTOGATE_LOW){
+		followSRFs(srf_FL,srf_L,false,8);// its moving foward and the minimum distance is 7cm
+	}
+	while(photogateAverage() < PHOTOGATE_HIGH);
+	
+	//stop
+	ST.stop();
+	
+	//close grabber
+	grabber_servo.write(GRABBER_CLOSE);
+	//wait for grabber to close
+	delay(500);
+	//raise arm
+	arm_servo.write(ARM_UP);
+	delay(1000);
+	victim_color result = getColor();
+	//delay(5000);//debugging: read results
+	
+	ST.drive(-35);
+	
+	//go until opening to lane 1
+	do {
+		followSRFs(srf_FL,srf_L,true,8);// its moving backwards and the minimum distance is 7cm
+	} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
+	
+	ST.turn(0);
+	findOpening(srf_L, -25);
+	
+	//turn facing lane 2
 	ST.drive(0);
 	ST.turn(-10);
-	gyroAngle(90);
+	gyroAngle(angle-45);
+	ST.drive(0);
+	ST.turn(-10);
+	gyroAngle(angle-45);
 	ST.stop();
+	
+	return result;
+	
 }
