@@ -11,6 +11,7 @@ void findOpening(NewPing& srf, int drive_speed){
 	Serial.println("findOpening");
 	unsigned long timeNow;
 	unsigned long srf_reading;
+	gyro_PID_setpoint = angle;
 	
 	//wait until opening
 	Serial.println("Looking for opening...");
