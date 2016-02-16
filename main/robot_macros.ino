@@ -426,22 +426,7 @@ void find_actual_baud(){
 
 void dropoff_R(){
 	
-	
-	//go forward toward wall
-  gyro_PID_setpoint = 90;
-  ST.turn(0);
-  ST.drive(20);
-	
-	do {
-    if(millis() - last_SRF_trigger > 50){
-      last_SRF_trigger = millis();
-      last_SRF_F_echo = srf_F.ping_cm();
-      Serial.println(last_SRF_F_echo);
-    }
-    followGyro();
-  } while (last_SRF_F_echo >= 6);
-  
-  ST.stop();
+
    //turn left 90 degrees in place
   ST.drive(0);
   ST.turn(-16);
@@ -614,4 +599,23 @@ victim_color get_W_city(){
 	
 	return result;
 	
+}
+
+void L2_to_L1() {
+		
+	//go forward toward wall
+  gyro_PID_setpoint = angle;
+  ST.turn(0);
+  ST.drive(20);
+	
+	do {
+    if(millis() - last_SRF_trigger > 50){
+      last_SRF_trigger = millis();
+      last_SRF_F_echo = srf_F.ping_cm();
+      Serial.println(last_SRF_F_echo);
+    }
+    followGyro();
+  } while (last_SRF_F_echo >= 6);
+  
+  ST.stop();
 }
