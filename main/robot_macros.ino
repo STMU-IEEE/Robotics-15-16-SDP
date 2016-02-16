@@ -528,10 +528,12 @@ void depart_from_Y(){
 	gyroAngle(angle-90);
 	ST.stop();
 }
-victim_color get_W_city(){
+//victim_color get_W_city(){
+void get_W_city(){
 	//go backward from wall
 	ST.turn(0);
 	ST.drive(-20);
+	gyro_PID_setpoint = angle;
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
@@ -574,8 +576,9 @@ victim_color get_W_city(){
 	delay(500);
 	//raise arm
 	arm_servo.write(ARM_UP);
-	delay(1000);
-	victim_color result = getColor();
+	delay(300);
+	//delay(1000);
+	//victim_color result = getColor();
 	//delay(5000);//debugging: read results
 	
 	ST.drive(-35);
@@ -597,7 +600,40 @@ victim_color get_W_city(){
 	gyroAngle(angle-45);
 	ST.stop();
 	
-	return result;
+	//go forward
+	gyro_PID_setpoint = angle;
+	ST.turn(0);
+	ST.drive(20);
+	do {
+		if(millis() - last_SRF_trigger > 50){
+		  last_SRF_trigger = millis();
+		  last_SRF_F_echo = srf_F.ping_cm();
+		  Serial.println(last_SRF_F_echo);
+		}
+		followGyro();
+	} while (last_SRF_F_echo > 7);
+	
+	//turn facing Y drop off
+	ST.drive(10);
+	ST.turn(10);
+	gyroAngle(angle+90);
+	
+	ST.turn(0);
+	ST.drive(25);
+	//go forward until L1-L2 opening
+	  do {
+    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+  		
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_L_echo = srf_L.ping();
+		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
+		
+    } while (srf_L.convert_cm(last_SRF_L_echo) < 30); //need enough room to drop arm
+    
+    ST.stop();
+	
+	//return result;
 	
 }
 
