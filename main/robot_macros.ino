@@ -692,3 +692,32 @@ void L2_to_L1() {
   
   ST.stop();
 }
+
+void L2_E_to_L2_S_B(){
+	//go forward to L2-L3 W opening
+	ST.drive(25);
+     do {
+    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_L_echo = srf_L.ping();
+		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
+		
+    } while (srf_L.convert_cm(last_SRF_L_echo) < 36);
+    
+    //keep going to L2-L3 center wall
+    do {
+    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_L_echo = srf_L.ping();
+		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
+		
+    } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
+ 
+	//rotate facing L1-L2 wall
+	ST.drive(-10);
+	ST.turn(10);
+	gyroAngle(angle+90);
+	ST.stop();
+}
