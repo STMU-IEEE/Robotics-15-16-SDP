@@ -172,7 +172,7 @@ victim_color get_E_city(){
 	arm_servo.write(ARM_UP);
 	delay(1000);
 	victim_color result = getColor();
-	delay(5000);//debugging: read results
+	//delay(5000);//debugging: read results
 	
 	ST.drive(-35);
 	
