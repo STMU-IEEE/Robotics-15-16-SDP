@@ -153,14 +153,32 @@ void loop() {
 	while(digitalRead(GO_PIN) != LOW);
 	
   	leaveStartingArea();
+  	L1_to_L2();
+  	
 	victim_color E_city = get_E_city();
-	if(E_city == yellow)
+	if(E_city == yellow){
 		dropoff_E_city_Y();
-		
-	//else //red
-		//dropoff_E_city_R // will be part of usual dropoff red victim case
-		//get_to_W_city_from_R
-	//should now be facing wall between lane 1 and 2 by W opening to lane 3 
+		depart_from_Y();
+	}
+	else{ //red
+		L2_to_L1();
+		dropoff_R(); // will be part of usual dropoff red victim case
+		L1_to_L2();
+		L2_E_to_L2_S_B();
+			//should now be facing wall between lane 1 and 2 by W opening to lane 3 
+	}
+	//victim_color W_city = get_W_city();
+	get_W_city();
+	if(E_city == yellow){//i.e. W_city == red
+		L2_W_to_L2_S();
+		L2_to_L1();
+		dropoff_R();
+		L1_to_L2();
+	}
+	else{
+		dropoff_Y();
+		//depart_from_Y();
+	}
 	
 	//wallFollower(srf_FL,srf_L);
 	//testMC();
@@ -174,7 +192,9 @@ void loop() {
 	Serial.println(" uS");
 	*/
 	//while(digitalRead(STOP_PIN) != LOW)
+	//while(true)
 		//srfTest();
+	//depart_from_Y();
 } //end loop()
 
 
