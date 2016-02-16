@@ -637,6 +637,31 @@ void get_W_city(){
 	
 }
 
+//not for E city
+void dropoff_Y (){
+	ST.drive(20);
+	do {
+    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+  		
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_F_echo = srf_F.ping();
+		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
+		
+    } while (srf_F.convert_cm(last_SRF_F_echo) >= 17); //need enough room to drop arm
+    
+  ST.stop();
+   //drop victim
+    arm_servo.write(ARM_DOWN);
+    delay(300);
+    grabber_servo.write(GRABBER_OPEN);
+    delay(300);
+    arm_servo.write(ARM_UP);
+    delay(300);
+    grabber_servo.write(GRABBER_CLOSE);
+}
+
+
 //for red dropoff and return to start
 void L2_W_to_L2_S(){
 	//find opening on left
