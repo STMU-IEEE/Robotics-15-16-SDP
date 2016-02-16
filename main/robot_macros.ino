@@ -637,6 +637,18 @@ void get_W_city(){
 	
 }
 
+//for red dropoff and return to start
+void L2_W_to_L2_S(){
+	//find opening on left
+  findOpening(srf_L,25);
+  
+  //turn facing L1
+  
+  ST.drive(0);
+  ST.turn(-16);
+  gyroAngle(angle-90);
+}
+
 void L2_to_L1() {
 		
 	//go forward toward wall
