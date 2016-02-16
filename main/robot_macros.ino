@@ -595,7 +595,7 @@ victim_color get_W_city(){
 	
 	ST.drive(-35);
 	
-	//go until opening to lane 1
+	//go until opening to lane 2
 	do {
 		followSRFs(srf_FL,srf_L,true,8);// its moving backwards and the minimum distance is 7cm
 	} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
