@@ -453,7 +453,7 @@ void dropoff_R(){
   
   
   do {
-    	while(!followSRFs(srf_FR,srf_R,false,11));// its moving forward and the minimum distance is 11cm
+    	while(!followSRFs(srf_FR,srf_R,false,14));// its moving forward and the minimum distance is 14cm
   		
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
@@ -474,7 +474,7 @@ void dropoff_R(){
     ST.turn(0);
     ST.drive(-30);
      do {
-    	while(!followSRFs(srf_FR,srf_R,true,11));// its moving backwards and the minimum distance is 11cm
+    	while(!followSRFs(srf_FR,srf_R,true,14));// its moving backwards and the minimum distance is 14cm
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
