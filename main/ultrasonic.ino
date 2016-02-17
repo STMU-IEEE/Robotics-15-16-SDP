@@ -1,46 +1,64 @@
 void srfTest() {
-  //static int8_t nextSensor = 0;
-  unsigned long timeNow;
-  
-  do
-    timeNow = millis();
-  while(timeNow - last_SRF_trigger < 50);
-  last_SRF_trigger = timeNow;
-  Serial.print("Left ping: ");
-  Serial.print(srf_L.ping_cm());
-  Serial.println("cm");   
+	//static int8_t nextSensor = 0;
+	unsigned long timeNow;
+
+//Uncomment which sensors to test
+//#define TEST_L_SRF
+//#define TEST_R_SRF
+//#define TEST_F_SRF
+//#define TEST_FR_SRF
+//#define TEST_FL_SRF
+
+#ifdef TEST_L_SRF
+	do
+		timeNow = millis();
+	while(timeNow - last_SRF_trigger < 50);
+	last_SRF_trigger = timeNow;
+	Serial.print("Left ping: ");
+	Serial.print(srf_L.ping_cm());
+	Serial.println("cm");		
+#endif
+
+#ifdef TEST_R_SRF
+	do
+		timeNow = millis();
+	while(timeNow - last_SRF_trigger < 50);
+	last_SRF_trigger = timeNow;
+	Serial.print("Right ping: ");
+	Serial.print(srf_R.ping_cm());
+	Serial.println(" cm");
+#endif
+
+#ifdef TEST_F_SRF
+	do
+		timeNow = millis();
+	while(timeNow - last_SRF_trigger < 50);
+	last_SRF_trigger = timeNow;
+	Serial.print("Front ping: ");
+	Serial.print(srf_F.ping_cm());
+	Serial.println(" cm");
+#endif
+
+#ifdef TEST_FR_SRF
+	do
+		timeNow = millis();
+	while(timeNow - last_SRF_trigger < 50);
+	last_SRF_trigger = timeNow;
+	Serial.print("Front right ping: ");
+	Serial.print(srf_FR.ping_cm());
+	Serial.println(" cm");
+#endif
+
+#ifdef TEST_FL_SRF	
+	do
+		timeNow = millis();
+	while(timeNow - last_SRF_trigger < 50);
+	last_SRF_trigger = timeNow;
+	Serial.print("Front left ping: ");
+	Serial.print(srf_FL.ping_cm());
+	Serial.println(" cm");
+#endif
 	
-  /*do
-    timeNow = millis();
-  while(timeNow - last_SRF_trigger < 50);
-  last_SRF_trigger = timeNow;
-  Serial.print("Right ping: ");
-  Serial.print(srf_R.ping_cm());
-  Serial.println(" cm");
-  
-  do
-    timeNow = millis();
-  while(timeNow - last_SRF_trigger < 50);
-  last_SRF_trigger = timeNow;
-  Serial.print("Front ping: ");
-  Serial.print(srf_F.ping_cm());
-  Serial.println(" cm");
-  
- /* do
-    timeNow = millis();
-  while(timeNow - last_SRF_trigger < 50);
-  last_SRF_trigger = timeNow;
-  Serial.print("Front right ping: ");
-  Serial.print(srf_FR.ping_cm());
-  Serial.println(" cm");
-  */
-  do
-    timeNow = millis();
-  while(timeNow - last_SRF_trigger < 50);
-  last_SRF_trigger = timeNow;
-  Serial.print("Front left ping: ");
-  Serial.print(srf_FL.ping_cm());
-  Serial.println(" cm");
 }
 
 int srfOffset(){
