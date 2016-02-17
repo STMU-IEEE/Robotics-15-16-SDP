@@ -174,10 +174,11 @@ void loop() {
 		L2_to_L1();
 		dropoff_R();
 		L1_to_L2();
+		L2_E_to_L2_N();
 	}
 	else{
 		dropoff_Y();
-		//depart_from_Y();
+		depart_from_Y_2();
 	}
 	
 	//wallFollower(srf_FL,srf_L);
