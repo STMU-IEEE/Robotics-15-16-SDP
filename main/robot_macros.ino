@@ -515,7 +515,7 @@ void depart_from_Y(){
     //back up to opening
     ST.drive(-35);
 	
-	//go until opening to lane 1
+	//go until opening to lane 3
 	do {
 		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
 	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
