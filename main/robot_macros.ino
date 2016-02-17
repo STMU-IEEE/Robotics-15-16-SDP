@@ -528,6 +528,68 @@ void depart_from_Y_1(){
 	gyroAngle(angle-90);
 	ST.stop();
 }
+
+void depart_from_Y_2(){
+    //back up to opening
+    ST.drive(-35);
+	
+	//go until 1st opening to lane 3
+	do {
+		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
+	
+	/* try using L1-L2 wall
+	//follow gyro until L2-L3 wall is seen
+	gyro_PID_setpoint = angle;
+	do {
+		if(millis() - last_SRF_trigger > 50) {
+			last_SRF_trigger = millis();
+			last_SRF_R_echo = srf_R.ping_cm();
+			Serial.println(last_SRF_F_echo);
+		}	
+		followGyro();
+	} while(srf_R.convert_cm(last_SRF_R_echo) > 25);
+	*/
+	
+	//keep going to L2-L3 center wall
+    do {
+    	while(!followSRFs(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_R_echo = srf_R.ping();
+		Serial.println(srf_R.convert_cm(last_SRF_R_echo));
+		
+    } while (srf_R.convert_cm(last_SRF_R_echo) > 30); //find L2-L3 center wall
+ 
+	//go until 2nd opening to lane 3
+   do {
+    	while(!followSRFs(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_R_echo = srf_R.ping();
+		Serial.println(srf_R.convert_cm(last_SRF_R_echo));
+		
+    } while (srf_R.convert_cm(last_SRF_R_echo) < 36); //find L2-L3 center wall
+ /*
+ //go until last L2-L3 wall
+   do {
+    	while(!followSRFs(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+  		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_R_echo = srf_R.ping();
+		Serial.println(srf_R.convert_cm(last_SRF_R_echo));
+		
+    } while (srf_R.convert_cm(last_SRF_R_echo) > 30); //find L2-L3 center wall
+ */
+ 
+ 	findOpening(srf_R,-20);
+ 	
+	//turn facing lane 3
+	ST.drive(0);
+	ST.turn(10);
+	gyroAngle(angle+90);
+	ST.stop();
+}
 //victim_color get_W_city(){
 void get_W_city(){
 	//go backward from wall
