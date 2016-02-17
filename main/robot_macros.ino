@@ -511,7 +511,7 @@ void dropoff_E_city_Y(){
 
 }
 
-void depart_from_Y(){
+void depart_from_Y_1(){
     //back up to opening
     ST.drive(-35);
 	

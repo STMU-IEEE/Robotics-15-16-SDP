@@ -158,7 +158,7 @@ void loop() {
 	victim_color E_city = get_E_city();
 	if(E_city == yellow){
 		dropoff_E_city_Y();
-		depart_from_Y();
+		depart_from_Y_1();
 	}
 	else{ //red
 		L2_to_L1();
