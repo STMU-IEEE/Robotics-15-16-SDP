@@ -836,3 +836,50 @@ void L2_E_to_L2_N() {
 	gyroAngle(angle-90);
 	ST.stop();
 }
+
+void get_NE_victim(){
+	//go forward 2.5 rotations before detecting obstacle
+	ST.drive(20);
+	motor_R_encoder.write(0);
+	gyro_PID_setpoint = angle;
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 2)
+		followGyro();
+	ST.stop();
+	while(millis() - last_SRF_trigger < 50);
+	last_SRF_F_echo = srf_F.ping();
+		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
+	if(srf_F.convert_cm(last_SRF_F_echo) < 60){
+		Serial.println("Obstacle");
+	}
+	else if(srf_F.convert_cm(last_SRF_F_echo) < 113){
+		Serial.println("NNE Victim");
+		//go forward using photogate, wall follower//lower arm
+		arm_servo.write(ARM_DOWN);
+		//open grabber
+		grabber_servo.write(GRABBER_OPEN);
+		//delay(500);
+		ST.drive(30);
+		while(photogateAverage() > PHOTOGATE_LOW){
+			followSRFs(srf_FR,srf_R,false,36);// its moving foward and the minimum distance is 36cm
+		}
+		while(photogateAverage() < PHOTOGATE_HIGH);
+	
+		//stop
+		ST.stop();
+	
+		//close grabber
+		grabber_servo.write(GRABBER_CLOSE);
+		//wait for grabber to close
+		delay(500);
+		//raise arm
+		arm_servo.write(ARM_UP);
+		delay(1000);
+		victim_color result = getColor();
+		//delay(5000);//debugging: read results
+	
+	}
+	else {
+		Serial.println("ENE Victim");
+	}
+	
+}
