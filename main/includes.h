@@ -59,8 +59,8 @@
 
 /************************     Servos      ************************/
 //servo angles from testing
-#define ARM_UP          28
-#define ARM_DOWN        97
+#define ARM_UP          25
+#define ARM_DOWN        95
 #define GRABBER_OPEN    140
 #define GRABBER_CLOSE   72
 #define GRABBER_MIN     50 //do not use when holding a victim
