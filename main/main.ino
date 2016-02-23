@@ -149,6 +149,28 @@ void setup() {
 }
 
 void loop() {
+
+	robot_game();
+	//srfTest();
+	
+	//wallFollower(srf_FL,srf_L);
+	//testMC();
+	/*
+	int i, sum = 0;
+	for(i = 0; i < 100; i++)
+		sum += srfOffset();
+	int averageOffset = sum / i;
+	Serial.print("Average offset: ");
+	Serial.print(averageOffset);
+	Serial.println(" uS");
+	*/
+	//while(digitalRead(STOP_PIN) != LOW)
+	//while(true)
+		//srfTest();
+	//depart_from_Y();
+}
+
+void robot_game() {
 	Serial.println("Press GO to continue");
 	while(digitalRead(GO_PIN) != LOW);
 	
@@ -180,23 +202,12 @@ void loop() {
 		dropoff_Y();
 		depart_from_Y_2();
 	}
+	//get to east L2-L3 opening
+	//depart_from_Y_2();
+	//L2_E_to_L2_N();
+	get_NE_victim();
 	
-	//wallFollower(srf_FL,srf_L);
-	//testMC();
-	/*
-	int i, sum = 0;
-	for(i = 0; i < 100; i++)
-		sum += srfOffset();
-	int averageOffset = sum / i;
-	Serial.print("Average offset: ");
-	Serial.print(averageOffset);
-	Serial.println(" uS");
-	*/
-	//while(digitalRead(STOP_PIN) != LOW)
-	//while(true)
-		//srfTest();
-	//depart_from_Y();
-} //end loop()
+} //end robot_game()
 
 
 //Interrupt functions for STOP buttons 
