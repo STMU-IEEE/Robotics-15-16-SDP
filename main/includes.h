@@ -56,6 +56,7 @@
 #define PHOTOGATE_PIN   A3    //pin for photogate (analog)
 //A4 shorted to SDA by Adafruit motor shield
 //A5 shorted to SCL by Adafruit motor shield
+#define IR_FRONT_PIN    A8    //long range sensor: Sharp GP2Y0A02YK0F
 
 /************************     Servos      ************************/
 //servo angles from testing
