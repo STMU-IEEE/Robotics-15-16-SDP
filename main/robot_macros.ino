@@ -883,3 +883,27 @@ void get_NE_victim(){
 	}
 	
 }
+/*
+void detect_WNW_victim() {
+	//go backward from wall
+	ST.turn(0);
+	ST.drive(-20);
+	gyro_PID_setpoint = angle;
+	do {
+		if(millis() - last_SRF_trigger > 50){
+		  last_SRF_trigger = millis();
+		  last_SRF_F_echo = srf_F.ping_cm();
+		  Serial.println(last_SRF_F_echo);
+		}
+		followGyro();
+	} while (last_SRF_F_echo < 70);
+	
+	//turn facing W city victim
+	ST.turn(10);
+	ST.drive(0);
+	gyroAngle(angle+85);
+	
+	//sweep to detect WNW victim
+	while(
+
+}*/
