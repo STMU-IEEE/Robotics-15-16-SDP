@@ -188,6 +188,7 @@ void robot_game() {
 		L1_to_L2();
 		L2_E_to_L2_S_B();
 			//should now be facing wall between lane 1 and 2 by W opening to lane 3 
+      
 	}
 	//victim_color W_city = get_W_city();
 	get_W_city();
