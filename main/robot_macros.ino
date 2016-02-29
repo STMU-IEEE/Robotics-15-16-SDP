@@ -84,7 +84,7 @@ void leaveStartingArea() {
   gyroPID.SetMode(AUTOMATIC);
 
   //go to opening to lane 2
-  findOpening(srf_L,25);
+  findOpening(srf_L,30);
   
   //turn left 90 degrees
   ST.drive(0);
@@ -97,7 +97,7 @@ void L1_to_L2(){
 
   //go forward toward wall
   gyro_PID_setpoint = -90;
-  ST.drive(30);
+  ST.drive(35);
   do {
     if(millis() - last_SRF_trigger > 50){
       last_SRF_trigger = millis();
@@ -115,7 +115,8 @@ void L1_to_L2(){
   ST.drive(10);
   ST.turn(10);
   gyroAngle(0);
-
+/*
+//Removing saves approximately 3 seconds
 	Serial.println("Advancing 2 turns...");
 	gyro_PID_setpoint = 0;
 	motor_L_encoder.write(0);
@@ -123,7 +124,7 @@ void L1_to_L2(){
 		followGyro(); 
 
 	ST.stop();//now facing E city victim
-  
+  */
   /*
   //go forward until wall on right
   gyro_PID_setpoint = 0;
@@ -155,7 +156,7 @@ victim_color get_E_city(){
 	//open grabber
 	grabber_servo.write(GRABBER_OPEN);
 	//delay(500);
-	ST.drive(55);
+	ST.drive(60);
 	while(photogateAverage() > PHOTOGATE_LOW){
 		followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
 	}
@@ -174,14 +175,14 @@ victim_color get_E_city(){
 	victim_color result = getColor();
 	//delay(5000);//debugging: read results
 	
-	ST.drive(-55);
+	ST.drive(-60);
 	
 	//go until opening to lane 1
 	do {
 		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
 	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
 	
-	findOpening(srf_R, -20);
+	findOpening(srf_R, -25);
 	
 	//turn facing lane 1
 	ST.drive(0);
@@ -433,7 +434,7 @@ void dropoff_R(){
   gyroAngle(angle-90);
   
   ST.turn(0);
-  ST.drive(55);
+  ST.drive(60);
   
   
   
@@ -457,7 +458,7 @@ void dropoff_R(){
     delay(300);
     grabber_servo.write(GRABBER_CLOSE);
     ST.turn(0);
-    ST.drive(-55);
+    ST.drive(-60);
      do {
     	while(!followSRFs(srf_FR,srf_R,true,14));// its moving backwards and the minimum distance is 14cm
   		while(millis() - last_SRF_trigger < 50);
@@ -513,7 +514,7 @@ void dropoff_E_city_Y(){
 
 void depart_from_Y_1(){
     //back up to opening
-    ST.drive(-35);
+    ST.drive(-40);
 	
 	//go until opening to lane 3
 	do {
@@ -531,7 +532,7 @@ void depart_from_Y_1(){
 
 void depart_from_Y_2(){
     //back up to opening
-    ST.drive(-50);
+    ST.drive(-55);
 	
 	//go until 1st opening to lane 3
 	do {
@@ -582,7 +583,7 @@ void depart_from_Y_2(){
     } while (srf_R.convert_cm(last_SRF_R_echo) > 30); //find L2-L3 center wall
  */
  
- 	findOpening(srf_R,-20);
+ 	findOpening(srf_R,-25);
  	
 	//turn facing lane 3
 	ST.drive(0);
@@ -594,7 +595,7 @@ void depart_from_Y_2(){
 void get_W_city(){
 	//go backward from wall
 	ST.turn(0);
-	ST.drive(-20);
+	ST.drive(-25);
 	gyro_PID_setpoint = angle;
 	do {
 		if(millis() - last_SRF_trigger > 50){
@@ -612,7 +613,7 @@ void get_W_city(){
 	
 	//go until wall on right
 	ST.turn(0);
-	ST.drive(35);
+	ST.drive(40);
 	motor_L_encoder.write(0);
 	gyro_PID_setpoint = angle;
 	while( -motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)/2)
@@ -643,7 +644,7 @@ void get_W_city(){
 	//victim_color result = getColor();
 	//delay(5000);//debugging: read results
 	
-	ST.drive(-35);
+	ST.drive(-40);
 	
 	//go until opening to lane 2
 	do {
@@ -665,7 +666,7 @@ void get_W_city(){
 	//go forward
 	gyro_PID_setpoint = angle;
 	ST.turn(0);
-	ST.drive(20);
+	ST.drive(25);
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
@@ -681,7 +682,7 @@ void get_W_city(){
 	gyroAngle(angle+90);
 	
 	ST.turn(0);
-	ST.drive(25);
+	ST.drive(30);
 	//go forward until L1-L2 opening
 	  do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
@@ -701,7 +702,7 @@ void get_W_city(){
 
 //not for E city
 void dropoff_Y (){
-	ST.drive(20);
+	ST.drive(25);
 	do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
   		
@@ -727,7 +728,7 @@ void dropoff_Y (){
 //for red dropoff and return to start
 void L2_W_to_L2_S(){
 	//find opening on left
-  findOpening(srf_L,25);
+  findOpening(srf_L,30);
   
   //turn facing L1
   
@@ -741,7 +742,7 @@ void L2_to_L1() {
 	//go forward toward wall
   gyro_PID_setpoint = angle;
   ST.turn(0);
-  ST.drive(35);
+  ST.drive(40);
 	
 	do {
     if(millis() - last_SRF_trigger > 50){
@@ -757,7 +758,7 @@ void L2_to_L1() {
 
 void L2_E_to_L2_S_B(){
 	//go forward to L2-L3 W opening
-	ST.drive(30);
+	ST.drive(35);
      do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
   		while(millis() - last_SRF_trigger < 50);
@@ -786,7 +787,7 @@ void L2_E_to_L2_S_B(){
 
 void L2_E_to_L2_N() {
 	//go forward to L2-L3 W opening
-	ST.drive(50);
+	ST.drive(55);
      do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
   		while(millis() - last_SRF_trigger < 50);
@@ -828,7 +829,7 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
- 	findOpening(srf_L,15);
+ 	findOpening(srf_L,20);
  	
 	//rotate facing L1-L2 wall
 	ST.drive(0);
