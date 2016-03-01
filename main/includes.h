@@ -36,7 +36,8 @@
 #define SRF_R_ECHO      12
 #define SRF_R_TRIGGER   12
 #define COLOR_LED_PIN   13    //to avoid blinding people; same as onboard LED
-//14-15 open
+#define GYRO_DRDY_PIN	14    //L3GD20H gyro data ready
+//15 open
 //16 reserved for Serial2 TX --> Sabertooth S1
 //17 reserved for Serial2 RX
 #define MOTOR_R_ENCODER_A   18
