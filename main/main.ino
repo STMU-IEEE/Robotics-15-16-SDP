@@ -111,15 +111,6 @@ void setup() {
   //Sabertooth can be re-enabled
   digitalWrite(ST_SHUTOFF_PIN,HIGH); 
   
-  find_actual_baud();
-  
-  //Servos
-  Serial.println("Attaching servos...");
-  grabber_servo.attach(GRABBER_PIN);
-  grabber_servo.write(GRABBER_MIN);
-  arm_servo.attach(ARM_PIN);
-  arm_servo.write(ARM_UP);
-  
   //color sensor LED
   pinMode(COLOR_LED_PIN,OUTPUT);
 
@@ -141,7 +132,6 @@ void setup() {
   
 	//data ready pin as input
 	pinMode(GYRO_DRDY_PIN,INPUT);
-  gyroCalibrate();
 
   //constrain turning power to safer values:
   int turn_range = 16;
@@ -176,6 +166,8 @@ void loop() {
 void robot_game() {
 	Serial.println("Press GO to continue");
 	while(digitalRead(GO_PIN) != LOW);
+	
+	robot_setup();
 	
   	leaveStartingArea();
   	L1_to_L2();
@@ -213,6 +205,17 @@ void robot_game() {
 	
 } //end robot_game()
 
+
+void robot_setup(){
+	gyroCalibrate();
+	find_actual_baud();
+	//Servos
+	Serial.println("Attaching servos...");
+	grabber_servo.attach(GRABBER_PIN);
+	grabber_servo.write(GRABBER_MIN);
+	arm_servo.attach(ARM_PIN);
+	arm_servo.write(ARM_UP);
+}
 
 //Interrupt functions for STOP buttons 
 void ISR_STOP() {
