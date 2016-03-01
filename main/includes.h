@@ -58,6 +58,7 @@
 //A4 shorted to SDA by Adafruit motor shield
 //A5 shorted to SCL by Adafruit motor shield
 #define IR_FRONT_PIN    A8    //long range sensor: Sharp GP2Y0A02YK0F
+#define IR_LEFT_PIN    A9    //long range sensor: Sharp GP2Y0A02YK0F
 
 /************************     Servos      ************************/
 //servo angles from testing
