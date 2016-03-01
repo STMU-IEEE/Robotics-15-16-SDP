@@ -908,3 +908,18 @@ void detect_WNW_victim() {
 	while(
 
 }*/
+/*
+void L1_to_L0() {
+// Allows Robot to return to start to end the round. 
+}
+
+void home_Y() {
+//find opening for L2-L1
+        findOpening(srf_L, -25);
+
+}
+
+void home_R() {
+        
+}
+*/
