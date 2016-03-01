@@ -138,6 +138,9 @@ void setup() {
   Serial.println(" found");
   gyro.enableDefault();
 
+  
+	//data ready pin as input
+	pinMode(GYRO_DRDY_PIN,INPUT);
   gyroCalibrate();
 
   //constrain turning power to safer values:
