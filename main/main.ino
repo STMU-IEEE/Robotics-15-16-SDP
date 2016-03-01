@@ -97,12 +97,9 @@ void setup() {
   Serial.begin(115200);
   STSerial.begin(38400); //problems communicating regardless of baud rate?
   
-  //wait 2s for Sabertooth to power up (p. 16)
-  Serial.println("\nWaiting for Sabertooth to power up...");
-  delay(2000);
-  //initialize motor controller baud rate--already waited for startup
+  //initialize motor controller baud rate
   Serial.print("Initializing Sabertooth...");
-  ST.autobaud(false);
+  ST.autobaud(true);
   
   //stop
   Serial.print("\nStopping motors...");
