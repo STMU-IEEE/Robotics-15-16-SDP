@@ -98,11 +98,11 @@ void setup() {
   STSerial.begin(38400); //problems communicating regardless of baud rate?
   
   //initialize motor controller baud rate
-  Serial.print("Initializing Sabertooth...");
+  Serial.println("Initializing Sabertooth...");
   ST.autobaud(true);
   
   //stop
-  Serial.print("\nStopping motors...");
+  Serial.println("Stopping motors...");
   ST.stop();
 
   //Sabertooth can be re-enabled
