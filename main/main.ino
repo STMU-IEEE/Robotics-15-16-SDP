@@ -106,9 +106,13 @@ void setup() {
   Serial.println("Initializing Sabertooth...");
   ST.autobaud(true);
   
-  //stop
+  //stop regardless of actual baud rate
   Serial.println("Stopping motors...");
-  ST.stop();
+  long options[] = {2400,9600,19200,38400};
+  for (int i = 0; i < 4; i++){
+  	STSerial.begin(options[i]);
+  	ST.stop();
+  }
 
   //Sabertooth can be re-enabled
   digitalWrite(ST_SHUTOFF_PIN,HIGH); 
