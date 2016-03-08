@@ -78,6 +78,11 @@ unsigned int last_SRF_FR_echo;
 Encoder motor_L_encoder(MOTOR_L_ENCODER_A, MOTOR_L_ENCODER_B);
 Encoder motor_R_encoder(MOTOR_R_ENCODER_A, MOTOR_R_ENCODER_B);
 
+//tables for interpolation
+const int IR_TABLE_SIZE = 14;
+int ir_distances_cm[IR_TABLE_SIZE] =	{150,140,130,120,110,100, 90, 80, 70, 60, 50, 40, 30, 20}; 
+
+
 void setup() {
   // put your setup code here, to run once:
 
