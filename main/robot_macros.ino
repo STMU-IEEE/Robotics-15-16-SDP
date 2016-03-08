@@ -787,7 +787,7 @@ void L2_E_to_L2_S_B(){
 
 void L2_E_to_L2_N() {
 	//go forward to L2-L3 W opening
-	ST.drive(55);
+	ST.drive(40);
      do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
   		while(millis() - last_SRF_trigger < 50);
@@ -839,14 +839,29 @@ void L2_E_to_L2_N() {
 }
 
 void get_NE_victim(){
-	//go forward 2.5 rotations before detecting obstacle
+	//go forward 3 rotations before detecting obstacle
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 2)
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6) / 2)
 		followGyro();
 	ST.stop();
-	while(millis() - last_SRF_trigger < 50);
+
+  ST.drive(0);
+  ST.turn(10);
+  gyroAngle(angle+90);
+  ST.stop();
+  
+  ST.drive(20);
+  motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3) / 2)
+    followGyro();
+
+  ST.drive(0);
+  ST.turn(-10);
+  gyroAngle(angle-90);
+  ST.stop();
+	/*while(millis() - last_SRF_trigger < 50);
 	last_SRF_F_echo = srf_F.ping();
 		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
 	if(srf_F.convert_cm(last_SRF_F_echo) < 60){
@@ -859,8 +874,9 @@ void get_NE_victim(){
 		//open grabber
 		grabber_servo.write(GRABBER_OPEN);
 		//delay(500);
-		ST.drive(30);
-		while(photogateAverage() > PHOTOGATE_LOW){
+		ST.drive(30);*/
+   
+	/*	while(photogateAverage() > PHOTOGATE_LOW){
 			followSRFs(srf_FR,srf_R,false,36);// its moving foward and the minimum distance is 36cm
 		}
 		while(photogateAverage() < PHOTOGATE_HIGH);
@@ -882,7 +898,7 @@ void get_NE_victim(){
 	else {
 		Serial.println("ENE Victim");
 	}
-	
+	*/
 }
 /*
 void detect_WNW_victim() {
