@@ -638,6 +638,9 @@ void get_W_city(){
 	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
+	
+	//these turns are identical--what goes here?
+	
 	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
