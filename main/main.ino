@@ -112,6 +112,7 @@ void setup() {
   for (int i = 0; i < 4; i++){
   	STSerial.begin(options[i]);
   	ST.stop();
+  	STSerial.flush();
   }
 
   //Sabertooth can be re-enabled
