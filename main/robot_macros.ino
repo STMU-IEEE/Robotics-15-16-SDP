@@ -937,7 +937,6 @@ if(is_ENE_victim_present){
 } 
     
 
-/*
 void detect_WNW_victim() {
 	//go backward from wall
 	ST.turn(0);
@@ -955,10 +954,15 @@ void detect_WNW_victim() {
 	//turn facing W city victim
 	ST.turn(10);
 	ST.drive(0);
-	gyroAngle(angle+85);
+	gyroAngle(angle+90);
 	
-	//sweep to detect WNW victim
-	while(
-
-}*/
-
+	//go forward until either victim in grabber, or encoders exceed limit
+	motor_R_encoder.write(0);
+	ST.turn(0);
+	ST.drive(20);
+	while((motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 4)
+		|| (photogateAverage() > PHOTOGATE_LOW)) {
+		followSRFs(srf_FL,srf_L,false,8);
+	}
+	ST.stop();
+}
