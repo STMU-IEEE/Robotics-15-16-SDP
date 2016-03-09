@@ -2,7 +2,7 @@
 float read_ir_long_range_cm(int sensor_pin){
 	int32_t avg_sensor_value = 0;
 	int i;
-	const int N = 160;
+	const int N = 256;
 	for (i = 0; i < N; i++){
 		avg_sensor_value += analogRead(sensor_pin);
 		//delay(48);
