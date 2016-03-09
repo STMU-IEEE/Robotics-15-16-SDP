@@ -156,7 +156,7 @@ victim_color get_E_city(){
 	//open grabber
 	grabber_servo.write(GRABBER_OPEN);
 	//delay(500);
-	ST.drive(60);
+	ST.drive(40); //can't make too fast (e.g. 60)--will get stuck against wall
 	while(photogateAverage() > PHOTOGATE_LOW){
 		followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
 	}
