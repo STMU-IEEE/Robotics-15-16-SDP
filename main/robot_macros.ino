@@ -182,14 +182,6 @@ victim_color get_E_city(){
 		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
 	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
 	
-	findOpening(srf_R, -25);
-	
-	//turn facing lane 1
-	ST.drive(0);
-	ST.turn(10);
-	gyroAngle(angle+90);
-	ST.stop();
-	
 	return result;
 }
 
@@ -478,29 +470,17 @@ void dropoff_R(){
 
 }
 void dropoff_E_city_Y(){
-	//backup to prevent hitting drop off
-	motor_L_encoder.write(0);
-	ST.drive(-10); //swing to avoid collision with dropoff box
-	ST.turn(0);
-	while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION / 4);
-	//keep turning toward yellow dropoff
-	ST.drive(0);
-	ST.turn(10);
-	gyroAngle(180);
+	//swing turn back toward lane 1
+	angle = 0;
+	ST.drive(-10);
+	ST.turn(-10);
+	gyroAngle(-90);
+	//swing turn into dropoff
+	ST.drive(10);
+	ST.turn(-10);
+	gyroAngle(-180);
 	ST.stop();
 	
-	//go further into dropoff for 1st victim
-	gyro_PID_setpoint = 180;
-	ST.drive(15);
-	do {
-    	if(millis() - last_SRF_trigger > 50){
-			last_SRF_trigger = millis();
-			last_SRF_F_echo = srf_F.ping_cm();
-			Serial.println(last_SRF_F_echo);
-		}
-		followGyro();
-    } while (last_SRF_F_echo >= 17); //need enough room to drop arm
-    
     //drop victim
     arm_servo.write(ARM_DOWN);
     delay(300);
@@ -735,6 +715,32 @@ void L2_W_to_L2_S(){
   ST.drive(0);
   ST.turn(-16);
   gyroAngle(angle-90);
+}
+
+void back_into_Y_then_face_L1(){
+	//start before opening to L1, facing E
+	//keep backing up until inside Y dropoff
+	gyro_PID_setpoint = angle;
+	ST.turn(0);
+	ST.drive(-10);
+	do {
+		while(!followSRFs(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_R_echo = srf_R.ping();
+	} while (srf_R.convert_cm(last_SRF_R_echo) > 25);
+	//swing turn forward right toward L1
+	ST.drive(10);
+	ST.turn(10);
+	angle = 0;
+	gyroAngle(45);
+	//go forward 1/6 turn
+	motor_R_encoder.write(0);
+	ST.turn(0);
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//keep swing turning toward L1
+	ST.turn(10);
+	gyroAngle(90);
 }
 
 void L2_to_L1() {

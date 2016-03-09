@@ -189,6 +189,7 @@ void robot_game() {
 		depart_from_Y_1();
 	}
 	else{ //red
+		back_into_Y_then_face_L1();
 		L2_to_L1();
 		dropoff_R(); // will be part of usual dropoff red victim case
 		L1_to_L2();
