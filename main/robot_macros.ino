@@ -835,7 +835,7 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
- 	findOpening(srf_L,20);
+ 	findOpening(srf_L,15);
  	
 	//rotate facing L1-L2 wall
 	ST.drive(0);
@@ -849,24 +849,103 @@ void get_NE_victim(){
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6) / 2)
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)){
 		followGyro();
+	}
 	ST.stop();
 
   ST.drive(0);
-  ST.turn(10);
+  ST.turn(20);
   gyroAngle(angle+90);
   ST.stop();
   
   ST.drive(20);
   motor_R_encoder.write(0);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3) / 2)
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
     followGyro();
+  }
 
   ST.drive(0);
-  ST.turn(-10);
+  ST.turn(-20);
   gyroAngle(angle-90);
   ST.stop();
+  
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+  //delay(500);
+  ST.drive(30);
+  motor_R_encoder.write(0);
+  
+  bool is_ENE_victim_present;
+
+  while(true){
+   followSRFs(srf_FR,srf_R,false,3);// its moving foward and the minimum distance is 4cm
+    if(photogateAverage() < PHOTOGATE_LOW){
+      is_ENE_victim_present=true; 
+      break;
+    }
+    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 4)){
+      is_ENE_victim_present=false;
+      break;
+    }
+   }
+if(is_ENE_victim_present){
+        while((photogateAverage() < PHOTOGATE_HIGH));
+        ST.stop();
+        //close grabber
+        grabber_servo.write(GRABBER_CLOSE);
+        //wait for grabber to close
+        delay(500);
+        //raise arm
+        arm_servo.write(ARM_UP);
+        delay(1000);
+        victim_color result = getColor();
+        //delay(5000);//debugging: read results
+        ST.stop();
+        
+  //pick up victim
+}
+  else{
+
+  ST.stop();
+  arm_servo.write(ARM_UP);
+  motor_R_encoder.write(0);
+    ST.drive(10);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8) / 10){
+    followGyro();
+  }
+  
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+  
+  ST.stop();
+    
+    //go to NNE victim
+  }
+} 
+    
+    /*while((photogateAverage() > PHOTOGATE_LOW) || ()){
+      followSRFs(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
+      }
+      while((photogateAverage() < PHOTOGATE_HIGH)){
+        //stop
+        ST.stop();
+        //close grabber
+        grabber_servo.write(GRABBER_CLOSE);
+        //wait for grabber to close
+        delay(500);
+        //raise arm
+        arm_servo.write(ARM_UP);
+        delay(1000);
+        victim_color result = getColor();
+        //delay(5000);//debugging: read results
+        ST.stop();
+   */
+
+  
 	/*while(millis() - last_SRF_trigger < 50);
 	last_SRF_F_echo = srf_F.ping();
 		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
@@ -905,7 +984,7 @@ void get_NE_victim(){
 		Serial.println("ENE Victim");
 	}
 	*/
-}
+
 /*
 void detect_WNW_victim() {
 	//go backward from wall
@@ -930,3 +1009,4 @@ void detect_WNW_victim() {
 	while(
 
 }*/
+
