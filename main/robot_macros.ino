@@ -936,63 +936,6 @@ if(is_ENE_victim_present){
   }
 } 
     
-    /*while((photogateAverage() > PHOTOGATE_LOW) || ()){
-      followSRFs(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
-      }
-      while((photogateAverage() < PHOTOGATE_HIGH)){
-        //stop
-        ST.stop();
-        //close grabber
-        grabber_servo.write(GRABBER_CLOSE);
-        //wait for grabber to close
-        delay(500);
-        //raise arm
-        arm_servo.write(ARM_UP);
-        delay(1000);
-        victim_color result = getColor();
-        //delay(5000);//debugging: read results
-        ST.stop();
-   */
-
-  
-	/*while(millis() - last_SRF_trigger < 50);
-	last_SRF_F_echo = srf_F.ping();
-		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
-	if(srf_F.convert_cm(last_SRF_F_echo) < 60){
-		Serial.println("Obstacle");
-	}
-	else if(srf_F.convert_cm(last_SRF_F_echo) < 113){
-		Serial.println("NNE Victim");
-		//go forward using photogate, wall follower//lower arm
-		arm_servo.write(ARM_DOWN);
-		//open grabber
-		grabber_servo.write(GRABBER_OPEN);
-		//delay(500);
-		ST.drive(30);*/
-   
-	/*	while(photogateAverage() > PHOTOGATE_LOW){
-			followSRFs(srf_FR,srf_R,false,36);// its moving foward and the minimum distance is 36cm
-		}
-		while(photogateAverage() < PHOTOGATE_HIGH);
-	
-		//stop
-		ST.stop();
-	
-		//close grabber
-		grabber_servo.write(GRABBER_CLOSE);
-		//wait for grabber to close
-		delay(500);
-		//raise arm
-		arm_servo.write(ARM_UP);
-		delay(1000);
-		victim_color result = getColor();
-		//delay(5000);//debugging: read results
-	
-	}
-	else {
-		Serial.println("ENE Victim");
-	}
-	*/
 
 /*
 void detect_WNW_victim() {
