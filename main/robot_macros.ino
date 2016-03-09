@@ -783,12 +783,18 @@ void L2_E_to_L2_S_B(){
 		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
 		
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
- 
-	//rotate facing L1-L2 wall
+ 	angle = 0;
+	//swing backward turning right, face L1-L2 wall
 	ST.drive(-10);
 	ST.turn(10);
-	gyroAngle(angle+90);
-	ST.stop();
+	gyroAngle(45);
+	//back up enough to clear wall
+	ST.turn(0);
+	motor_L_encoder.write(0);
+	while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//complete turn
+	ST.turn(10);
+	gyroAngle(90);
 }
 
 void L2_E_to_L2_N() {
