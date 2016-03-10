@@ -709,7 +709,9 @@ void dropoff_Y (){
 
 
 //for red dropoff and return to start
+//use same function for L3 (returning NW victim)
 void L2_W_to_L2_S(){
+	Serial.println("L2 W to L2 S");
 	//find opening on left
   findOpening(srf_L,30);
   
