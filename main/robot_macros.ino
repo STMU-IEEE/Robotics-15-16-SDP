@@ -1084,9 +1084,5 @@ victim_color detect_WNW_victim() {
 	}
 	
 	ST.stop();
-<<<<<<< HEAD
-}
-=======
 	return result;
 }
->>>>>>> origin/master
