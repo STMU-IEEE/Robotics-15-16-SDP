@@ -151,7 +151,13 @@ void setup() {
 
 void loop() {
 
-	robot_game();
+  Serial.println("Press GO to continue");
+  while(digitalRead(GO_PIN) != LOW);
+  
+  robot_setup();
+  L2_E_to_L2_N();
+  get_NE_victim();
+	//robot_game();
 	//srfTest();
 	
 	//wallFollower(srf_FL,srf_L);

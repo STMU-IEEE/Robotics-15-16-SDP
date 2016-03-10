@@ -70,6 +70,8 @@ void findOpening(NewPing& srf, int drive_speed){
 	ST.stop();
 }
 
+
+
 void leaveStartingArea() {
   Serial.println("Zeroing encoders...");
   motor_L_encoder.write(0);
@@ -864,18 +866,18 @@ void get_NE_victim(){
 	ST.stop();
 
   ST.drive(0);
-  ST.turn(20);
+  ST.turn(15);
   gyroAngle(angle+90);
   ST.stop();
   
   ST.drive(20);
   motor_R_encoder.write(0);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6) / 5){
     followGyro();
   }
 
   ST.drive(0);
-  ST.turn(-20);
+  ST.turn(-15);
   gyroAngle(angle-90);
   ST.stop();
   
@@ -884,18 +886,18 @@ void get_NE_victim(){
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
   //delay(500);
-  ST.drive(30);
+  ST.drive(35);
   motor_R_encoder.write(0);
   
   bool is_ENE_victim_present;
 
   while(true){
-   followSRFs(srf_FR,srf_R,false,3);// its moving foward and the minimum distance is 4cm
+   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 4cm
     if(photogateAverage() < PHOTOGATE_LOW){
       is_ENE_victim_present=true; 
       break;
     }
-    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 4)){
+    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 3)){
       is_ENE_victim_present=false;
       break;
     }
@@ -920,19 +922,54 @@ if(is_ENE_victim_present){
 
   ST.stop();
   arm_servo.write(ARM_UP);
-  motor_R_encoder.write(0);
-    ST.drive(10);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8) / 10){
-    followGyro();
-  }
-  
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-180);
+  ST.stop();
+  /*motor_R_encoder.write(0);
   ST.drive(0);
   ST.turn(-15);
   gyroAngle(angle-90);
-  
   ST.stop();
-    
-    //go to NNE victim
+    ST.drive(10);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 9) / 4){
+    followGyro();
+  }
+  ST.stop(); 
+  ST.drive(0);
+  ST.turn(15);
+  gyroAngle(angle+90);
+  ST.stop();
+
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+  //delay(500);
+  motor_R_encoder.write(0);
+  ST.drive(10); //can't make too fast (e.g. 60)--will get stuck against wall
+   
+while(((motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION))
+    || (photogateAverage() > PHOTOGATE_LOW)) {
+   followGyro();
+   Serial.println("marco!"); 
+  }
+
+  //stop
+  Serial.println("found you"); 
+    ST.stop();
+  
+  //close grabber
+  grabber_servo.write(GRABBER_CLOSE);
+  //wait for grabber to close
+  delay(500);
+  //raise arm
+  arm_servo.write(ARM_UP);
+  delay(1000);
+  victim_color result = getColor();
+
+    */
+   //go to NNE victim
   }
 } 
     
