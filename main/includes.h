@@ -104,4 +104,5 @@ enum victim_color: int8_t {
 //encoder counts per revolution for 50:1 motor (Pololu #2824)
 // 50 * 64 = 3200
 #define MOTOR_COUNTS_PER_REVOLUTION 3200
+#define MOTOR_COUNTS_12IN_OFFSET	-582  //03/10/16: measured using find_opening_offset_helper()
 

@@ -61,11 +61,16 @@ void findOpening(NewPing& srf, int drive_speed){
 	//reverse to middle of opening
 	Serial.println("Going to opening...");
 	ST.drive(-drive_speed);
-	do {
-		last_encoder_reading = motor_L_encoder.read();
-		followGyro();
-	} while((drive_speed < 0) ? last_encoder_reading > ((encoder_opening + encoder_wall)/ 2)
-	                          : last_encoder_reading < ((encoder_opening + encoder_wall)/ 2));
+	if(drive_speed < 0){
+		while(motor_L_encoder.read() > (((encoder_opening + encoder_wall)/ 2) + MOTOR_COUNTS_12IN_OFFSET)) {
+			followGyro();
+		}
+	}
+	else {
+		while(motor_L_encoder.read() < (((encoder_opening + encoder_wall)/ 2) + MOTOR_COUNTS_12IN_OFFSET)) {
+			followGyro();
+		}
+	}
 	
 	ST.stop();
 }
