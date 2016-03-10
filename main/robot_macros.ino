@@ -928,6 +928,11 @@ if(is_ENE_victim_present){
   ST.turn(-15);
   gyroAngle(angle-180);
   ST.stop();
+  ST.drive(-20);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
+    followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
+  }
+  ST.stop();
   /*motor_R_encoder.write(0);
   ST.drive(0);
   ST.turn(-15);
