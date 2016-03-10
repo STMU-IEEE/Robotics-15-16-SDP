@@ -773,7 +773,7 @@ void L2_E_to_L2_S_B(){
 	//go forward to L2-L3 W opening
 	ST.drive(35);
      do {
-    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+    	while(!followSRFs(srf_FR,srf_R,false,9));// its moving forward and the minimum distance is 9cm
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
@@ -783,7 +783,7 @@ void L2_E_to_L2_S_B(){
     
     //keep going to L2-L3 center wall
     do {
-    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+    	while(!followSRFs(srf_FR,srf_R,false,9));// its moving forward and the minimum distance is 9cm
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
