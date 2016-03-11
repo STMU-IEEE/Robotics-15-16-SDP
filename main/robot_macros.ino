@@ -858,34 +858,37 @@ void L2_E_to_L2_N() {
 }
 
 void get_NE_victim(){
-	//go forward 3 rotations before detecting obstacle
+	//go forward 2.67 rotations before swing turn
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
 	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8)/3){
 		followGyro();
 	}
+ //it will stop and wait 1s then swing turn right 90 degrees
 	ST.stop();
   delay(1000);
-  
   ST.drive(15);
   ST.turn(15);
   gyroAngle(angle+90);
+
+  // it will stop and move foward .5 rotations.
   ST.stop();
-  
   ST.drive(25);
   motor_R_encoder.write(0);
   while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 2){
     followGyro();
   }
-  
+
+  //it will stop and wait 1s then swing turn left 90 degrees
   ST.stop();
   ST.drive(15);
   ST.turn(-15);
   gyroAngle(angle-90);
+
+
+  //its going to put the grabber down, follow the wall and its going to detect if NE victim is present 
   ST.stop();
- 
-  
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
@@ -895,7 +898,8 @@ void get_NE_victim(){
   motor_R_encoder.write(0);
   
   bool is_ENE_victim_present;
-
+  //its going to follow the wall a certain distance or it will detect the NE victim
+  
   while(true){
    followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 4cm
     if(photogateAverage() < PHOTOGATE_LOW){
@@ -907,6 +911,8 @@ void get_NE_victim(){
       break;
     }
    }
+   // it we have the NE victim, then wait until its in the correct position and get it.
+   //pick up victim
 if(is_ENE_victim_present){
         while((photogateAverage() < PHOTOGATE_HIGH));
         ST.stop();
@@ -920,24 +926,39 @@ if(is_ENE_victim_present){
         victim_color result = getColor();
         //delay(5000);//debugging: read results
         ST.stop();
-        
-  //pick up victim
-}
-  else{
+        //turn to the left 180 degrees. no we are facing the city section
+       ST.drive(0);
+       ST.turn(-15);
+       gyroAngle(angle-180);
+       ST.stop();
+       // lets try to get back to the dropoff zones
+       //??????????????
   
+}
+// lets get victim NNE but we have to be in the right position
+  else{
+ //stop after 3 rotations, raise the arm up
   ST.stop();
   arm_servo.write(ARM_UP);
+
+ //turn to the left 180 degrees. no we are facing the city section
   ST.drive(0);
   ST.turn(-15);
   gyroAngle(angle-180);
   ST.stop();
   
+  //reset the encoders and back up until we are a few cm from the wall. I dont know the exact distance yet ( 1.25 of a rotation) 
   motor_R_encoder.write(0);
   ST.drive(-20);
   while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
     followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
   }
   ST.stop();
+
+//turn right 90 degrees. it should be right in front of the victim. 
+//bring the grabber down, close it and pick it up and get the color.
+//then turn left 90 degrees.
+  
   /*motor_R_encoder.write(0);
   ST.drive(0);
   ST.turn(-15);
