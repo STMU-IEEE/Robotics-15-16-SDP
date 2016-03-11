@@ -177,7 +177,7 @@ victim_color get_E_city(){
 	victim_color result = getColor();
 	//delay(5000);//debugging: read results
 	
-	ST.drive(-60);
+	ST.drive(-40);
 	
 	//go until opening to lane 1
 	do {
@@ -955,9 +955,34 @@ if(is_ENE_victim_present){
   }
   ST.stop();
 
-//turn right 90 degrees. it should be right in front of the victim. 
+//idea: turn right 90 degrees. it should be right in front of the victim. 
+
+//it will stop and wait 1s then swing turn right 90 degrees
+  ST.stop();
+  delay(1000);
+  ST.drive(15);
+  ST.turn(15);
+  gyroAngle(angle+90);
+  ST.stop();
 //bring the grabber down, close it and pick it up and get the color.
+        grabber_servo.write(GRABBER_CLOSE);
+        //wait for grabber to close
+        delay(500);
+        //raise arm
+        arm_servo.write(ARM_UP);
+        delay(1000);
+        victim_color result = getColor();
+        //delay(5000);//debugging: read results
+        ST.stop();
 //then turn left 90 degrees.
+
+  //it will stop and wait 1s then swing turn left 90 degrees
+  ST.stop();
+  ST.drive(15);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+  ST.stop();
+  // now lets get back to the dropoff zones.
   
   /*motor_R_encoder.write(0);
   ST.drive(0);
