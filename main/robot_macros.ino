@@ -1093,7 +1093,7 @@ victim_color detect_WNW_victim() {
 		//go specified encoder distance backwards
 		motor_L_encoder.write(0);
 		gyro_PID_setpoint = angle;
-		while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 3){
+		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2){
 			followGyro();
 		}
 		//face toward L2-L3 wall
