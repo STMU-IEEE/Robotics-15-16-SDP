@@ -907,7 +907,7 @@ void get_NE_victim(){
       is_ENE_victim_present=true; 
       break;
     }
-    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 5)/2){
+    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 7)/2){
       is_ENE_victim_present=false;
       break;
     }
@@ -943,6 +943,12 @@ if(is_ENE_victim_present){
  //stop after 3 rotations, raise the arm up
   ST.stop();
   arm_servo.write(ARM_UP);
+  
+
+  
+  
+      
+    
 /*
  //turn to the left 180 degrees. no we are facing the city section
   ST.drive(0);
@@ -952,6 +958,8 @@ if(is_ENE_victim_present){
   */
   
   ST.stop();
+
+  
 
   //it will stop and wait 1s then swing turn left 90 degrees
   ST.stop();
