@@ -59,6 +59,7 @@
 //A5 shorted to SCL by Adafruit motor shield
 #define IR_FRONT_PIN    A8    //long range sensor: Sharp GP2Y0A02YK0F
 #define IR_LEFT_PIN    A9    //long range sensor: Sharp GP2Y0A02YK0F
+#define IR_REAR_PIN     A10   //photodiode proximity sensor behind battery
 
 /************************     Servos      ************************/
 //servo angles from testing
