@@ -858,7 +858,8 @@ void L2_E_to_L2_N() {
 }
 
 void get_NE_victim(){
-	//go forward 2.67 rotations before swing turn
+	//go forward 2.67 rotations before swing turn (rev*8/3)
+ //
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
@@ -876,7 +877,7 @@ void get_NE_victim(){
   ST.stop();
   ST.drive(25);
   motor_R_encoder.write(0);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 2){
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 5){
     followGyro();
   }
 
@@ -894,7 +895,7 @@ void get_NE_victim(){
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
   //delay(500);
-  ST.drive(35);
+  ST.drive(40);
   motor_R_encoder.write(0);
   
   bool is_ENE_victim_present;
@@ -906,7 +907,7 @@ void get_NE_victim(){
       is_ENE_victim_present=true; 
       break;
     }
-    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 3)){
+    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 5)/2){
       is_ENE_victim_present=false;
       break;
     }
@@ -926,13 +927,15 @@ if(is_ENE_victim_present){
         victim_color result = getColor();
         //delay(5000);//debugging: read results
         ST.stop();
-        //turn to the left 180 degrees. no we are facing the city section
+        
+        
+       /* //turn to the left 180 degrees. no we are facing the city section
        ST.drive(0);
        ST.turn(-15);
        gyroAngle(angle-180);
        ST.stop();
        // lets try to get back to the dropoff zones
-       //??????????????
+       //??????????????*/
   
 }
 // lets get victim NNE but we have to be in the right position
@@ -940,31 +943,41 @@ if(is_ENE_victim_present){
  //stop after 3 rotations, raise the arm up
   ST.stop();
   arm_servo.write(ARM_UP);
-
+/*
  //turn to the left 180 degrees. no we are facing the city section
   ST.drive(0);
   ST.turn(-15);
   gyroAngle(angle-180);
   ST.stop();
+  */
   
-  //reset the encoders and back up until we are a few cm from the wall. I dont know the exact distance yet ( 1.25 of a rotation) 
-  motor_R_encoder.write(0);
-  ST.drive(-20);
-  while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
-    followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
-  }
   ST.stop();
 
+  //it will stop and wait 1s then swing turn left 90 degrees
+  ST.stop();
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+   ST.stop();
+   
+/*
 //idea: turn right 90 degrees. it should be right in front of the victim. 
 
-//it will stop and wait 1s then swing turn right 90 degrees
+//it will stop and wait 1s then  turn right 90 degrees
   ST.stop();
   delay(1000);
-  ST.drive(15);
+  ST.drive(0);
   ST.turn(15);
   gyroAngle(angle+90);
   ST.stop();
 //bring the grabber down, close it and pick it up and get the color.
+        ST.stop();
+        //open grabber
+        grabber_servo.write(GRABBER_OPEN);
+        delay(500);
+        //lower arm
+        arm_servo.write(ARM_DOWN);
+        delay(500);
         grabber_servo.write(GRABBER_CLOSE);
         //wait for grabber to close
         delay(500);
@@ -981,7 +994,7 @@ if(is_ENE_victim_present){
   ST.drive(15);
   ST.turn(-15);
   gyroAngle(angle-90);
-  ST.stop();
+  ST.stop();*/
   // now lets get back to the dropoff zones.
   
   /*motor_R_encoder.write(0);
