@@ -70,6 +70,8 @@ void findOpening(NewPing& srf, int drive_speed){
 	ST.stop();
 }
 
+
+
 void leaveStartingArea() {
   Serial.println("Zeroing encoders...");
   motor_L_encoder.write(0);
@@ -156,7 +158,7 @@ victim_color get_E_city(){
 	//open grabber
 	grabber_servo.write(GRABBER_OPEN);
 	//delay(500);
-	ST.drive(60);
+	ST.drive(40); //can't make too fast (e.g. 60)--will get stuck against wall
 	while(photogateAverage() > PHOTOGATE_LOW){
 		followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
 	}
@@ -181,14 +183,6 @@ victim_color get_E_city(){
 	do {
 		followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
 	} while (srf_R.convert_cm(last_SRF_R_echo) < 30);
-	
-	findOpening(srf_R, -25);
-	
-	//turn facing lane 1
-	ST.drive(0);
-	ST.turn(10);
-	gyroAngle(angle+90);
-	ST.stop();
 	
 	return result;
 }
@@ -426,18 +420,14 @@ void find_actual_baud(){
 }
 
 void dropoff_R(){
-	
-
    //turn left 90 degrees in place
   ST.drive(0);
   ST.turn(-16);
   gyroAngle(angle-90);
-  
+
   ST.turn(0);
   ST.drive(60);
-  
-  
-  
+
   do {
     	while(!followSRFs(srf_FR,srf_R,false,14));// its moving forward and the minimum distance is 14cm
   		
@@ -478,29 +468,17 @@ void dropoff_R(){
 
 }
 void dropoff_E_city_Y(){
-	//backup to prevent hitting drop off
-	motor_L_encoder.write(0);
-	ST.drive(-10); //swing to avoid collision with dropoff box
-	ST.turn(0);
-	while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION / 4);
-	//keep turning toward yellow dropoff
-	ST.drive(0);
-	ST.turn(10);
-	gyroAngle(180);
+	//swing turn back toward lane 1
+	angle = 0;
+	ST.drive(-10);
+	ST.turn(-10);
+	gyroAngle(-90);
+	//swing turn into dropoff
+	ST.drive(10);
+	ST.turn(-10);
+	gyroAngle(-180);
 	ST.stop();
 	
-	//go further into dropoff for 1st victim
-	gyro_PID_setpoint = 180;
-	ST.drive(15);
-	do {
-    	if(millis() - last_SRF_trigger > 50){
-			last_SRF_trigger = millis();
-			last_SRF_F_echo = srf_F.ping_cm();
-			Serial.println(last_SRF_F_echo);
-		}
-		followGyro();
-    } while (last_SRF_F_echo >= 17); //need enough room to drop arm
-    
     //drop victim
     arm_servo.write(ARM_DOWN);
     delay(300);
@@ -658,6 +636,9 @@ void get_W_city(){
 	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
+	
+	//these turns are identical--what goes here?
+	
 	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
@@ -726,7 +707,9 @@ void dropoff_Y (){
 
 
 //for red dropoff and return to start
+//use same function for L3 (returning NW victim)
 void L2_W_to_L2_S(){
+	Serial.println("L2 W to L2 S");
 	//find opening on left
   findOpening(srf_L,30);
   
@@ -735,6 +718,32 @@ void L2_W_to_L2_S(){
   ST.drive(0);
   ST.turn(-16);
   gyroAngle(angle-90);
+}
+
+void back_into_Y_then_face_L1(){
+	//start before opening to L1, facing E
+	//keep backing up until inside Y dropoff
+	gyro_PID_setpoint = angle;
+	ST.turn(0);
+	ST.drive(-10);
+	do {
+		while(!followSRFs(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+		while(millis() - last_SRF_trigger < 50);
+		last_SRF_trigger = millis();
+		last_SRF_R_echo = srf_R.ping();
+	} while (srf_R.convert_cm(last_SRF_R_echo) > 25);
+	//swing turn forward right toward L1
+	ST.drive(10);
+	ST.turn(10);
+	angle = 0;
+	gyroAngle(45);
+	//go forward 1/6 turn
+	motor_R_encoder.write(0);
+	ST.turn(0);
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//keep swing turning toward L1
+	ST.turn(10);
+	gyroAngle(90);
 }
 
 void L2_to_L1() {
@@ -760,7 +769,7 @@ void L2_E_to_L2_S_B(){
 	//go forward to L2-L3 W opening
 	ST.drive(35);
      do {
-    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+    	while(!followSRFs(srf_FR,srf_R,false,9));// its moving forward and the minimum distance is 9cm
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
@@ -770,24 +779,30 @@ void L2_E_to_L2_S_B(){
     
     //keep going to L2-L3 center wall
     do {
-    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+    	while(!followSRFs(srf_FR,srf_R,false,9));// its moving forward and the minimum distance is 9cm
   		while(millis() - last_SRF_trigger < 50);
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
 		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
 		
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
- 
-	//rotate facing L1-L2 wall
+ 	angle = 0;
+	//swing backward turning right, face L1-L2 wall
 	ST.drive(-10);
 	ST.turn(10);
-	gyroAngle(angle+90);
-	ST.stop();
+	gyroAngle(45);
+	//back up enough to clear wall
+	ST.turn(0);
+	motor_L_encoder.write(0);
+	while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//complete turn
+	ST.turn(10);
+	gyroAngle(90);
 }
 
 void L2_E_to_L2_N() {
 	//go forward to L2-L3 W opening
-	ST.drive(55);
+	ST.drive(40);
      do {
     	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
   		while(millis() - last_SRF_trigger < 50);
@@ -829,7 +844,7 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
- 	findOpening(srf_L,20);
+ 	findOpening(srf_L,15);
  	
 	//rotate facing L1-L2 wall
 	ST.drive(0);
@@ -839,87 +854,321 @@ void L2_E_to_L2_N() {
 }
 
 void get_NE_victim(){
-	//go forward 2.5 rotations before detecting obstacle
+	//go forward 2.67 rotations before swing turn
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 2)
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8)/3){
 		followGyro();
+	}
+ //it will stop and wait 1s then swing turn right 90 degrees
 	ST.stop();
-	while(millis() - last_SRF_trigger < 50);
-	last_SRF_F_echo = srf_F.ping();
-		Serial.println(srf_F.convert_cm(last_SRF_F_echo));
-	if(srf_F.convert_cm(last_SRF_F_echo) < 60){
-		Serial.println("Obstacle");
-	}
-	else if(srf_F.convert_cm(last_SRF_F_echo) < 113){
-		Serial.println("NNE Victim");
-		//go forward using photogate, wall follower//lower arm
-		arm_servo.write(ARM_DOWN);
-		//open grabber
-		grabber_servo.write(GRABBER_OPEN);
-		//delay(500);
-		ST.drive(30);
-		while(photogateAverage() > PHOTOGATE_LOW){
-			followSRFs(srf_FR,srf_R,false,36);// its moving foward and the minimum distance is 36cm
-		}
-		while(photogateAverage() < PHOTOGATE_HIGH);
-	
-		//stop
-		ST.stop();
-	
-		//close grabber
-		grabber_servo.write(GRABBER_CLOSE);
-		//wait for grabber to close
-		delay(500);
-		//raise arm
-		arm_servo.write(ARM_UP);
-		delay(1000);
-		victim_color result = getColor();
-		//delay(5000);//debugging: read results
-	
-	}
-	else {
-		Serial.println("ENE Victim");
-	}
-	
+  delay(1000);
+  ST.drive(15);
+  ST.turn(15);
+  gyroAngle(angle+90);
+
+  // it will stop and move foward .5 rotations.
+  ST.stop();
+  ST.drive(25);
+  motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 2){
+    followGyro();
+  }
+
+  //it will stop and wait 1s then swing turn left 90 degrees
+  ST.stop();
+  ST.drive(15);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+
+
+  //its going to put the grabber down, follow the wall and its going to detect if NE victim is present 
+  ST.stop();
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+  //delay(500);
+  ST.drive(35);
+  motor_R_encoder.write(0);
+  
+  bool is_ENE_victim_present;
+  //its going to follow the wall a certain distance or it will detect the NE victim
+  
+  while(true){
+   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 4cm
+    if(photogateAverage() < PHOTOGATE_LOW){
+      is_ENE_victim_present=true; 
+      break;
+    }
+    if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 3)){
+      is_ENE_victim_present=false;
+      break;
+    }
+   }
+   // it we have the NE victim, then wait until its in the correct position and get it.
+   //pick up victim
+if(is_ENE_victim_present){
+        while((photogateAverage() < PHOTOGATE_HIGH));
+        ST.stop();
+        //close grabber
+        grabber_servo.write(GRABBER_CLOSE);
+        //wait for grabber to close
+        delay(500);
+        //raise arm
+        arm_servo.write(ARM_UP);
+        delay(1000);
+        victim_color result = getColor();
+        //delay(5000);//debugging: read results
+        ST.stop();
+        //turn to the left 180 degrees. no we are facing the city section
+       ST.drive(0);
+       ST.turn(-15);
+       gyroAngle(angle-180);
+       ST.stop();
+       // lets try to get back to the dropoff zones
+       //??????????????
+  
 }
-/*
-void detect_WNW_victim() {
+// lets get victim NNE but we have to be in the right position
+  else{
+ //stop after 3 rotations, raise the arm up
+  ST.stop();
+  arm_servo.write(ARM_UP);
+
+ //turn to the left 180 degrees. no we are facing the city section
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-180);
+  ST.stop();
+  
+  //reset the encoders and back up until we are a few cm from the wall. I dont know the exact distance yet ( 1.25 of a rotation) 
+  motor_R_encoder.write(0);
+  ST.drive(-20);
+  while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
+    followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
+  }
+  ST.stop();
+
+//turn right 90 degrees. it should be right in front of the victim. 
+//bring the grabber down, close it and pick it up and get the color.
+//then turn left 90 degrees.
+  
+  /*motor_R_encoder.write(0);
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+  ST.stop();
+    ST.drive(10);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 9) / 4){
+    followGyro();
+  }
+  ST.stop(); 
+  ST.drive(0);
+  ST.turn(15);
+  gyroAngle(angle+90);
+  ST.stop();
+
+  //lower arm
+  arm_servo.write(ARM_DOWN);
+  //open grabber
+  grabber_servo.write(GRABBER_OPEN);
+  //delay(500);
+  motor_R_encoder.write(0);
+  ST.drive(10); //can't make too fast (e.g. 60)--will get stuck against wall
+   
+while(((motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION))
+    || (photogateAverage() > PHOTOGATE_LOW)) {
+   followGyro();
+   Serial.println("marco!"); 
+  }
+
+  //stop
+  Serial.println("found you"); 
+    ST.stop();
+  
+  //close grabber
+  grabber_servo.write(GRABBER_CLOSE);
+  //wait for grabber to close
+  delay(500);
+  //raise arm
+  arm_servo.write(ARM_UP);
+  delay(1000);
+  victim_color result = getColor();
+
+    */
+   //go to NNE victim
+  }
+} 
+    
+
+victim_color detect_WNW_victim() {
+	victim_color result; //to be returned at end of function
 	//go backward from wall
 	ST.turn(0);
 	ST.drive(-20);
 	gyro_PID_setpoint = angle;
+	
+	//also try: watching for each wall--detect last wall, then go certain encoder distance.
+	
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
-		  last_SRF_F_echo = srf_F.ping_cm();
-		  Serial.println(last_SRF_F_echo);
+		  last_SRF_F_echo = srf_F.ping();
+		  Serial.print("Front distance: ");
+		  Serial.println(srf_F.convert_cm(last_SRF_F_echo));
 		}
 		followGyro();
-	} while (last_SRF_F_echo < 70);
+	} while (srf_F.convert_cm(last_SRF_F_echo) < 65);
 	
-	//turn facing W city victim
+	//turn facing WNW victim location
 	ST.turn(10);
 	ST.drive(0);
-	gyroAngle(angle+85);
+	gyroAngle(angle+90);
 	
-	//sweep to detect WNW victim
-	while(
+	//lower arm, open grabber
+	grabber_servo.write(GRABBER_OPEN);
+	arm_servo.write(ARM_DOWN);
+	
+	//go forward until either victim in grabber, or encoders exceed limit
+	motor_R_encoder.write(0);
+	ST.turn(0);
+	ST.drive(20);
+	bool is_WNW_victim_present;
+	while(true){
+		if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2) {
+			is_WNW_victim_present = false;
+			break;
+		}
+		if(photogateAverage() < PHOTOGATE_LOW) {
+			is_WNW_victim_present = true;
+			break;
+		}
+		followSRFs(srf_FL,srf_L,false,8);
+	}
+	if(is_WNW_victim_present){
+		Serial.println("WNW victim");
+		//pick up victim and return (may need to move some of this to after the else case)
+		while(photogateAverage() < PHOTOGATE_HIGH);
+		ST.stop();
+		grabber_servo.write(GRABBER_CLOSE);
+		delay(500);
+		arm_servo.write(ARM_UP);
+		delay(300);
+		result = getColor();
+		ST.drive(-20);
+		do{
+			followSRFs(srf_FL,srf_L,true,8);
+		} while(srf_L.convert_cm(last_SRF_L_echo) < 25);
+		//go specified encoder distance backwards
+		motor_L_encoder.write(0);
+		gyro_PID_setpoint = angle;
+		while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 3){
+			followGyro();
+		}
+		//face toward L2-L3 wall
+		Serial.println("Face L2-L3");
+		gyro_PID_setpoint = angle;
+		ST.drive(0);
+		ST.turn(-10);
+		//gyroAngle(-45);
+		//motor_L_encoder.write(0);
+		//ST.turn(0);
+		//while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION / 6);
+		//ST.turn(-10);
+		gyroAngle(90);
+		
+		//go forward
+		gyro_PID_setpoint = angle;
+		ST.turn(0);
+		ST.drive(25);
+		do {
+			if(millis() - last_SRF_trigger > 50){
+			  last_SRF_trigger = millis();
+			  last_SRF_F_echo = srf_F.ping_cm();
+			  Serial.println(last_SRF_F_echo);
+			}
+			followGyro();
+		} while (last_SRF_F_echo > 3);
 
-}*/
-/*
-void L1_to_L0() {
-// Allows Robot to return to start to end the round. 
+		//turn away from wall facing W
+		angle = 0;
+		ST.turn(10);
+		ST.drive(0);
+		gyroAngle(90);
+		Serial.println("Follow L2-L3");
+		ST.turn(0);
+		ST.drive(25);
+		do {
+			followSRFs(srf_FL,srf_L,false,7);// its moving forward and the minimum distance is 7cm
+		} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
+	
+	}
+	else{
+		Serial.println("NNW victim");
+		//get NNW victim
+//raise arm to make turn to move to next location
+    ST.stop();
+    arm_servo.write(ARM_UP);
+    
+//Turn to have angle be 45 degrees to run parallel to river
+    ST.stop();
+    ST.drive(0);
+    ST.turn(10);
+    gyroAngle(angle+225);
+
+//Drive forward relying on the gyro to keep parallel with the river
+    motor_L_encoder.write(0);
+    ST.drive(20);
+    while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 5){  //drive forward 5 rotations measure what the approximate distance is
+      followGyro();
+    }
+
+//Turn left after passing the river
+    ST.stop();
+    ST.drive(0);
+    ST.turn(-10);
+    gyroAngle(angle+90);
+
+//Follow wall to turn at NW corner of field
+    motor_L_encoder.write(0);
+    ST.drive(20);
+    while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 3){  //drive forward 3 rotations measure what the approximate distance is
+      followGyro();
+    }
+
+//Turn left to face NNW victim
+    ST.stop();
+    ST.drive(0);
+    ST.turn(-10);
+    gyroAngle(angle);
+
+    //lower arm
+    arm_servo.write(ARM_DOWN);
+    //open grabber
+    grabber_servo.write(GRABBER_OPEN);
+    //delay(500);
+    ST.drive(35);
+    motor_R_encoder.write(0);
+
+    while(photogateAverage() > PHOTOGATE_LOW){
+      followSRFs(srf_FL,srf_L,false,8);// its moving foward and the minimum distance is 7cm
+    }
+    while(photogateAverage() < PHOTOGATE_HIGH);
+
+    //stop
+    ST.stop();
+    //close grabber
+    grabber_servo.write(GRABBER_CLOSE);
+    //wait for grabber to close
+    delay(500);
+    //raise arm
+    arm_servo.write(ARM_UP);
+    delay(300);
+
+  }
+	
+	ST.stop();
+	return result;
 }
-
-void home_Y() {
-//find opening for L2-L1
-        findOpening(srf_L, -25);
-
-}
-
-void home_R() {
-        
-}
-*/
