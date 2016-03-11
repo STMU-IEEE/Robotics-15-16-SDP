@@ -862,26 +862,29 @@ void get_NE_victim(){
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)){
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8)/3){
 		followGyro();
 	}
 	ST.stop();
-
-  ST.drive(0);
+  delay(1000);
+  
+  ST.drive(15);
   ST.turn(15);
   gyroAngle(angle+90);
   ST.stop();
   
-  ST.drive(20);
+  ST.drive(25);
   motor_R_encoder.write(0);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6) / 5){
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 2){
     followGyro();
   }
-
-  ST.drive(0);
+  
+  ST.stop();
+  ST.drive(15);
   ST.turn(-15);
   gyroAngle(angle-90);
   ST.stop();
+ 
   
   //lower arm
   arm_servo.write(ARM_DOWN);
@@ -921,15 +924,17 @@ if(is_ENE_victim_present){
   //pick up victim
 }
   else{
-
+  
   ST.stop();
   arm_servo.write(ARM_UP);
   ST.drive(0);
   ST.turn(-15);
   gyroAngle(angle-180);
   ST.stop();
+  
+  motor_R_encoder.write(0);
   ST.drive(-20);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
+  while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 5) / 4){
     followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
   }
   ST.stop();
