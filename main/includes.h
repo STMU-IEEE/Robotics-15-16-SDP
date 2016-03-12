@@ -69,11 +69,12 @@
 #define GRABBER_CLOSE   72
 #define GRABBER_MIN     50 //do not use when holding a victim
  
-/*************************   Photogate     *********************/
+/*******************   Proximity/Photogate    *********************/
 //15-bit thresholds with hysteresis
 //(readings are roughly 2200 to 20000)
 #define PHOTOGATE_LOW   6000
 #define PHOTOGATE_HIGH  12000
+#define PROXIMITY_THRESHOLD	2458 //about 0.375V
 
 
 /*************************   Gyro sensor     *********************/
