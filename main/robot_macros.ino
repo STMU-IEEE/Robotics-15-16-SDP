@@ -1152,8 +1152,8 @@ victim_color detect_WNW_victim() {
 		ST.drive(25);
 		do {
 			followSRFs(srf_FL,srf_L,false,7);// its moving forward and the minimum distance is 7cm
-		} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
-	
+		} while (srf_FL.convert_cm(last_SRF_FL_echo) < 30);
+		
 	}
 	else{
 		Serial.println("NNW victim");
