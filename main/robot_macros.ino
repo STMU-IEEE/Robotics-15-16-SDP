@@ -1108,12 +1108,16 @@ victim_color detect_WNW_victim() {
 		delay(300);
 		result = getColor();
 		ST.drive(-20);
+		encoder_compensate_initialize();
 		do{
-			followSRFs(srf_FL,srf_L,true,8);
+			while(!followSRFs(srf_FL,srf_L,true,8));
+			encoder_compensate_sample();
 		} while(srf_L.convert_cm(last_SRF_L_echo) < 25);
+		encoder_compensate_apply(true);
 		//go specified encoder distance backwards
 		motor_L_encoder.write(0);
 		gyro_PID_setpoint = angle;
+		ST.drive(-20);
 		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2){
 			followGyro();
 		}
