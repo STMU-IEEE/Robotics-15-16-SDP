@@ -1150,40 +1150,13 @@ victim_color detect_WNW_victim() {
 		Serial.println("Follow L2-L3");
 		ST.turn(0);
 		ST.drive(20);
-		/* attempt to track average encoder difference
-		 * restore it once opening is found to prevent crashing into wall */
-		motor_R_encoder.write(0);
-		motor_L_encoder.write(0);
-		int32_t sum_of_differences = 0;
-		int number_of_differences = 0;
+		encoder_compensate_initialize();
 		do {
 			while(!followSRFs(srf_FL,srf_L,false,7)); // its moving forward and the minimum distance is 7cm
-		
-			int32_t sample_difference = motor_L_encoder.read() + motor_R_encoder.read(); //add, because the encoders count opposite from each other 
-			number_of_differences++;
-			Serial.print("Difference ");
-			Serial.print(number_of_differences);
-			Serial.print(" : ");
-			Serial.println(sample_difference);
-			sum_of_differences += sample_difference;
+			encoder_compensate_sample();
 		} while (srf_FL.convert_cm(last_SRF_FL_echo) < 30);
 		ST.stop();
-		Serial.print("Average difference: ");
-		int32_t average_difference = sum_of_differences / number_of_differences;
-		Serial.println(average_difference);
-		//swing turn about right motor to correct difference
-		motor_R_encoder.write(average_difference);
-		if(average_difference > 0){
-			ST.drive(-10);
-			ST.turn(10);
-			while(motor_R_encoder.read() > 0);
-		}
-		else {
-			ST.drive(10);
-			ST.turn(-10);
-			while(motor_R_encoder.read() <= 0);
-		}
-		ST.stop();
+		encoder_compensate_apply(true);
 	}
 	else{
 		Serial.println("NNW victim");

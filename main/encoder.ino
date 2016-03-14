@@ -47,3 +47,78 @@ void encoderDistanceTest() {
   Serial.println(motor_R_encoder.read());
 }
 
+/* Encoder-assisted compensation
+ * e.g. for wall following: attempt to track average encoder difference
+ * restore it once opening is found to prevent crashing into wall 
+ * **Assumes exclusive use of encoders** 
+ * Use regularly-timed samples: e.g. when wall-following, _don't_ use 
+ 	
+ 	do {
+ 		followSRFs(...);
+ 		encoder_compensate_sample(); //will sample too often--unusable result
+ 	} while(...);
+ 	
+ * Replace with:
+ 	
+ 	do {
+ 		while(!followSRFs(...)); //wait for regularly-timed update before proceeding
+ 		encoder_compensate_sample();
+ 	} while(...);
+ 
+ */
+
+//setup global variables for use with compensation
+void encoder_compensate_initialize() {
+	encoder_compensate_sum = 0;
+	encoder_compensate_n = 0;
+	motor_R_encoder.write(0);
+	motor_L_encoder.write(0);
+}
+
+//sample the encoder difference
+void encoder_compensate_sample() {
+	int32_t sample_difference = motor_L_encoder.read() + motor_R_encoder.read(); //add, because the encoders count opposite from each other 
+	encoder_compensate_n++;
+	Serial.print("Difference ");
+	Serial.print(encoder_compensate_n);
+	Serial.print(" : ");
+	Serial.println(sample_difference);
+	encoder_compensate_sum += sample_difference;
+}
+
+/* apply the average encoder difference
+ * use_motor_R: if true, swing turns using right motor
+ *              if false, swing turns using left motor */
+void encoder_compensate_apply(bool use_motor_R) {
+	Serial.print("Average difference: ");
+	int32_t average_difference = encoder_compensate_sum / encoder_compensate_n;
+	Serial.println(average_difference);
+	//swing turn about motor to correct difference
+	if(use_motor_R) {
+		motor_R_encoder.write(average_difference);
+		if(average_difference > 0){
+			ST.drive(-10);
+			ST.turn(10);
+			while(motor_R_encoder.read() > 0);
+		}
+		else {
+			ST.drive(10);
+			ST.turn(-10);
+			while(motor_R_encoder.read() <= 0);
+		}
+	}
+	else {
+		motor_L_encoder.write(average_difference);
+		if(average_difference > 0){
+			ST.drive(10);
+			ST.turn(10);
+			while(motor_L_encoder.read() > 0);
+		}
+		else {
+			ST.drive(-10);
+			ST.turn(-10);
+			while(motor_L_encoder.read() <= 0);
+		}
+	}
+	ST.stop();
+}
