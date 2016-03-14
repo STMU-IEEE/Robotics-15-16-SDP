@@ -1169,10 +1169,9 @@ victim_color detect_WNW_victim() {
     motor_R_encoder.write(0);
     do{
       followSRFs(srf_FL,srf_L,true,7);
-//      Serial.println(last_SRF_FL_echo);
     }
     while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 3) );  //Reverse 3 rotations measure what the approximate distance is
-//    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner of the field
+//    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner
     ST.stop();
 
 
