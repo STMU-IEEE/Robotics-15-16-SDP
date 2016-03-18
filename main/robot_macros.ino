@@ -1060,8 +1060,8 @@ victim_color detect_WNW_victim() {
 	ST.drive(-20);
 	gyro_PID_setpoint = angle;
 	
-	//also try: watching for each wall--detect last wall, then go certain encoder distance.
-	
+	/*
+	//go back from L1-L2 wall a specified distance using front sensor
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
@@ -1071,11 +1071,61 @@ victim_color detect_WNW_victim() {
 		}
 		followGyro();
 	} while (srf_F.convert_cm(last_SRF_F_echo) < 65);
+	*/
 	
+	//go back from L1-L2 and watch for L2-L3 and L3-offroad walls
+	for(int i = 1; i <= 2; i++){
+		//go 1/3 turn before detecting next wall
+		motor_L_encoder.write(0);
+		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+			followGyro();
+		
+		do {
+			if(millis() - last_SRF_trigger > 50){
+				last_SRF_trigger = millis();
+				last_SRF_FR_echo = srf_FR.ping();
+				Serial.print("Front right distance: ");
+				Serial.println(srf_FR.convert_cm(last_SRF_FR_echo));
+			}
+			followGyro();
+		} while(srf_FR.convert_cm(last_SRF_FR_echo) > 10);
+		Serial.print("Wall ");
+		Serial.println(i);
+		
+		//go 1/3 turn before detecting next opening
+		motor_L_encoder.write(0);
+		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+			followGyro();
+		
+		do {
+			if(millis() - last_SRF_trigger > 50){
+				last_SRF_trigger = millis();
+				last_SRF_FR_echo = srf_FR.ping();
+				Serial.print("Front right distance: ");
+				Serial.println(srf_FR.convert_cm(last_SRF_FR_echo));
+			}
+			followGyro();
+		} while(srf_FR.convert_cm(last_SRF_FR_echo) < 20);
+		Serial.print("Opening ");
+		Serial.println(i);
+	}
 	//turn facing WNW victim location
+	/*
 	ST.turn(10);
 	ST.drive(0);
 	gyroAngle(angle+90);
+	*/
+	ST.drive(-10);
+	ST.turn(10);
+	gyroAngle(angle+45);
+	ST.turn(0);
+	ST.drive(16);
+	motor_R_encoder.write(0);
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	ST.drive(10);
+	ST.turn(10);
+	gyroAngle(angle+45);
+	
 	
 	//lower arm, open grabber
 	grabber_servo.write(GRABBER_OPEN);
@@ -1086,6 +1136,7 @@ victim_color detect_WNW_victim() {
 	ST.turn(0);
 	ST.drive(20);
 	bool is_WNW_victim_present;
+	encoder_compensate_initialize();
 	while(true){
 		if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2) {
 			is_WNW_victim_present = false;
@@ -1095,7 +1146,9 @@ victim_color detect_WNW_victim() {
 			is_WNW_victim_present = true;
 			break;
 		}
-		followSRFs(srf_FL,srf_L,false,8);
+		if(followSRFs(srf_FL,srf_L,false,8)){
+			encoder_compensate_sample();
+		}
 	}
 	if(is_WNW_victim_present){
 		Serial.println("WNW victim");
@@ -1107,8 +1160,8 @@ victim_color detect_WNW_victim() {
 		arm_servo.write(ARM_UP);
 		delay(300);
 		result = getColor();
-		ST.drive(-20);
-		encoder_compensate_initialize();
+		ST.drive(-25);
+		//encoder_compensate_initialize();
 		do{
 			while(!followSRFs(srf_FL,srf_L,true,8));
 			encoder_compensate_sample();
@@ -1117,7 +1170,7 @@ victim_color detect_WNW_victim() {
 		//go specified encoder distance backwards
 		motor_L_encoder.write(0);
 		gyro_PID_setpoint = angle;
-		ST.drive(-20);
+		ST.drive(-25);
 		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2){
 			followGyro();
 		}
@@ -1144,7 +1197,7 @@ victim_color detect_WNW_victim() {
 			  Serial.println(last_SRF_F_echo);
 			}
 			followGyro();
-		} while (last_SRF_F_echo > 3);
+		} while (last_SRF_F_echo > 5);
 
 		//turn away from wall facing W
 		angle = 0;
@@ -1161,6 +1214,70 @@ victim_color detect_WNW_victim() {
 		} while (srf_FL.convert_cm(last_SRF_FL_echo) < 30);
 		ST.stop();
 		encoder_compensate_apply(true);
+		
+		Serial.println("Go to opening for L2");
+		//L2_W_to_L2_S();
+		/*
+		//swing turn forward left
+		ST.drive(10);
+		ST.turn(-10);
+		gyroAngle(angle-45);
+		//go forward 1/6 turn
+		ST.drive(10);
+		ST.turn(0);
+		motor_R_encoder.write(0);
+		while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+		//complete swing turn forward left
+		ST.drive(10);
+		ST.turn(-10);
+		gyroAngle(angle-45);
+		*/
+		/*
+		findOpening(srf_L, 20);
+		ST.drive(0);
+		ST.turn(-10);
+		gyroAngle(angle-90);
+		*/
+		angle = 0;
+		//swing turn forward right
+		ST.drive(10);
+		ST.turn(10);
+		gyroAngle(45);
+		//go forward 1/6 turn
+		ST.drive(16);
+		ST.turn(0);
+		motor_R_encoder.write(0);
+		while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+		//complete swing turn forward right
+		ST.drive(10);
+		ST.turn(10);
+		gyroAngle(90);
+		//swing turn backwards left
+		ST.drive(-10);
+		ST.turn(10);
+		gyroAngle(135);
+		//go backwards 1/6 turn
+		ST.drive(-10);
+		ST.turn(0);
+		motor_L_encoder.write(0);
+		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+		//swing turn backwards right
+		ST.drive(-10);
+		ST.turn(-10);
+		gyroAngle(90);
+		
+		//backup to L1-L2 wall
+		ST.turn(0);
+		ST.drive(-16);
+		gyro_PID_setpoint = 90;
+		while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+			followGyro();
+		}
+		
+		//turn facing Y dropoff
+		ST.turn(-10);
+		ST.drive(0);
+		gyroAngle(0);
 	}
 	else{
 		Serial.println("NNW victim");
