@@ -1282,6 +1282,103 @@ victim_color detect_WNW_victim() {
 	else{
 		Serial.println("NNW victim");
 		//get NNW victim
+
+//raise arm to make turn to move to next location
+    ST.stop();
+    arm_servo.write(ARM_UP);
+    delay(500);
+
+    ST.turn(0);
+    ST.drive(30);
+    do {
+      if(millis() - last_SRF_trigger > 50){
+        last_SRF_trigger = millis();
+        last_SRF_F_echo = srf_F.ping_cm();
+        Serial.println(last_SRF_F_echo);
+      }
+    } while (last_SRF_F_echo >= 6);
+    ST.stop();
+
+    gyro_PID_setpoint = angle;
+
+    ST.stop();
+    ST.drive(0);
+    ST.turn(16);
+    gyroAngle(angle+130); //angle+135 puts at 45 degrees to run parallel with the river
+    ST.stop();
+
+//Drive forward relying on the gyro to keep parallel with the river
+    ST.drive(30);
+    ST.turn(0);
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 6);  //drive forward 5 rotations measure what the approximate distance is
+
+//Swing turn left after passing the river
+//    ST.drive(10);
+//    ST.turn(-16);
+//    gyroAngle(angle-120);
+
+//Turn right after passing the river
+    ST.stop();
+    ST.drive(10);
+    ST.turn(16);
+    gyroAngle(angle+50);
+
+//Follow wall to turn at NW corner of field
+/*    motor_R_encoder.write(0);
+    ST.drive(30);
+    do{
+      if(millis() - last_SRF_trigger > 50){
+        last_SRF_trigger = millis();
+        last_SRF_F_echo = srf_F.ping_cm();
+      }
+      followSRFs(srf_FR,srf_R,false,7);
+    } while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 3);  //drive forward 3 rotations measure what the approximate distance is
+    while (last_SRF_F_echo >= 6);
+    ST.stop();
+//    gyro_PID_setpoint = angle;
+*/
+//Follow wall to reverse into NW corner of field
+    ST.drive(-30);
+    motor_R_encoder.write(0);
+    do{
+      followSRFs(srf_FL,srf_L,true,7);
+    }
+    while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 3) );  //Reverse 3 rotations measure what the approximate distance is
+//    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner
+    ST.stop();
+
+
+//Turn left to face NNW victim
+//    ST.stop();
+//    gyro_PID_setpoint = angle;
+//    ST.drive(0);
+//    ST.turn(-10);
+//    gyroAngle(angle-90);
+
+    //lower arm
+//    arm_servo.write(ARM_DOWN);
+    //open grabber
+//    grabber_servo.write(GRABBER_OPEN);
+    //delay(500);
+//    ST.drive(35);
+//    motor_R_encoder.write(0);
+
+//    while(photogateAverage() > PHOTOGATE_LOW){
+//      followSRFs(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
+//    }
+//    while(photogateAverage() < PHOTOGATE_HIGH);
+
+    //stop
+//    ST.stop();
+    //close grabber
+//    grabber_servo.write(GRABBER_CLOSE);
+    //wait for grabber to close
+//    delay(500);
+    //raise arm
+//    arm_servo.write(ARM_UP);
+//    delay(300);
+
 	}
 	
 	ST.stop();
