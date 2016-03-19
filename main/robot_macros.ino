@@ -1074,6 +1074,7 @@ victim_color detect_WNW_victim() {
 	
 	//go back from L1-L2 and watch for L2-L3 and L3-offroad walls
 	for(int i = 1; i <= 2; i++){
+		digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
 		//go 1/3 turn before detecting next wall
 		motor_L_encoder.write(0);
 		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
@@ -1090,6 +1091,7 @@ victim_color detect_WNW_victim() {
 		} while(srf_FR.convert_cm(last_SRF_FR_echo) > 10);
 		Serial.print("Wall ");
 		Serial.println(i);
+		digitalWrite(COLOR_LED_PIN, LOW);//debug LED
 		
 		//go 1/3 turn before detecting next opening
 		motor_L_encoder.write(0);
