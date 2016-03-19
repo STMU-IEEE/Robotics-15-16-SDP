@@ -1140,30 +1140,25 @@ victim_color detect_WNW_victim() {
     while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 6);  //drive forward 5 rotations measure what the approximate distance is
 
 //Swing turn left after passing the river
-//    ST.drive(10);
-//    ST.turn(-16);
-//    gyroAngle(angle-120);
+    ST.drive(5);
+    ST.turn(-16);
+    gyroAngle(angle-120);
 
 //Turn right after passing the river
-    ST.stop();
-    ST.drive(10);
-    ST.turn(16);
-    gyroAngle(angle+50);
+//    ST.stop();
+//    ST.drive(10);
+//    ST.turn(16);
+//    gyroAngle(angle+50);
 
 //Follow wall to turn at NW corner of field
-/*    motor_R_encoder.write(0);
     ST.drive(30);
+    motor_R_encoder.write(0);
     do{
-      if(millis() - last_SRF_trigger > 50){
-        last_SRF_trigger = millis();
-        last_SRF_F_echo = srf_F.ping_cm();
-      }
       followSRFs(srf_FR,srf_R,false,7);
-    } while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 3);  //drive forward 3 rotations measure what the approximate distance is
-    while (last_SRF_F_echo >= 6);
+    } while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 4) );
     ST.stop();
 //    gyro_PID_setpoint = angle;
-*/
+/*
 //Follow wall to reverse into NW corner of field
     ST.drive(-30);
     motor_R_encoder.write(0);
@@ -1171,40 +1166,73 @@ victim_color detect_WNW_victim() {
       followSRFs(srf_FL,srf_L,true,7);
     }
     while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 3) );  //Reverse 3 rotations measure what the approximate distance is
-//    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner
+//    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner of the field
     ST.stop();
-
+*/
 
 //Turn left to face NNW victim
-//    ST.stop();
-//    gyro_PID_setpoint = angle;
-//    ST.drive(0);
-//    ST.turn(-10);
-//    gyroAngle(angle-90);
+    ST.stop();
+    gyro_PID_setpoint = angle;
+    ST.drive(0);
+    ST.turn(-10);
+    gyroAngle(angle-80);
 
     //lower arm
-//    arm_servo.write(ARM_DOWN);
+    arm_servo.write(ARM_DOWN);
     //open grabber
-//    grabber_servo.write(GRABBER_OPEN);
+    grabber_servo.write(GRABBER_OPEN);
     //delay(500);
-//    ST.drive(35);
-//    motor_R_encoder.write(0);
-
-//    while(photogateAverage() > PHOTOGATE_LOW){
-//      followSRFs(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
-//    }
-//    while(photogateAverage() < PHOTOGATE_HIGH);
+    ST.drive(20);
+    motor_R_encoder.write(0);
+    while(photogateAverage() > PHOTOGATE_LOW){
+      followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
+    }
+    while(photogateAverage() < PHOTOGATE_HIGH);
 
     //stop
-//    ST.stop();
+    ST.stop();
     //close grabber
-//    grabber_servo.write(GRABBER_CLOSE);
+    grabber_servo.write(GRABBER_CLOSE);
     //wait for grabber to close
-//    delay(500);
+    delay(500);
     //raise arm
-//    arm_servo.write(ARM_UP);
+    arm_servo.write(ARM_UP);
 //    delay(300);
-
+    ST.drive(-20);
+    motor_R_encoder.write(0);
+    do{
+      followSRFs(srf_FR,srf_R,true,7);
+    }
+    while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION / 2) );  //Reverse 1/2 rotation measure what the approximate distance is
+    ST.stop();
+//Swing turn left after reversing with the victim
+    gyro_PID_setpoint = angle;
+    ST.drive(5);
+    ST.turn(-16);
+    gyroAngle(angle-90);
+//Follow wall to get to align with the fixed obstacle
+    ST.drive(30);
+    motor_R_encoder.write(0);
+    do{
+      followSRFs(srf_FL,srf_L,false,7);
+    } while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 4);
+    ST.stop();
+//Turn right after passing the river
+    ST.stop();
+    ST.drive(0);
+    ST.turn(16);
+    gyroAngle(0); //May need to adjust the angle. Supposed to be lined up with the fixed obstacle.
+    ST.drive(30);
+    motor_R_encoder.write(0);
+    do{
+      if(millis() - last_SRF_trigger > 50){
+        last_SRF_trigger = millis();
+        last_SRF_F_echo = srf_F.ping_cm();
+        Serial.println(last_SRF_F_echo);
+      }
+    } while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * (3/2) ); //Move towards the fixed obstacle. 
+    ST.stop();
+//Setup a swing turn to drive around the fixed obstacle.
   }
     ST.stop();
   return result;
