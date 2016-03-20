@@ -886,6 +886,7 @@ void get_NE_victim(){
  //it will stop and wait 1s then swing turn right 90 degrees
 	ST.stop();
   delay(1000);
+  
   ST.drive(15);
   ST.turn(15);
   gyroAngle(angle+90);
