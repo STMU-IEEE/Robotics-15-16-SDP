@@ -847,12 +847,19 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
- 	findOpening(srf_L,15);
- 	
-	//rotate facing L1-L2 wall
-	ST.drive(0);
+	//swing turn into L2-L3 opening
+	ST.drive(10);
 	ST.turn(-10);
-	gyroAngle(angle-90);
+	gyroAngle(angle-45);
+	//go forward slightly
+	ST.drive(10);
+	ST.turn(0);
+	motor_R_encoder.write(0);
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//complete swing turn
+	ST.drive(10);
+	ST.turn(-10);
+	gyroAngle(angle-45);
 	ST.stop();
 }
 
