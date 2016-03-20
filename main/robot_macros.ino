@@ -633,17 +633,35 @@ void get_W_city(){
 		followSRFs(srf_FL,srf_L,true,8);// its moving backwards and the minimum distance is 7cm
 	} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
 	
+	//go until L2-L3 wall on other side of opening
 	ST.turn(0);
-	findOpening(srf_L, -25);
-	
-	//turn facing lane 2
-	ST.drive(0);
+	ST.drive(-25);
+	//wait at least 1/4 turn before detecting wall
+	motor_L_encoder.write(0);
+	while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4));
+	do {
+		if(millis() - last_SRF_trigger > 50){
+			last_SRF_trigger = millis();
+			last_SRF_L_echo = srf_L.ping();
+			Serial.print("Left distance: ");
+			Serial.println(srf_L.convert_cm(last_SRF_L_echo));
+		}
+		followGyro();
+	} while(srf_L.convert_cm(last_SRF_L_echo) > 15);
+		
+	//turn into lane 2 using swing turns
+	ST.drive(10);
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	
-	//these turns are identical--what goes here?
+	//go forward before completing turn
+	ST.turn(0);
+	ST.drive(16);
+	motor_R_encoder.write(0);
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
 	
-	ST.drive(0);
+	//complete turn
+	ST.drive(10);
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	ST.stop();
