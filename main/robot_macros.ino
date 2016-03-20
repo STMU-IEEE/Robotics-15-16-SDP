@@ -1279,7 +1279,8 @@ victim_color detect_WNW_victim() {
 		//turn facing Y dropoff
 		ST.turn(-10);
 		ST.drive(0);
-		gyroAngle(0);
+		//gyroAngle(0); //already faces L1-L2, crashes; leave some room
+		gyroAngle(15); //10 too low, 20 too high 
 	}
 	else{
 		Serial.println("NNW victim");
