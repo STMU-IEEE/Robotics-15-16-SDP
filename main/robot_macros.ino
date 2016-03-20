@@ -1028,13 +1028,14 @@ if(is_ENE_victim_present){
   //delay(5000);//debugging: read results
 
  
-   ST.turn(0);
+
    ST.drive(-20);
    while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
    followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
    }
    
   // now lets get back to the dropoff zones.
+  ST.stop();
   delay(1000);
   ST.drive(20);
   motor_R_encoder.write(0);
