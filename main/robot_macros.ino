@@ -804,6 +804,8 @@ void L2_E_to_L2_S_B(){
 }
 
 void L2_E_to_L2_N() {
+	//compensate encoders before turning into opening
+	encoder_compensate_initialize();
 	//go forward to L2-L3 W opening
 	ST.drive(40);
      do {
@@ -812,7 +814,7 @@ void L2_E_to_L2_N() {
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
 		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
-		
+		encoder_compensate_sample();
     } while (srf_L.convert_cm(last_SRF_L_echo) < 36);
     
     //keep going to L2-L3 center wall
@@ -822,7 +824,7 @@ void L2_E_to_L2_N() {
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
 		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
-		
+		encoder_compensate_sample();
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
 	
 	 //keep going to second L2-L3 opening
@@ -832,7 +834,7 @@ void L2_E_to_L2_N() {
 		last_SRF_trigger = millis();
 		last_SRF_L_echo = srf_L.ping();
 		Serial.println(srf_L.convert_cm(last_SRF_L_echo));
-		
+		encoder_compensate_sample();		
     } while (srf_L.convert_cm(last_SRF_L_echo) < 36); //find L2-L3 center wall
  
  /*
@@ -847,6 +849,7 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
+ 	encoder_compensate_apply();
 	//swing turn into L2-L3 opening
 	ST.drive(10);
 	ST.turn(-10);
