@@ -191,12 +191,19 @@ void robot_game() {
   	leaveStartingArea();
   	L1_to_L2();
   	
+  	//retrieve and get color of E city victim
 	victim_color E_city = get_E_city();
+	
+	victim_color W_city; //will determine using color of E city victim
+	
+	//drop off E city victim and get to common point for W city victim
 	if(E_city == yellow){
+		W_city = red;
 		dropoff_E_city_Y();
 		depart_from_Y_1();
 	}
-	else{ //red
+	else{ //E_city == red
+		W_city = yellow;
 		back_into_Y_then_face_L1();
 		L2_to_L1();
 		dropoff_R(); // will be part of usual dropoff red victim case
@@ -207,14 +214,15 @@ void robot_game() {
 	}
 	//victim_color W_city = get_W_city();
 	get_W_city();
-	if(E_city == yellow){//i.e. W_city == red
+	//drop off W city victim
+	if(W_city == red){
 		L2_W_to_L2_S();
 		L2_to_L1();
 		dropoff_R();
 		L1_to_L2();
 		L2_E_to_L2_N();
 	}
-	else{
+	else{//W_city == yellow
 		dropoff_Y();
 		depart_from_Y_2();
 	}
