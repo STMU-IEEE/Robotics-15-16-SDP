@@ -666,18 +666,18 @@ void get_W_city(){
 	gyroAngle(angle-45);
 	ST.stop();
 	
-	//go forward
+	//go forward until L1-L2 wall
 	gyro_PID_setpoint = angle;
 	ST.turn(0);
 	ST.drive(25);
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
-		  last_SRF_F_echo = srf_F.ping_cm();
-		  Serial.println(last_SRF_F_echo);
+		  last_SRF_F_echo = srf_F.ping();
+		  Serial.println(srf_F.convert_cm(last_SRF_F_echo));
 		}
 		followGyro();
-	} while (last_SRF_F_echo > 7);
+	} while (srf_F.convert_cm(last_SRF_F_echo) > 7);
 	
 	//turn facing Y drop off
 	ST.drive(10);
