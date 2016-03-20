@@ -959,94 +959,56 @@ if(is_ENE_victim_present){
   
       
     
-/*
+
  //turn to the left 180 degrees. no we are facing the city section
   ST.drive(0);
-  ST.turn(-15);
+  ST.turn(-20);
   gyroAngle(angle-180);
   ST.stop();
-  */
   
-  ST.stop();
-
-  
-
-  //it will stop and wait 1s then turn left 90 degrees
-  ST.stop();
-  ST.drive(0);
-  ST.turn(-15);
-  gyroAngle(angle-90);
+   ST.turn(0);
+   ST.drive(-20);
+   while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+   followSRFs(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
+   }
    ST.stop();
-   
-/*
-//idea: turn right 90 degrees. it should be right in front of the victim. 
+   delay(500);
 
-//it will stop and wait 1s then  turn right 90 degrees
-  ST.stop();
-  delay(1000);
-  ST.drive(0);
-  ST.turn(15);
-  gyroAngle(angle+90);
-  ST.stop();
-//bring the grabber down, close it and pick it up and get the color.
-        ST.stop();
-        //open grabber
-        grabber_servo.write(GRABBER_OPEN);
-        delay(500);
-        //lower arm
-        arm_servo.write(ARM_DOWN);
-        delay(500);
-        grabber_servo.write(GRABBER_CLOSE);
-        //wait for grabber to close
-        delay(500);
-        //raise arm
-        arm_servo.write(ARM_UP);
-        delay(1000);
-        victim_color result = getColor();
-        //delay(5000);//debugging: read results
-        ST.stop();
-//then turn left 90 degrees.
-
-  //it will stop and wait 1s then swing turn left 90 degrees
-  ST.stop();
-  ST.drive(15);
-  ST.turn(-15);
-  gyroAngle(angle-90);
-  ST.stop();*/
-  // now lets get back to the dropoff zones.
-  
-  /*motor_R_encoder.write(0);
-  ST.drive(0);
-  ST.turn(-15);
-  gyroAngle(angle-90);
-  ST.stop();
-    ST.drive(10);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 9) / 4){
+  ST.drive(20);
+  motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
     followGyro();
   }
-  ST.stop(); 
-  ST.drive(0);
-  ST.turn(15);
-  gyroAngle(angle+90);
-  ST.stop();
+   ST.stop();
+   delay(500);
+   
+   ST.drive(0);
+   ST.turn(15);
+   gyroAngle(angle+90);
+   ST.stop();
 
+   ST.turn(0);
+   ST.drive(-20);
+   while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+   followSRFs(srf_FR,srf_R,true,6);// its moving backwards and the minimum distance is 7cm
+   }
+
+   //its going to put the grabber down, follow the wall and its going to detect if NE victim is present 
+  ST.stop();
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
   grabber_servo.write(GRABBER_OPEN);
-  //delay(500);
-  motor_R_encoder.write(0);
-  ST.drive(10); //can't make too fast (e.g. 60)--will get stuck against wall
-   
-while(((motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION))
-    || (photogateAverage() > PHOTOGATE_LOW)) {
-   followGyro();
-   Serial.println("marco!"); 
+  delay(500);
+  
+  ST.drive(30); //can't make too fast (e.g. 60)--will get stuck against wall
+  while(photogateAverage() > PHOTOGATE_LOW){
+    followSRFs(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
   }
-
+  while(photogateAverage() < PHOTOGATE_HIGH);
+  
   //stop
-  Serial.println("found you"); 
-    ST.stop();
+  ST.stop();
   
   //close grabber
   grabber_servo.write(GRABBER_CLOSE);
@@ -1056,8 +1018,13 @@ while(((motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION))
   arm_servo.write(ARM_UP);
   delay(1000);
   victim_color result = getColor();
+  //delay(5000);//debugging: read results
 
-    */
+   
+
+  // now lets get back to the dropoff zones.
+  
+
    //go to NNE victim
   }
 } 
