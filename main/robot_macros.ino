@@ -849,7 +849,7 @@ void L2_E_to_L2_N() {
     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
  */
  	
- 	encoder_compensate_apply();
+ 	encoder_compensate_apply(true);
 	//swing turn into L2-L3 opening
 	ST.drive(10);
 	ST.turn(-10);
