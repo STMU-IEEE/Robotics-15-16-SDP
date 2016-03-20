@@ -864,6 +864,7 @@ void L2_E_to_L2_N() {
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	ST.stop();
+  delay(2000);
 }
 
 void get_NE_victim(){
