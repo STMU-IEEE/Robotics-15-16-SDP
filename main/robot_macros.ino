@@ -633,51 +633,33 @@ void get_W_city(){
 		followSRFs(srf_FL,srf_L,true,8);// its moving backwards and the minimum distance is 7cm
 	} while (srf_L.convert_cm(last_SRF_L_echo) < 30);
 	
-	//go until L2-L3 wall on other side of opening
 	ST.turn(0);
-	ST.drive(-25);
-	//wait at least 1/4 turn before detecting wall
-	motor_L_encoder.write(0);
-	while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4));
-	do {
-		if(millis() - last_SRF_trigger > 50){
-			last_SRF_trigger = millis();
-			last_SRF_L_echo = srf_L.ping();
-			Serial.print("Left distance: ");
-			Serial.println(srf_L.convert_cm(last_SRF_L_echo));
-		}
-		followGyro();
-	} while(srf_L.convert_cm(last_SRF_L_echo) > 15);
-		
-	//turn into lane 2 using swing turns
-	ST.drive(10);
+	findOpening(srf_L, -25);
+	
+	//turn facing lane 2
+	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	
-	//go forward before completing turn
-	ST.turn(0);
-	ST.drive(16);
-	motor_R_encoder.write(0);
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//these turns are identical--what goes here?
 	
-	//complete turn
-	ST.drive(10);
+	ST.drive(0);
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	ST.stop();
 	
-	//go forward until L1-L2 wall
+	//go forward
 	gyro_PID_setpoint = angle;
 	ST.turn(0);
 	ST.drive(25);
 	do {
 		if(millis() - last_SRF_trigger > 50){
 		  last_SRF_trigger = millis();
-		  last_SRF_F_echo = srf_F.ping();
-		  Serial.println(srf_F.convert_cm(last_SRF_F_echo));
+		  last_SRF_F_echo = srf_F.ping_cm();
+		  Serial.println(last_SRF_F_echo);
 		}
 		followGyro();
-	} while (srf_F.convert_cm(last_SRF_F_echo) > 7);
+	} while (last_SRF_F_echo > 7);
 	
 	//turn facing Y drop off
 	ST.drive(10);
@@ -885,7 +867,7 @@ void get_NE_victim(){
 	}
  //it will stop and wait 1s then swing turn right 90 degrees
 	ST.stop();
-  delay(1000);
+  delay(300);
   
   ST.drive(15);
   ST.turn(15);
@@ -920,7 +902,7 @@ void get_NE_victim(){
   //its going to follow the wall a certain distance or it will detect the NE victim
   
   while(true){
-   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 4cm
+   followSRFs(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
     if(photogateAverage() < PHOTOGATE_LOW){
       is_ENE_victim_present=true; 
       break;
@@ -946,7 +928,17 @@ if(is_ENE_victim_present){
         //delay(5000);//debugging: read results
         ST.stop();
         
-        
+        ST.turn(0);
+        ST.drive(-20);
+        while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+        followSRFs(srf_FR,srf_R,true,6);// its moving backwards and the minimum distance is 7cm
+        }
+        ST.stop();
+        delay(500);
+        ST.drive(0);
+        ST.turn(-15);
+        gyroAngle(angle-90);
+        ST.stop();
        /* //turn to the left 180 degrees. no we are facing the city section
        ST.drive(0);
        ST.turn(-15);
@@ -979,7 +971,7 @@ if(is_ENE_victim_present){
 
   
 
-  //it will stop and wait 1s then swing turn left 90 degrees
+  //it will stop and wait 1s then turn left 90 degrees
   ST.stop();
   ST.drive(0);
   ST.turn(-15);
@@ -1093,7 +1085,6 @@ victim_color detect_WNW_victim() {
 	
 	//go back from L1-L2 and watch for L2-L3 and L3-offroad walls
 	for(int i = 1; i <= 2; i++){
-		digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
 		//go 1/3 turn before detecting next wall
 		motor_L_encoder.write(0);
 		while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
@@ -1110,7 +1101,6 @@ victim_color detect_WNW_victim() {
 		} while(srf_FR.convert_cm(last_SRF_FR_echo) > 10);
 		Serial.print("Wall ");
 		Serial.println(i);
-		digitalWrite(COLOR_LED_PIN, LOW);//debug LED
 		
 		//go 1/3 turn before detecting next opening
 		motor_L_encoder.write(0);
@@ -1142,9 +1132,8 @@ victim_color detect_WNW_victim() {
 	ST.drive(16);
 	motor_R_encoder.write(0);
 	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
-	//ST.drive(10);
-	ST.drive(0); //try point turn instead--gets stuck with swing turn
-	ST.turn(16); //need more power than 10--still getting stuck
+	ST.drive(10);
+	ST.turn(10);
 	gyroAngle(angle+45);
 	
 	
@@ -1298,8 +1287,7 @@ victim_color detect_WNW_victim() {
 		//turn facing Y dropoff
 		ST.turn(-10);
 		ST.drive(0);
-		//gyroAngle(0); //already faces L1-L2, crashes; leave some room
-		gyroAngle(15); //10 too low, 20 too high 
+		gyroAngle(0);
 	}
 	else{
 		Serial.println("NNW victim");
