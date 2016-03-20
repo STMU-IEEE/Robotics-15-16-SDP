@@ -514,7 +514,7 @@ void depart_from_Y_1(){
 
 void depart_from_Y_2(){
     //back up to opening
-    ST.drive(-55);
+    ST.drive(-30);
 	
 	//go until 1st opening to lane 3
 	do {
@@ -1020,12 +1020,58 @@ if(is_ENE_victim_present){
   victim_color result = getColor();
   //delay(5000);//debugging: read results
 
+ 
+   ST.turn(0);
+   ST.drive(-20);
+   while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+   followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+   }
    
-
   // now lets get back to the dropoff zones.
+  delay(1000);
+  ST.drive(20);
+  motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
+    followGyro();
+  }
+   ST.stop();
   
+  ST.drive(0);
+  ST.turn(-20);
+  gyroAngle(angle-90);
+  ST.stop();
+  delay(500);
+  
+  ST.drive(30);
+  motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
+   followSRFs(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
+  }
 
+  ST.stop();
+
+  delay(300);
+  
+  ST.drive(0);
+  ST.turn(25);
+  gyroAngle(angle+180);
+
+   ST.turn(0);
+   ST.drive(-20);
+   while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
+   followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+   }
+    ST.stop();
+    
+
+        delay(500);
+        ST.drive(0);
+        ST.turn(-15);
+        gyroAngle(angle-90);
+        ST.stop();
    //go to NNE victim
+
+   
   }
 } 
     
