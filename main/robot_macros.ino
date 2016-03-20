@@ -1123,8 +1123,9 @@ victim_color detect_WNW_victim() {
 	ST.drive(16);
 	motor_R_encoder.write(0);
 	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
-	ST.drive(10);
-	ST.turn(10);
+	//ST.drive(10);
+	ST.drive(0); //try point turn instead--gets stuck with swing turn
+	ST.turn(16); //need more power than 10--still getting stuck
 	gyroAngle(angle+45);
 	
 	
