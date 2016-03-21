@@ -6,7 +6,6 @@ void led_blink(unsigned long delay_ms) {
     delay(delay_ms/2);
 }
 
-
 void leave_starting_area() {
 	Serial.println("leave_starting_area()");
 	
@@ -619,7 +618,8 @@ victim_color get_E_offroad(){
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)){
         follow_gyro();
     }
-    
+
+    //swing turn right 90 degrees
     ST.drive(15);
     ST.turn(15);
     gyro_angle(angle+90);
@@ -632,11 +632,10 @@ victim_color get_E_offroad(){
         follow_gyro();
     }
     
-    //swing turn left 90 degrees
-    ST.drive(15);
+    //point turn left 90 degrees
+    ST.drive(0);
     ST.turn(-15);
     gyro_angle(angle-90);
-    
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
@@ -885,8 +884,7 @@ void get_W_offroad() {
     ST.drive(0);
     ST.turn(20);
     gyro_angle(angle+45);
-    
-    
+
     //lower arm, open grabber
     grabber_servo.write(GRABBER_OPEN);
     arm_servo.write(ARM_DOWN);
@@ -970,7 +968,7 @@ void get_W_offroad() {
         ST.stop();
         
         //Drive forward relying on the gyro to keep parallel with the river
-        ST.drive(30);
+        ST.drive(40);
         ST.turn(0);
         motor_R_encoder.write(0);
         gyro_PID_setpoint = 135;
