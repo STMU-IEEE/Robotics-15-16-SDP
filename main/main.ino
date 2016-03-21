@@ -84,230 +84,230 @@ int encoder_compensate_n; //number of samples
 
 //tables for interpolation
 const int IR_TABLE_SIZE = 14;
-int ir_left_raw_table[IR_TABLE_SIZE] =	{ 92,102,108,116,128,140,153,173,193,223,265,331,419,539}; 
-int ir_distances_cm[IR_TABLE_SIZE] =	{150,140,130,120,110,100, 90, 80, 70, 60, 50, 40, 30, 20}; 
+int ir_left_raw_table[IR_TABLE_SIZE] =	{ 92,102,108,116,128,140,153,173,193,223,265,331,419,539};
+int ir_distances_cm[IR_TABLE_SIZE] =	{150,140,130,120,110,100, 90, 80, 70, 60, 50, 40, 30, 20};
 
 
 void setup() {
-  // put your setup code here, to run once:
-
-  //shutoff Sabertooth motors until stop commands are sent
-  //(this still takes about 2 seconds from reset to happen)
-  pinMode(ST_SHUTOFF_PIN,OUTPUT);
-  digitalWrite(ST_SHUTOFF_PIN,LOW); //shutoff is active low
-
-  //configure stop pin
-  pinMode(STOP_PIN, INPUT_PULLUP);
-  enableInterrupt(STOP_PIN, ISR_STOP, FALLING);
-  //configure go pin
-  pinMode(GO_PIN, INPUT_PULLUP);
- 
-   
-  //set serial baud
-  Serial.begin(115200);
-  STSerial.begin(38400); //problems communicating regardless of baud rate?
-  
-  //initialize motor controller baud rate
-  Serial.println("Initializing Sabertooth...");
-  ST.autobaud(true);
-  
-  //stop regardless of actual baud rate
-  Serial.println("Stopping motors...");
-  long options[] = {2400,9600,19200,38400};
-  for (int i = 0; i < 4; i++){
-  	STSerial.begin(options[i]);
-  	ST.stop();
-  	STSerial.flush();
-  }
-
-  //Sabertooth can be re-enabled
-  digitalWrite(ST_SHUTOFF_PIN,HIGH); 
-  
-  //color sensor LED
-  pinMode(COLOR_LED_PIN,OUTPUT);
-
-  //initialize color sensor
-  //based on Adafruit TCS3725 example code
-  Serial.print("TCS34725 I2C color sensor");
-  if(!tcs.begin())         //Adafruit_TCS34725.cpp v1.0.1 prints "44\r\n"
-    Serial.print(" not");
-  Serial.println(" found");
-  
-  //initialize gyro sensor
-  //based on Adafruit L3GD20 example code:
-  Serial.print("L3GD20H I2C gyro sensor");
-  if (!gyro.init())
-    Serial.print(" not");
-  Serial.println(" found");
-  gyro.enableDefault();
-
-  
-	//data ready pin as input
-	pinMode(GYRO_DRDY_PIN,INPUT);
-
-  //constrain turning power to safer values:
-  int turn_range = 16;
-  gyroPID.SetOutputLimits(-turn_range/2, turn_range/2);
-  
-  //assume PID is computed for every gyro reading
-  gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
+    // put your setup code here, to run once:
+    
+    //shutoff Sabertooth motors until stop commands are sent
+    //(this still takes about 2 seconds from reset to happen)
+    pinMode(ST_SHUTOFF_PIN,OUTPUT);
+    digitalWrite(ST_SHUTOFF_PIN,LOW); //shutoff is active low
+    
+    //configure stop pin
+    pinMode(STOP_PIN, INPUT_PULLUP);
+    enableInterrupt(STOP_PIN, ISR_STOP, FALLING);
+    //configure go pin
+    pinMode(GO_PIN, INPUT_PULLUP);
+    
+    
+    //set serial baud
+    Serial.begin(115200);
+    STSerial.begin(38400); //problems communicating regardless of baud rate?
+    
+    //initialize motor controller baud rate
+    Serial.println("Initializing Sabertooth...");
+    ST.autobaud(true);
+    
+    //stop regardless of actual baud rate
+    Serial.println("Stopping motors...");
+    long options[] = {2400,9600,19200,38400};
+    for (int i = 0; i < 4; i++){
+        STSerial.begin(options[i]);
+        ST.stop();
+        STSerial.flush();
+    }
+    
+    //Sabertooth can be re-enabled
+    digitalWrite(ST_SHUTOFF_PIN,HIGH);
+    
+    //color sensor LED
+    pinMode(COLOR_LED_PIN,OUTPUT);
+    
+    //initialize color sensor
+    //based on Adafruit TCS3725 example code
+    Serial.print("TCS34725 I2C color sensor");
+    if(!tcs.begin())         //Adafruit_TCS34725.cpp v1.0.1 prints "44\r\n"
+        Serial.print(" not");
+    Serial.println(" found");
+    
+    //initialize gyro sensor
+    //based on Adafruit L3GD20 example code:
+    Serial.print("L3GD20H I2C gyro sensor");
+    if (!gyro.init())
+        Serial.print(" not");
+    Serial.println(" found");
+    gyro.enableDefault();
+    
+    
+    //data ready pin as input
+    pinMode(GYRO_DRDY_PIN,INPUT);
+    
+    //constrain turning power to safer values:
+    int turn_range = 16;
+    gyroPID.SetOutputLimits(-turn_range/2, turn_range/2);
+    
+    //assume PID is computed for every gyro reading
+    gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
 }
 
 void loop() {
-
-	robot_game();
-	//srfTest();
-	
-	//wallFollower(srf_FL,srf_L);
-	//testMC();
-	/*
-	int i, sum = 0;
-	for(i = 0; i < 100; i++)
-		sum += srfOffset();
-	int averageOffset = sum / i;
-	Serial.print("Average offset: ");
-	Serial.print(averageOffset);
-	Serial.println(" uS");
-	*/
-	//while(digitalRead(STOP_PIN) != LOW)
-	//while(true)
-		//srfTest();
-	//depart_from_Y();
+    
+    robot_game();
+    //srfTest();
+    
+    //wallFollower(srf_FL,srf_L);
+    //testMC();
+    /*
+     int i, sum = 0;
+     for(i = 0; i < 100; i++)
+     sum += srfOffset();
+     int averageOffset = sum / i;
+     Serial.print("Average offset: ");
+     Serial.print(averageOffset);
+     Serial.println(" uS");
+     */
+    //while(digitalRead(STOP_PIN) != LOW)
+    //while(true)
+    //srfTest();
+    //depart_from_Y();
 }
 
 void robot_game() {
-	Serial.println("Press GO to continue");
-	while(digitalRead(GO_PIN) != LOW);
-	
-	robot_setup();
-	
-  	leaveStartingArea();
-  	
-  	//face E city victim
-  	L1_to_L2();
-  	
-  	//retrieve and get color of E city victim
-	victim_color E_city = get_E_city();
-	
-	victim_color W_city; //will determine using color of E city victim
-	
-	//drop off E city victim and get to common point for W city victim
-	if(E_city == yellow){
-		W_city = red;
-		dropoff_E_city_Y();
-		depart_from_Y_1();
-	}
-	else{ //E_city == red
-		W_city = yellow;
-		back_into_Y_then_face_L1();
-		L2_to_L1();
-		dropoff_R(); // will be part of usual dropoff red victim case
-		depart_from_R_dropoff();
-		L1_to_L2();
-		L2_E_to_L2_S_B();
-			//should now be facing wall between lane 1 and 2 by W opening to lane 3 
-      
-	}
-	//victim_color W_city = get_W_city();
-	get_W_city();
-	L2_L3_opening_to_L1_L2_opening();
-	//drop off W city victim--get to common point later
-	if(W_city == red){
-		L2_W_to_L1_E();
-		dropoff_R();
-		depart_from_R_dropoff();
-		L1_to_L2();
-	}
-	else{//W_city == yellow
-		dropoff_Y();
-	}
-	
-	//get to common point for E offroad victim
-	if(W_city == red){
-		L2_E_to_L2_N();
-	}
-	else{//W_city == yellow
-		depart_from_Y_2();
-	}
-	
-	victim_color E_offroad = get_NE_victim();
-	
-	victim_color W_offroad; //will determine using color of E offroad victim 
-	
-	//drop off E offroad victim--get to common point for W offroad victim later
-	if(E_offroad == yellow){
-		W_offroad = red;
-		dropoff_Y();
-	}
-	else{ //E_offroad == red
-		W_offroad = yellow;
-		L2_W_to_L1_E();
-		dropoff_R();
-		depart_from_R_dropoff();
-		L1_to_L2();
-	}
-	
-	//get to common point for W offroad victim
-	if(E_offroad == red){
-		L2_E_to_L2_S_B();
-	}
-	else{//E_offroad == yellow
-		depart_from_Y_1();
-	}
-	
-	//end NE victim
-	/*
-	//get to common point for W offroad victim
-	//temporary: replace these with above checks against E_offroad once it can be retrieved
-	if(W_city == red){
-		L2_E_to_L2_S_B();
-	}
-	else{//W_city == yellow
-		depart_from_Y_1();
-	}
-	*/
-	//TODO: read color from get_NE_victim() instead of detect_WNW_victim()
-	detect_WNW_victim();
-	return_offroad();
-	//victim_color W_offroad = detect_WNW_victim();
-	L2_L3_opening_to_L1_L2_opening();
-	if(W_offroad == yellow) {
-		dropoff_Y();
-		Y_dropoff_to_start();
-	}
-	else {//W_offroad == red
-		L2_W_to_L1_E();
-		dropoff_R();
-		R_dropoff_to_start();
-	}
+    Serial.println("Press GO to continue");
+    while(digitalRead(GO_PIN) != LOW);
+    
+    robot_setup();
+    
+    leaveStartingArea();
+    
+    //face E city victim
+    L1_to_L2();
+    
+    //retrieve and get color of E city victim
+    victim_color E_city = get_E_city();
+    
+    victim_color W_city; //will determine using color of E city victim
+    
+    //drop off E city victim and get to common point for W city victim
+    if(E_city == yellow){
+        W_city = red;
+        dropoff_E_city_Y();
+        depart_from_Y_1();
+    }
+    else{ //E_city == red
+        W_city = yellow;
+        back_into_Y_then_face_L1();
+        L2_to_L1();
+        dropoff_R(); // will be part of usual dropoff red victim case
+        depart_from_R_dropoff();
+        L1_to_L2();
+        L2_E_to_L2_S_B();
+        //should now be facing wall between lane 1 and 2 by W opening to lane 3
+        
+    }
+    //victim_color W_city = get_W_city();
+    get_W_city();
+    L2_L3_opening_to_L1_L2_opening();
+    //drop off W city victim--get to common point later
+    if(W_city == red){
+        L2_W_to_L1_E();
+        dropoff_R();
+        depart_from_R_dropoff();
+        L1_to_L2();
+    }
+    else{//W_city == yellow
+        dropoff_Y();
+    }
+    
+    //get to common point for E offroad victim
+    if(W_city == red){
+        L2_E_to_L2_N();
+    }
+    else{//W_city == yellow
+        depart_from_Y_2();
+    }
+    
+    victim_color E_offroad = get_NE_victim();
+    
+    victim_color W_offroad; //will determine using color of E offroad victim
+    
+    //drop off E offroad victim--get to common point for W offroad victim later
+    if(E_offroad == yellow){
+        W_offroad = red;
+        dropoff_Y();
+    }
+    else{ //E_offroad == red
+        W_offroad = yellow;
+        L2_W_to_L1_E();
+        dropoff_R();
+        depart_from_R_dropoff();
+        L1_to_L2();
+    }
+    
+    //get to common point for W offroad victim
+    if(E_offroad == red){
+        L2_E_to_L2_S_B();
+    }
+    else{//E_offroad == yellow
+        depart_from_Y_1();
+    }
+    
+    //end NE victim
+    /*
+     //get to common point for W offroad victim
+     //temporary: replace these with above checks against E_offroad once it can be retrieved
+     if(W_city == red){
+     L2_E_to_L2_S_B();
+     }
+     else{//W_city == yellow
+     depart_from_Y_1();
+     }
+     */
+    //TODO: read color from get_NE_victim() instead of detect_WNW_victim()
+    detect_WNW_victim();
+    return_offroad();
+    //victim_color W_offroad = detect_WNW_victim();
+    L2_L3_opening_to_L1_L2_opening();
+    if(W_offroad == yellow) {
+        dropoff_Y();
+        Y_dropoff_to_start();
+    }
+    else {//W_offroad == red
+        L2_W_to_L1_E();
+        dropoff_R();
+        R_dropoff_to_start();
+    }
 } //end robot_game()
 
 
 void robot_setup(){
-	gyroCalibrate();
-	find_actual_baud();
-	//Servos
-	Serial.println("Attaching servos...");
-	grabber_servo.attach(GRABBER_PIN);
-	grabber_servo.write(GRABBER_MIN);
-	arm_servo.attach(ARM_PIN);
-	arm_servo.write(ARM_UP);
+    gyroCalibrate();
+    find_actual_baud();
+    //Servos
+    Serial.println("Attaching servos...");
+    grabber_servo.attach(GRABBER_PIN);
+    grabber_servo.write(GRABBER_MIN);
+    arm_servo.attach(ARM_PIN);
+    arm_servo.write(ARM_UP);
 }
 
 //Interrupt functions for STOP buttons 
 void ISR_STOP() {
-	//disable Sabertooth
-	digitalWrite(ST_SHUTOFF_PIN, LOW);
-	//detach servos
-	grabber_servo.detach();
-	arm_servo.detach();
-	//wait for GO to be pressed
-	while(digitalRead(GO_PIN) != LOW);
-	//enable Sabertooth
-	digitalWrite(ST_SHUTOFF_PIN, HIGH);
-	//reattach servos
-	grabber_servo.attach(GRABBER_PIN);
-	arm_servo.attach(ARM_PIN);
+    //disable Sabertooth
+    digitalWrite(ST_SHUTOFF_PIN, LOW);
+    //detach servos
+    grabber_servo.detach();
+    arm_servo.detach();
+    //wait for GO to be pressed
+    while(digitalRead(GO_PIN) != LOW);
+    //enable Sabertooth
+    digitalWrite(ST_SHUTOFF_PIN, HIGH);
+    //reattach servos
+    grabber_servo.attach(GRABBER_PIN);
+    arm_servo.attach(ARM_PIN);
 }
 
 
