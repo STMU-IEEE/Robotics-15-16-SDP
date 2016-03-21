@@ -328,25 +328,6 @@ void get_W_city(){
    
 }
 
-void L2_L3_opening_to_L1_L2_opening() {
-	Serial.println("L2_L3_opening_to_L1_L2_opening()");
-    ST.turn(0);
-    ST.drive(30);
-    //go forward until L1-L2 opening
-    do {
-        while(!follow_srf(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
-        
-        while(millis() - last_srf_trigger_ms < 50);
-        last_srf_trigger_ms = millis();
-        last_srf_L_echo_us = srf_L.ping();
-        Serial.println(srf_L.convert_cm(last_srf_L_echo_us));
-        
-    } while (srf_L.convert_cm(last_srf_L_echo_us) < 30); //need enough room to drop arm
-    
-    ST.stop();
-    
-    
-}
 
 //not for E city
 void dropoff_Y (){
@@ -1156,4 +1137,20 @@ void L3_to_L2(){
     ST.turn(-10);
     ST.drive(0);
     gyro_angle(0);
+    
+    //approach Y dropoff
+    ST.turn(0);
+    ST.drive(30);
+    //go forward until L1-L2 opening
+    do {
+        while(!follow_srf(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
+        
+        while(millis() - last_srf_trigger_ms < 50);
+        last_srf_trigger_ms = millis();
+        last_srf_L_echo_us = srf_L.ping();
+        Serial.println(srf_L.convert_cm(last_srf_L_echo_us));
+        
+    } while (srf_L.convert_cm(last_srf_L_echo_us) < 30); //need enough room to drop arm
+    
+    ST.stop();
 }

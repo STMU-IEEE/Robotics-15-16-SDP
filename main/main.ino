@@ -183,8 +183,8 @@ void robot_game() {
     }
     //victim_color W_city = get_W_city();
     get_W_city();
+    
     L3_to_L2();
-    L2_L3_opening_to_L1_L2_opening();
     //drop off W city victim--get to common point later
     if(W_city == red){
         L2_W_to_L1_E();
@@ -206,6 +206,7 @@ void robot_game() {
     
     victim_color E_offroad = get_E_offroad();
     return_offroad();
+    L3_to_L2();
     
     victim_color W_offroad; //will determine using color of E offroad victim
     
@@ -233,7 +234,6 @@ void robot_game() {
     get_W_offroad();
     return_offroad();
     L3_to_L2();
-    L2_L3_opening_to_L1_L2_opening();
     if(W_offroad == yellow) {
         dropoff_Y();
         Y_dropoff_to_start();
