@@ -194,9 +194,13 @@ void depart_from_Y_2(){
     //back up to opening
     ST.drive(-30);
     
+    //compensate encoders before turning at end of lane 2
+    encoder_compensate_initialize();
+    
     //go until 1st opening to lane 3
     do {
-        follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+        while(!follow_srf(srf_FR,srf_R,true,7));// its moving backwards and the minimum distance is 7cm
+        encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) < 30);
     
     //keep going to L2-L3 center wall
@@ -206,7 +210,7 @@ void depart_from_Y_2(){
         last_srf_trigger_ms = millis();
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
-        
+        encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
     
     //go until 2nd opening to lane 3
@@ -216,26 +220,32 @@ void depart_from_Y_2(){
         last_srf_trigger_ms = millis();
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
-        
+        encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) < 36); //find L2-L3 center wall
-    /*
-     //go until last L2-L3 wall
-     do {
-    	while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
-     while(millis() - last_srf_trigger_ms < 50);
-     last_srf_trigger_ms = millis();
-     last_srf_R_echo_us = srf_R.ping();
-     Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
-     
-     } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
-     */
     
-    find_opening(srf_R,-25);
+    //go until last L2-L3 wall
+    do {
+        while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+        while(millis() - last_srf_trigger_ms < 50);
+        last_srf_trigger_ms = millis();
+        last_srf_R_echo_us = srf_R.ping();
+        Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
+        encoder_compensate_sample();
+    } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
+
     
-    //turn facing lane 3
-    ST.drive(0);
+    //swing turn facing lane 3
+    encoder_compensate_apply(true);
+    ST.drive(10);
     ST.turn(10);
-    gyro_angle(angle+90);
+    gyro_angle(angle+45);
+    ST.turn(0);
+    ST.drive(16);
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    ST.drive(10);
+    ST.turn(10);
+    gyro_angle(angle+45);
     ST.stop();
 }
 //victim_color get_W_city(){
@@ -628,12 +638,17 @@ void L2_E_to_L2_N() {
 victim_color get_E_offroad(){
 	Serial.println("get_E_offroad()");
     victim_color result; //to be updated and returned at end of function
+    
+    //back into L1-L2 for reference
+    ST.turn(0);
+    ST.drive(-20);
+    while(rear_average() < PROXIMITY_THRESHOLD);
+    
     //go forward 2.67 rotations before swing turn (rev*8/3)
-    //
     ST.drive(20);
     motor_R_encoder.write(0);
     gyro_PID_setpoint = angle;
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)){
         follow_gyro();
     }
     
