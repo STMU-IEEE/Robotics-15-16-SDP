@@ -288,9 +288,6 @@ void get_W_city(){
     //raise arm
     arm_servo.write(ARM_UP);
     delay(300);
-    //delay(1000);
-    //victim_color result = get_color();
-    //delay(5000);//debugging: read results
     
     ST.drive(-40);
     
@@ -639,24 +636,20 @@ victim_color get_E_offroad(){
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
         follow_gyro();
     }
-    //it will stop and wait 1s then swing turn right 90 degrees
-    ST.stop();
-    delay(500);
     
     ST.drive(15);
     ST.turn(15);
     gyro_angle(angle+90);
     
-    // it will stop and move foward .5 rotations.
-    ST.stop();
+    //move foward .5 rotations.
     ST.drive(25);
     motor_R_encoder.write(0);
+    gyro_PID_setpoint += 90;
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 3){
         follow_gyro();
     }
     
-    //it will stop and wait 1s then swing turn left 90 degrees
-    ST.stop();
+    //swing turn left 90 degrees
     ST.drive(15);
     ST.turn(-15);
     gyro_angle(angle-90);
@@ -664,12 +657,10 @@ victim_color get_E_offroad(){
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
-    delay(1000);
     //lower arm
     arm_servo.write(ARM_DOWN);
     //open grabber
     grabber_servo.write(GRABBER_OPEN);
-    //delay(500);
     ST.drive(40);
     motor_R_encoder.write(0);
     
@@ -716,6 +707,7 @@ victim_color get_E_offroad(){
         ST.stop();
         ST.drive(20);
         motor_R_encoder.write(0);
+        gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
             follow_gyro();
         }
@@ -748,6 +740,7 @@ victim_color get_E_offroad(){
         
         ST.drive(20);
         motor_R_encoder.write(0);
+        gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
             follow_gyro();
         }
@@ -797,10 +790,10 @@ victim_color get_E_offroad(){
         }
         
         // now lets get back to the dropoff zones.
-        ST.stop();
-        delay(1000);
+        ST.turn(0);
         ST.drive(20);
         motor_R_encoder.write(0);
+        gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
             follow_gyro();
         }
@@ -843,6 +836,7 @@ victim_color get_E_offroad(){
         
         ST.drive(20);
         motor_R_encoder.write(0);
+        gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
             follow_gyro();
         }
@@ -1128,10 +1122,14 @@ void return_offroad(){
     ST.drive(-10);
     ST.turn(-10);
     gyro_angle(90);
-    
+    ST.stop();
+}
+
+void L3_to_L2(){
     //backup to L1-L2 wall
     ST.turn(0);
     ST.drive(-16);
+    angle = 90;
     gyro_PID_setpoint = 90;
     while(rear_average() < PROXIMITY_THRESHOLD){
         follow_gyro();
