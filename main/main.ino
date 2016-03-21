@@ -159,6 +159,10 @@ void robot_game() {
     //face E city victim
     L1_to_L2();
     
+    //temporary: for getting to offroad victims
+    //L2_E_to_L2_S_B();
+    //victim_color W_offroad = yellow;
+    
     //retrieve and get color of E city victim
     victim_color E_city = get_E_city();
     
@@ -243,6 +247,7 @@ void robot_game() {
         dropoff_R();
         R_dropoff_to_start();
     }
+    ST.stop();
 } //end robot_game()
 
 
