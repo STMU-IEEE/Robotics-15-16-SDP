@@ -857,28 +857,28 @@ void L2_E_to_L2_N() {
 	//go forward slightly
 	ST.drive(10);
 	ST.turn(0);
-	motor_R_encoder.write(0);
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+	//motor_R_encoder.write(0);
+	//while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
 	//complete swing turn
 	ST.drive(10);
 	ST.turn(-10);
 	gyroAngle(angle-45);
 	ST.stop();
-  delay(2000);
+  delay(1000);
 }
 
 void get_NE_victim(){
-	//go forward 2.67 rotations before swing turn (rev*8/3)
+	//go forward 2 rotations before swing turn (rev*8/3)
  //
 	ST.drive(20);
 	motor_R_encoder.write(0);
 	gyro_PID_setpoint = angle;
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 8)/3){
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
 		followGyro();
 	}
  //it will stop and wait 1s then swing turn right 90 degrees
 	ST.stop();
-  delay(300);
+  delay(500);
   
   ST.drive(15);
   ST.turn(15);
@@ -888,7 +888,7 @@ void get_NE_victim(){
   ST.stop();
   ST.drive(25);
   motor_R_encoder.write(0);
-  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 5){
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 3){
     followGyro();
   }
 
@@ -901,6 +901,7 @@ void get_NE_victim(){
 
   //its going to put the grabber down, follow the wall and its going to detect if NE victim is present 
   ST.stop();
+  delay(1000);
   //lower arm
   arm_servo.write(ARM_DOWN);
   //open grabber
@@ -913,7 +914,7 @@ void get_NE_victim(){
   //its going to follow the wall a certain distance or it will detect the NE victim
   
   while(true){
-   followSRFs(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
+   followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
     if(photogateAverage() < PHOTOGATE_LOW){
       is_ENE_victim_present=true; 
       break;
@@ -942,7 +943,7 @@ if(is_ENE_victim_present){
         ST.turn(0);
         ST.drive(-20);
         while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
-        followSRFs(srf_FR,srf_R,true,6);// its moving backwards and the minimum distance is 7cm
+        followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }
         ST.stop();
         delay(500);
@@ -950,14 +951,17 @@ if(is_ENE_victim_present){
         ST.turn(-15);
         gyroAngle(angle-90);
         ST.stop();
-       /* //turn to the left 180 degrees. no we are facing the city section
-       ST.drive(0);
-       ST.turn(-15);
-       gyroAngle(angle-180);
-       ST.stop();
-       // lets try to get back to the dropoff zones
-       //??????????????*/
-  
+        ST.drive(20);
+      motor_R_encoder.write(0);
+      while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+      followGyro();
+      }
+      
+  ST.stop();
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+  ST.stop();
 }
 // lets get victim NNE but we have to be in the right position
   else{
@@ -1069,7 +1073,7 @@ if(is_ENE_victim_present){
   gyroAngle(angle+180);
 
    ST.turn(0);
-   ST.drive(-20);
+   ST.drive(-30);
    while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
    followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
    }
@@ -1081,6 +1085,19 @@ if(is_ENE_victim_present){
         ST.turn(-15);
         gyroAngle(angle-90);
         ST.stop();
+        
+
+    ST.drive(20);
+    motor_R_encoder.write(0);
+  while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+    followGyro();
+  }
+
+  ST.stop();
+  ST.drive(0);
+  ST.turn(-15);
+  gyroAngle(angle-90);
+  ST.stop();
    //go to NNE victim
 
    
