@@ -1040,9 +1040,21 @@ void get_W_offroad() {
         //raise arm
         arm_servo.write(ARM_UP);
         delay(300);
-        
-    }
-    
+
+//Reverse to North Wall
+        ST.drive(-20);
+        while(rear_average() < PROXIMITY_THRESHOLD){
+            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+        }
+
+//Turn facing West Wall
+        ST.drive(0);
+        ST.turn(-20);
+        gyro_angle(angle+80);
+        ST.stop();
+        delay(500);
+    } //End of else NNW statement
+
     ST.stop();
 }
 
