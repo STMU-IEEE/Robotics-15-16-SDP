@@ -11,6 +11,10 @@ int analog_average(int analog_pin) {
  * for photogate built using 2 proximity sensors
  * use one as emitter; block emitter of receiver to only measure transmitted light
  */
-int photogateAverage() {
+int photogate_average() {
     return analog_average(PHOTOGATE_PIN);
+}
+
+int rear_average() {
+	return analog_average(IR_REAR_PIN);
 }

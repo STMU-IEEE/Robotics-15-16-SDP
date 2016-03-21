@@ -1,5 +1,5 @@
 //Continuously print encoder position--move wheels manually to change readings
-void encoderReadTest() {
+void encoder_read_test() {
     Serial.println("Encoder position:");
     Serial.println("L\t\tR");
     while(true){
@@ -11,7 +11,7 @@ void encoderReadTest() {
 }
 
 //go straight using gyro PID until one forward rotation of right motor
-void encoderDistanceTest() {
+void encoder_distance_test() {
     Serial.print ("Enter rotations: ");
     while(Serial.available() < 2);
     long n = Serial.parseInt();
@@ -31,14 +31,14 @@ void encoderDistanceTest() {
     
     //wait for n full turns forward
     while(motor_L_encoder.read() <= n * MOTOR_COUNTS_PER_REVOLUTION)
-        if(followGyro())
+        if(follow_gyro())
             Serial.println(gyro_PID_output);
     
     //stop
     ST.stop();
     
     //stop PID
-    gyroPID.SetMode(MANUAL);
+    gyro_PID.SetMode(MANUAL);
     
     Serial.println("Final positions:");
     Serial.print("L\t");

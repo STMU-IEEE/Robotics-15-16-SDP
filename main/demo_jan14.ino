@@ -17,8 +17,8 @@ void demo_jan14() {
     delay(500);
     //go forward until photo gate triggered
     ST.drive(straight_speed);
-    while(photogateAverage() > PHOTOGATE_LOW);
-    while(photogateAverage() < PHOTOGATE_HIGH);
+    while(photogate_average() > PHOTOGATE_LOW);
+    while(photogate_average() < PHOTOGATE_HIGH);
     //stop
     ST.stop();
     
@@ -31,7 +31,7 @@ void demo_jan14() {
     digitalWrite(COLOR_LED_PIN, HIGH);
     delay(1000);
     //print hue
-    Serial.println(readHue());
+    Serial.println(read_hue());
     
     ST.drive(-straight_speed);
     delay(1000);
@@ -39,7 +39,7 @@ void demo_jan14() {
     //spin right 90 degrees
     ST.turn(turn_speed);
     //make 1 full right turn
-    gyroAngle(360);
+    gyro_angle(360);
     ST.stop();
     
     //drop victim

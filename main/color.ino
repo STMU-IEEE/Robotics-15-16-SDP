@@ -1,7 +1,7 @@
-victim_color getColor() {
+victim_color get_color() {
     digitalWrite(COLOR_LED_PIN,HIGH);
     delay(700); //wait for at least 1 new reading to occur
-    victim_color result = hue2color(readHue());
+    victim_color result = hue2color(read_hue());
     digitalWrite(COLOR_LED_PIN,LOW);
     return result;
 }
@@ -9,7 +9,7 @@ victim_color getColor() {
 //Calculate hue (color) detected, returned as 8-bit value (not on 360 degree scale!)
 //Hypothesis: hue is more immune to changes in lighting than e.g. simply using red/green values.
 //As written, there is room for optimization and improved accuracy--test first.
-uint8_t readHue() {
+uint8_t read_hue() {
     uint16_t tcs_r, tcs_g, tcs_b, tcs_c;  //red, green, blue, clear
     tcs.getRawData(&tcs_r,&tcs_g,&tcs_b,&tcs_c);
     CRGB tcs_rgb; //object from FastLED

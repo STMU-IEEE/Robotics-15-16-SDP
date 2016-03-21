@@ -7,7 +7,7 @@ Servo grabber_servo, arm_servo;
 L3G gyro;
 
 //for gyro calibration routine
-const int sampleNum = 1000;
+const int sample_num = 1000;
 int16_t dc_offset = 0;
 float noise = 0;
 
@@ -34,17 +34,17 @@ const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
 const byte ZYXDA           =     1 << 3;    //STATUS(ZYXDA), aka XYZDA; data ready flag
 
 //Gyro PID controller
-PID gyroPID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
+PID gyro_PID(&gyro_PID_input, &gyro_PID_output, &gyro_PID_setpoint,
             gyro_PID_Kp, gyro_PID_Ki, gyro_PID_Kd,
             DIRECT); // change in output corresponds to same-sign change in input
 
 //color sensor
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_4X);
 
-//use separate serial port for Sabertooth (RX only)
-HardwareSerial& STSerial = Serial2;
+//use separate serial port for Sabertooth (TX only; RX unused)
+HardwareSerial& ST_Serial = Serial2;
 //Sabertooth 2x25 v1.02 motor controller
-Sabertooth ST(ST_ADDR, STSerial);
+Sabertooth ST(ST_ADDR, ST_Serial);
 
 //ultrasonic range finders
 NewPing srf_L = NewPing(SRF_L_TRIGGER, SRF_L_ECHO);
@@ -54,14 +54,14 @@ NewPing srf_FR = NewPing(SRF_FR_TRIGGER, SRF_FR_ECHO);
 NewPing srf_FL = NewPing(SRF_FL_TRIGGER, SRF_FL_ECHO);
 
 //use to wait 50ms between readings; update using millis()
-unsigned long last_SRF_trigger = 0;
+unsigned long last_srf_trigger_ms = 0;
 
 //keep last reading (in microseconds) available for use globally
-unsigned int last_SRF_L_echo;
-unsigned int last_SRF_R_echo;
-unsigned int last_SRF_F_echo;
-unsigned int last_SRF_FL_echo;
-unsigned int last_SRF_FR_echo;
+unsigned int last_srf_L_echo_us;
+unsigned int last_srf_R_echo_us;
+unsigned int last_srf_F_echo_us;
+unsigned int last_srf_FL_echo_us;
+unsigned int last_srf_FR_echo_us;
 
 
 //motor quadrature encoders
@@ -96,7 +96,7 @@ void setup() {
     
     //set serial baud
     Serial.begin(115200);
-    STSerial.begin(38400); //problems communicating regardless of baud rate?
+    ST_Serial.begin(38400); //problems communicating regardless of baud rate?
     
     //initialize motor controller baud rate
     Serial.println("Initializing Sabertooth...");
@@ -106,9 +106,9 @@ void setup() {
     Serial.println("Stopping motors...");
     long options[] = {2400,9600,19200,38400};
     for (int i = 0; i < 4; i++){
-        STSerial.begin(options[i]);
+        ST_Serial.begin(options[i]);
         ST.stop();
-        STSerial.flush();
+        ST_Serial.flush();
     }
     
     //Sabertooth can be re-enabled
@@ -138,10 +138,10 @@ void setup() {
     
     //constrain turning power to safer values:
     int turn_range = 16;
-    gyroPID.SetOutputLimits(-turn_range/2, turn_range/2);
+    gyro_PID.SetOutputLimits(-turn_range/2, turn_range/2);
     
     //assume PID is computed for every gyro reading
-    gyroPID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
+    gyro_PID.SetSampleTime((int)(1000/SAMPLE_RATE)); //in ms
 }
 
 void loop() {
@@ -154,7 +154,7 @@ void robot_game() {
     
     robot_setup();
     
-    leaveStartingArea();
+    leave_starting_area();
     
     //face E city victim
     L1_to_L2();
@@ -244,14 +244,23 @@ void robot_game() {
 
 
 void robot_setup(){
-    gyroCalibrate();
+    gyro_calibrate();
     find_actual_baud();
+    
     //Servos
     Serial.println("Attaching servos...");
     grabber_servo.attach(GRABBER_PIN);
     grabber_servo.write(GRABBER_MIN);
     arm_servo.attach(ARM_PIN);
     arm_servo.write(ARM_UP);
+    
+    //initialize PID
+    angle = 0;             //start with angle 0
+    gyro_PID_setpoint = 0; //keep angle at 0
+    gyro_PID_output = 0; //start without turning
+    
+    //start PID
+    gyro_PID.SetMode(AUTOMATIC);
 }
 
 //Interrupt functions for STOP buttons 

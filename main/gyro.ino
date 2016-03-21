@@ -1,19 +1,19 @@
-void testGyroTurn() {
+void test_gyro_turn() {
     byte turn_speed = 16; //slow to minimize error
     //spin right
     ST.drive(0);
     ST.turn(turn_speed);
     //make 5 full right turns
     angle = 0;
-    gyroAngle(360*5);
+    gyro_angle(360*5);
     ST.stop();
 }
 
 //PID demo: go back and forth, report angle
-void testGyroPID() {
+void test_gyro_PID() {
     Serial.print("Enter power: ");
     while(Serial.available() < 2)
-        ledBlink(1000);
+        led_blink(1000);
     byte speed = Serial.parseInt();
     
     gyro_PID_output = 64;
@@ -21,7 +21,7 @@ void testGyroPID() {
     angle = 0;
     
     //start PID
-    gyroPID.SetMode(AUTOMATIC);
+    gyro_PID.SetMode(AUTOMATIC);
     
     while(!Serial.available()){ //press key to stop
         //change forwards/backwards every 5 seconds
@@ -30,14 +30,14 @@ void testGyroPID() {
         } else {
             ST.drive(-speed);
         }
-        followGyro();
+        follow_gyro();
     }
     
     //stop
     ST.stop();
     
     //stop PID
-    gyroPID.SetMode(MANUAL);
+    gyro_PID.SetMode(MANUAL);
 }
 
 /* Usage for this function (stale example):
@@ -67,18 +67,18 @@ void testGyroPID() {
  *
  * (would consider using function pointer for your_condition(), but types of any parameters would need to be known)  */
 
-bool followGyro() {
+bool follow_gyro() {
     bool was_updated;
-    static unsigned long lastMCUpdate = 0; //cap rate at which commands are sent
+    static unsigned long last_ST_update_ms = 0; //cap rate at which commands are sent
     //update angle, PID, and turning with new gyro reading
-    if(gyroDataReady()){
-        was_updated = updateAngle();
-        if((millis() - lastMCUpdate) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
-            lastMCUpdate = millis();
-            int newTurn = gyro_PID_output;
+    if(gyro_data_ready()){
+        was_updated = update_angle();
+        if((millis() - last_ST_update_ms) > 50){ //limit to 20Hz*4bytes*10bits/byte=800bps
+            last_ST_update_ms = millis();
+            int new_turn = gyro_PID_output;
             Serial.print("New turn speed: ");
-            Serial.println(newTurn);
-            ST.turn(newTurn);
+            Serial.println(new_turn);
+            ST.turn(new_turn);
         }
     }
     return was_updated;
@@ -87,7 +87,7 @@ bool followGyro() {
 //A more readable way to test gyro status
 //poll status register ZYXDA bit for new data
 //instead of DRDY line, check corresponding status register
-bool gyroDataReady(){
+bool gyro_data_ready(){
     return (gyro.readReg(L3G::STATUS) & ZYXDA) == ZYXDA;
 }
 
@@ -101,24 +101,24 @@ bool gyroDataReady(){
  *
  * gyro -y axis corresponds to robot's +z axis
  */
-void gyroCalibrate() {
+void gyro_calibrate() {
     //"8.1  Measure Gyro Offset at Rest (Zero-rate Level)"
     Serial.print("Gyro DC Offset: ");
     int32_t dc_offset_sum = 0; //original type "int" overflows!
-    for(int n = 0; n < sampleNum; n++){
-        while(!gyroDataReady()); //wait for new reading
+    for(int n = 0; n < sample_num; n++){
+        while(!gyro_data_ready()); //wait for new reading
         digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
         gyro.read();
         digitalWrite(COLOR_LED_PIN,LOW);//debug LED
         dc_offset_sum += gyro_robot_z;
     }
-    dc_offset = dc_offset_sum / sampleNum;
+    dc_offset = dc_offset_sum / sample_num;
     Serial.println(dc_offset);
     
     // unused, will need to fix if used
 #ifdef GYRO_NOISE_THRESHOLD
     Serial.print("Gyro Noise Level: ");
-    for(int n = 0; n < sampleNum; n++)
+    for(int n = 0; n < sample_num; n++)
     {
         digitalWrite(COLOR_LED_PIN,HIGH);//debug LED
         gyro.read();
@@ -137,17 +137,20 @@ void gyroCalibrate() {
 //wait until past target angle (initialize angle before calling!)
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
-void gyroAngle(float target) {
+void gyro_angle(float target) {
     bool is_counter_clockwise = (target > angle);
-    Serial.println("gyroAngle");//debug
+    //debug output:
+    Serial.print("gyro_angle(");
+    Serial.print(target);
+    Serial.println(")");
     //Wait for angle to cross target
     while((is_counter_clockwise && (angle < target)) ||     //increasing angle
           (!is_counter_clockwise && (angle > target)))     //decreasing angle
-        if(gyroDataReady())
-            updateAngle();
+        if(gyro_data_ready())
+            update_angle();
 } //end gyroAngle
 
-bool updateAngle(){
+bool update_angle(){
     
     gyro.read();
     
@@ -164,7 +167,7 @@ bool updateAngle(){
     //"remember the current speed for the next loop rate integration."
     prev_rate = rate;
     
-    return gyroPID.Compute();
+    return gyro_PID.Compute();
 }
 
 
