@@ -182,6 +182,8 @@ void robot_game() {
 	robot_setup();
 	
   	leaveStartingArea();
+  	
+  	//face E city victim
   	L1_to_L2();
   	
   	//retrieve and get color of E city victim
@@ -200,6 +202,7 @@ void robot_game() {
 		back_into_Y_then_face_L1();
 		L2_to_L1();
 		dropoff_R(); // will be part of usual dropoff red victim case
+		depart_from_R_dropoff();
 		L1_to_L2();
 		L2_E_to_L2_S_B();
 			//should now be facing wall between lane 1 and 2 by W opening to lane 3 
@@ -207,23 +210,76 @@ void robot_game() {
 	}
 	//victim_color W_city = get_W_city();
 	get_W_city();
-	//drop off W city victim
+	L2_L3_opening_to_L1_L2_opening();
+	//drop off W city victim--get to common point later
 	if(W_city == red){
-		L2_W_to_L2_S();
-		L2_to_L1();
+		L2_W_to_L1_E();
 		dropoff_R();
+		depart_from_R_dropoff();
 		L1_to_L2();
-		L2_E_to_L2_N();
 	}
 	else{//W_city == yellow
 		dropoff_Y();
+	}
+	
+	//get to common point for E offroad victim
+	if(W_city == red){
+		L2_E_to_L2_N();
+	}
+	else{//W_city == yellow
 		depart_from_Y_2();
 	}
-	//get to east L2-L3 opening
-	//depart_from_Y_2();
-	//L2_E_to_L2_N();
-	get_NE_victim();
 	
+	victim_color E_offroad = get_NE_victim();
+	
+	victim_color W_offroad; //will determine using color of E offroad victim 
+	
+	//drop off E offroad victim--get to common point for W offroad victim later
+	if(E_offroad == yellow){
+		W_offroad = red;
+		dropoff_Y();
+	}
+	else{ //E_offroad == red
+		W_offroad = yellow;
+		L2_W_to_L1_E();
+		dropoff_R();
+		depart_from_R_dropoff();
+		L1_to_L2();
+	}
+	
+	//get to common point for W offroad victim
+	if(E_offroad == red){
+		L2_E_to_L2_S_B();
+	}
+	else{//E_offroad == yellow
+		depart_from_Y_1();
+	}
+	
+	//end NE victim
+	/*
+	//get to common point for W offroad victim
+	//temporary: replace these with above checks against E_offroad once it can be retrieved
+	if(W_city == red){
+		L2_E_to_L2_S_B();
+	}
+	else{//W_city == yellow
+		depart_from_Y_1();
+	}
+	*/
+	//TODO: read color from get_NE_victim() instead of detect_WNW_victim()
+	detect_WNW_victim();
+	return_offroad();
+	//victim_color W_offroad = detect_WNW_victim();
+	L2_L3_opening_to_L1_L2_opening();
+	if(W_offroad == yellow) {
+		dropoff_Y();
+		Y_dropoff_to_start();
+	}
+	else {//W_offroad == red
+		L2_W_to_L1_E();
+		dropoff_R();
+		R_dropoff_to_start();
+	}
 } //end robot_game()
 
 
