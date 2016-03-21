@@ -769,7 +769,7 @@ victim_color get_E_offroad(){
 
 void follow_N_wall(){
 	//start following along N wall toward NE corner
-    ST.drive(-40);
+    ST.drive(-45);
     while(rear_average() < PROXIMITY_THRESHOLD){
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     }
@@ -892,7 +892,7 @@ void get_W_offroad() {
     //go forward until either victim in grabber, or encoders exceed limit
     motor_R_encoder.write(0);
     ST.turn(0);
-    ST.drive(20);
+    ST.drive(30);
     bool is_WNW_victim_present;
     encoder_compensate_initialize();
     while(true){
