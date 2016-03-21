@@ -48,7 +48,7 @@ void L1_to_L2(){
     
     ST.drive(10);
     ST.turn(10);
-    gyro_angle(0);
+    gyro_angle(-5); //don't crash into L1-L2
     
 }
 
