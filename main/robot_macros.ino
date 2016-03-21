@@ -1071,28 +1071,6 @@ void return_offroad(){
     encoder_compensate_apply(true);
     
     Serial.println("Go to opening for L2");
-    //L2_W_to_L2_S();
-    /*
-     //swing turn forward left
-     ST.drive(10);
-     ST.turn(-10);
-     gyro_angle(angle-45);
-     //go forward 1/6 turn
-     ST.drive(10);
-     ST.turn(0);
-     motor_R_encoder.write(0);
-     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
-     //complete swing turn forward left
-     ST.drive(10);
-     ST.turn(-10);
-     gyro_angle(angle-45);
-     */
-    /*
-     find_opening(srf_L, 20);
-     ST.drive(0);
-     ST.turn(-10);
-     gyro_angle(angle-90);
-     */
     angle = 0;
     //swing turn forward right
     ST.drive(10);
