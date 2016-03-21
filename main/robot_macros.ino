@@ -307,39 +307,20 @@ void get_W_city(){
     } while (srf_L.convert_cm(last_srf_L_echo_us) < 30);
     
     ST.turn(0);
-    find_opening(srf_L, -25);
     
-    //turn facing lane 2
-    ST.drive(0);
-    ST.turn(-10);
-    gyro_angle(angle-45);
-    
-    //these turns are identical--what goes here?
-    
-    ST.drive(0);
-    ST.turn(-10);
-    gyro_angle(angle-45);
-    ST.stop();
-    
-    //go forward
-    gyro_PID_setpoint = angle;
-    ST.turn(0);
-    ST.drive(25);
-    do {
-        if(millis() - last_srf_trigger_ms > 50){
-            last_srf_trigger_ms = millis();
-            last_srf_F_echo_us = srf_F.ping_cm();
-            Serial.println(last_srf_F_echo_us);
-        }
-        follow_gyro();
-    } while (last_srf_F_echo_us > 7);
-    
-    //turn facing Y drop off
-    ST.drive(10);
+    //swing turn backwards into lane 2
+    ST.drive(-10);
     ST.turn(10);
-    gyro_angle(angle+90);
-    
-    //return result;
+    gyro_angle(angle+45);
+    //ST.turn(0);
+    //ST.drive(-16);
+    //motor_L_encoder.write(0);
+    //while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    ST.drive(-10);
+    ST.turn(10);
+    gyro_angle(angle+45);
+    ST.stop();
+   
 }
 
 void L2_L3_opening_to_L1_L2_opening() {
