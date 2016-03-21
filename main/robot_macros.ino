@@ -712,7 +712,6 @@ victim_color get_E_offroad(){
         ST.drive(0);
         ST.turn(-15);
         gyro_angle(angle-90);
-        ST.stop();
     }
     // lets get victim NNE but we have to be in the right position
     else{
@@ -780,71 +779,76 @@ victim_color get_E_offroad(){
         delay(1000);
         victim_color result = get_color();
         
-        ST.drive(-20);
-        while(rear_average() < PROXIMITY_THRESHOLD){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }
-        
-        // now lets get back to the dropoff zones.
-        ST.turn(0);
-        ST.drive(20);
-        motor_R_encoder.write(0);
-        gyro_PID_setpoint = angle;
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
-            follow_gyro();
-        }
-        ST.stop();
-        
-        ST.drive(0);
-        ST.turn(-20);
-        gyro_angle(angle-90);
-        ST.stop();
-        delay(500);
-        
-        ST.drive(30);
-        motor_R_encoder.write(0);
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
-            follow_srf(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
-        }
-        
-        ST.stop();
-        
-        delay(300);
-        
-        ST.drive(0);
-        ST.turn(25);
-        gyro_angle(angle+180);
-        
-        ST.turn(0);
-        ST.drive(-30);
-        while(rear_average() < PROXIMITY_THRESHOLD){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }
-        ST.stop();
-        
-        
-        delay(500);
-        ST.drive(0);
-        ST.turn(-15);
-        gyro_angle(angle-90);
-        ST.stop();
-        
-        
-        ST.drive(20);
-        motor_R_encoder.write(0);
-        gyro_PID_setpoint = angle;
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
-            follow_gyro();
-        }
-        
-        ST.stop();
-        ST.drive(0);
-        ST.turn(-15);
-        gyro_angle(angle-90);
-        ST.stop();
+        follow_N_wall();
     }
+    ST.stop();
 }
 
+void follow_N_wall(){
+
+    ST.drive(-20);
+    while(rear_average() < PROXIMITY_THRESHOLD){
+        follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+    }
+    
+    // now lets get back to the dropoff zones.
+    ST.turn(0);
+    ST.drive(20);
+    motor_R_encoder.write(0);
+    gyro_PID_setpoint = angle;
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
+        follow_gyro();
+    }
+    ST.stop();
+    
+    ST.drive(0);
+    ST.turn(-20);
+    gyro_angle(angle-90);
+    ST.stop();
+    delay(500);
+    
+    ST.drive(30);
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
+        follow_srf(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
+    }
+    
+    ST.stop();
+    
+    delay(300);
+    
+    ST.drive(0);
+    ST.turn(25);
+    gyro_angle(angle+180);
+    
+    ST.turn(0);
+    ST.drive(-30);
+    while(rear_average() < PROXIMITY_THRESHOLD){
+        follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+    }
+    ST.stop();
+    
+    
+    delay(500);
+    ST.drive(0);
+    ST.turn(-15);
+    gyro_angle(angle-90);
+    ST.stop();
+    
+    
+    ST.drive(20);
+    motor_R_encoder.write(0);
+    gyro_PID_setpoint = angle;
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+        follow_gyro();
+    }
+    
+    ST.stop();
+    ST.drive(0);
+    ST.turn(-15);
+    gyro_angle(angle-90);
+    ST.stop();
+}
 
 void get_W_offroad() {
 	Serial.println("get_W_offroad()");
