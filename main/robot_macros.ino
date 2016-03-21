@@ -232,10 +232,15 @@ void depart_from_Y_2(){
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
-
+    
+    //go back toward opening slightly
+    ST.turn(0);
+    ST.drive(16);
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4));
     
     //swing turn facing lane 3
-    encoder_compensate_apply(true);
+    //encoder_compensate_apply(true);
     ST.drive(10);
     ST.turn(10);
     gyro_angle(angle+45);
