@@ -489,7 +489,7 @@ void back_into_Y_then_face_L1(){
     //keep backing up until inside Y dropoff
     gyro_PID_setpoint = angle;
     ST.turn(0);
-    ST.drive(-10);
+    ST.drive(-20);
     do {
         while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
         while(millis() - last_srf_trigger_ms < 50);
