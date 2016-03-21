@@ -13,10 +13,6 @@ uint8_t readHue() {
     uint16_t tcs_r, tcs_g, tcs_b, tcs_c;  //red, green, blue, clear
     tcs.getRawData(&tcs_r,&tcs_g,&tcs_b,&tcs_c);
     CRGB tcs_rgb; //object from FastLED
-    /*
-     tcs_rgb.red = highByte(tcs_r);
-     tcs_rgb.green = highByte(tcs_g);
-     tcs_rgb.blue = highByte(tcs_b);*/
     //scale to 8-bit (only need relative precision for hue;
     // ignore saturation and value)
     Serial.println("Color sensor readings:");

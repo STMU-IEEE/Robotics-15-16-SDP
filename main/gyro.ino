@@ -40,7 +40,7 @@ void testGyroPID() {
     gyroPID.SetMode(MANUAL);
 }
 
-/* Usage for this function:
+/* Usage for this function (stale example):
  *
  *  //initialize PID
  *  angle = 0;             //start with angle 0
@@ -111,7 +111,6 @@ void gyroCalibrate() {
         gyro.read();
         digitalWrite(COLOR_LED_PIN,LOW);//debug LED
         dc_offset_sum += gyro_robot_z;
-        //Serial.println(dc_offset_sum);
     }
     dc_offset = dc_offset_sum / sampleNum;
     Serial.println(dc_offset);
@@ -139,9 +138,6 @@ void gyroCalibrate() {
 //if turning clockwise, use false for is_counter_clockwise
 //Based on "9  Measure Rotational Velocity" and "10  Measure Angle" (Hill 2013, p. 8)
 void gyroAngle(float target) {
-    //const int sampleTime = 10; //in ms
-    //unsigned long time1 = millis(),time2; //same type as millis()
-    //angle = 0;
     bool is_counter_clockwise = (target > angle);
     Serial.println("gyroAngle");//debug
     //Wait for angle to cross target
@@ -151,26 +147,9 @@ void gyroAngle(float target) {
             updateAngle();
 } //end gyroAngle
 
-/* The following snippet might not work due to
- * incorrect order of operations:
- *   - dc_offset is scaled by (sampleNum - 1) then added
- *      but never unscaled by (1 / sampleNum)
- *   - does (1 / sampleNum) == 0 because of integer division?
- *      (sampleNum is type int)
- *      if so: then (1 / sampleNum) * gyro.g.z == 0
- 
- void gyroRecalibrate() {
- //"11  Design Considerations" (Hill 2013, p. 10)
- //"Code to correct for gyro drift when rover is motionless"
- dc_offset = (sampleNum - 1) * dc_offset + (1 / sampleNum) * gyro_robot_z;
- }
- */
-
 bool updateAngle(){
     
-    //digitalWrite(COLOR_LED_PIN, HIGH);//debug LED
     gyro.read();
-    //digitalWrite(COLOR_LED_PIN, LOW);//debug LED
     
     rate = (float)(gyro_robot_z - dc_offset) * ADJUSTED_SENSITIVITY;
 #ifdef  GYRO_NOISE_THRESHOLD
@@ -188,19 +167,4 @@ bool updateAngle(){
     return gyroPID.Compute();
 }
 
-/* code for (continuously) measuring gyro sample rate if needed:
- *  (can also take readings, then use elapsed time, instead of averaging)
- *
- static double sum = 0;
- static unsigned long n = 0;
- static unsigned long lastDebugTime; //use estimate
- gyro.read();
- 
- unsigned long this_delay = millis() - lastDebugTime;
- lastDebugTime = millis();
- if(n++ == 0) //discard first reading
- return;
- sum += (double)this_delay;        //total ms sampled
- Serial.println(1000/(sum/(n-1))); //in Hz
- */
 

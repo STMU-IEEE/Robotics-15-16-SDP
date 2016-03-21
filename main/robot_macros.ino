@@ -117,39 +117,7 @@ void L1_to_L2(){
     ST.drive(10);
     ST.turn(10);
     gyroAngle(0);
-    /*
-     //Removing saves approximately 3 seconds
-     Serial.println("Advancing 2 turns...");
-     gyro_PID_setpoint = 0;
-     motor_L_encoder.write(0);
-     while(motor_L_encoder.read() > -MOTOR_COUNTS_PER_REVOLUTION / 2)
-     followGyro();
-     
-     ST.stop();//now facing E city victim
-     */
-    /*
-     //go forward until wall on right
-     gyro_PID_setpoint = 0;
-     ST.turn(0);
-     ST.drive(20);
-     arm_servo.write(ARM_DOWN);
-     grabber_servo.write(GRABBER_OPEN);
-     while(photogateAverage() > PHOTOGATE_LOW){
-     followGyro();
-     }
-     Serial.println("Approaching victim...");
-     while(photogateAverage() < PHOTOGATE_HIGH){
-     followGyro();
-     }
-     //stop
-     ST.stop();
-     
-     Serial.println("Grabbing victim...");
-     grabber_servo.write(GRABBER_CLOSE);
-     delay(500);
-     arm_servo.write(ARM_UP);
-     //stop PID
-     gyroPID.SetMode(MANUAL);*/
+    
 }
 
 victim_color get_E_city(){
@@ -157,7 +125,6 @@ victim_color get_E_city(){
     arm_servo.write(ARM_DOWN);
     //open grabber
     grabber_servo.write(GRABBER_OPEN);
-    //delay(500);
     ST.drive(40); //can't make too fast (e.g. 60)--will get stuck against wall
     while(photogateAverage() > PHOTOGATE_LOW){
         followSRFs(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
@@ -175,7 +142,6 @@ victim_color get_E_city(){
     arm_servo.write(ARM_UP);
     delay(1000);
     victim_color result = getColor();
-    //delay(5000);//debugging: read results
     
     ST.drive(-40);
     
@@ -206,9 +172,6 @@ void followSRF(NewPing& srf, bool is_driving_backwards){
         if(srf_reading < 9)
             //turn away from wall
             ST.turn((-TURN_POWER) * turn_sign);
-        //else if(srf_reading == 9)
-        //go straight
-        //ST.turn(0);
         else //if(srf_reading > 9)
             //turn toward wall
             ST.turn(TURN_POWER * turn_sign);
@@ -510,8 +473,6 @@ void depart_from_Y_1(){
         followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     } while (srf_R.convert_cm(last_SRF_R_echo) < 30);
     
-    //findOpening(srf_R, -25);
-    
     //turn facing lane 3
     ST.drive(-10);
     ST.turn(-10);
@@ -527,19 +488,6 @@ void depart_from_Y_2(){
     do {
         followSRFs(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     } while (srf_R.convert_cm(last_SRF_R_echo) < 30);
-    
-    /* try using L1-L2 wall
-     //follow gyro until L2-L3 wall is seen
-     gyro_PID_setpoint = angle;
-     do {
-     if(millis() - last_SRF_trigger > 50) {
-     last_SRF_trigger = millis();
-     last_SRF_R_echo = srf_R.ping_cm();
-     Serial.println(last_SRF_F_echo);
-     }
-     followGyro();
-     } while(srf_R.convert_cm(last_SRF_R_echo) > 25);
-     */
     
     //keep going to L2-L3 center wall
     do {
@@ -954,38 +902,17 @@ void L2_E_to_L2_N() {
         encoder_compensate_sample();
     } while (srf_L.convert_cm(last_SRF_L_echo) < 36); //find L2-L3 center wall
     
-    /*
-     //keep going to last L2-L3 wall
-     do {
-    	while(!followSRFs(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
-     while(millis() - last_SRF_trigger < 50);
-     last_SRF_trigger = millis();
-     last_SRF_L_echo = srf_L.ping();
-     Serial.println(srf_L.convert_cm(last_SRF_L_echo));
-     
-     } while (srf_L.convert_cm(last_SRF_L_echo) > 30); //find L2-L3 center wall
-     */
-    
     encoder_compensate_apply(true);
     //swing turn into L2-L3 opening
     ST.drive(10);
     ST.turn(-10);
-    gyroAngle(angle-45);
-    //go forward slightly
-    ST.drive(10);
-    ST.turn(0);
-    //motor_R_encoder.write(0);
-    //while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
-    //complete swing turn
-    ST.drive(10);
-    ST.turn(-10);
-    gyroAngle(angle-45);
+    gyroAngle(angle-90);
     ST.stop();
     delay(1000);
 }
 
 
-victim_color get_NE_victim(){
+victim_color get_E_offroad(){
     victim_color result; //to be updated and returned at end of function
     //go forward 2.67 rotations before swing turn (rev*8/3)
     //
@@ -1088,12 +1015,6 @@ victim_color get_NE_victim(){
         ST.stop();
         arm_servo.write(ARM_UP);
         
-        
-        
-        
-        
-        
-        
         //turn to the left 180 degrees. no we are facing the city section
         ST.drive(0);
         ST.turn(-20);
@@ -1152,9 +1073,6 @@ victim_color get_NE_victim(){
         arm_servo.write(ARM_UP);
         delay(1000);
         victim_color result = getColor();
-        //delay(5000);//debugging: read results
-        
-        
         
         ST.drive(-20);
         while(analog_average(IR_REAR_PIN) < PROXIMITY_THRESHOLD){
@@ -1217,32 +1135,15 @@ victim_color get_NE_victim(){
         ST.turn(-15);
         gyroAngle(angle-90);
         ST.stop();
-        //go to NNE victim
-        
-        
     }
 }
 
 
-victim_color detect_WNW_victim() {
-    victim_color result; //to be returned at end of function
+void get_W_offroad() {
     //go backward from wall
     ST.turn(0);
     ST.drive(-20);
     gyro_PID_setpoint = angle;
-    
-    /*
-     //go back from L1-L2 wall a specified distance using front sensor
-     do {
-     if(millis() - last_SRF_trigger > 50){
-     last_SRF_trigger = millis();
-     last_SRF_F_echo = srf_F.ping();
-     Serial.print("Front distance: ");
-     Serial.println(srf_F.convert_cm(last_SRF_F_echo));
-     }
-     followGyro();
-     } while (srf_F.convert_cm(last_SRF_F_echo) < 65);
-     */
     
     //go back from L1-L2 and watch for L2-L3 and L3-offroad walls
     for(int i = 1; i <= 2; i++){
@@ -1281,11 +1182,6 @@ victim_color detect_WNW_victim() {
         Serial.println(i);
     }
     //turn facing WNW victim location
-    /*
-     ST.turn(10);
-     ST.drive(0);
-     gyroAngle(angle+90);
-     */
     ST.drive(-10);
     ST.turn(10);
     gyroAngle(angle+45);
@@ -1330,7 +1226,6 @@ victim_color detect_WNW_victim() {
         delay(500);
         arm_servo.write(ARM_UP);
         delay(300);
-        result = getColor();
         ST.drive(-25);
         //encoder_compensate_initialize();
         do{
@@ -1350,11 +1245,6 @@ victim_color detect_WNW_victim() {
         gyro_PID_setpoint = angle;
         ST.drive(0);
         ST.turn(-10);
-        //gyroAngle(-45);
-        //motor_L_encoder.write(0);
-        //ST.turn(0);
-        //while(motor_L_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION / 6);
-        //ST.turn(-10);
         gyroAngle(90);
         
     }
@@ -1397,12 +1287,6 @@ victim_color detect_WNW_victim() {
         ST.turn(-16);
         gyroAngle(angle-120);
         
-        //Turn right after passing the river
-        //    ST.stop();
-        //    ST.drive(10);
-        //    ST.turn(16);
-        //    gyroAngle(angle+50);
-        
         //Follow wall to turn at NW corner of field
         ST.drive(30);
         motor_R_encoder.write(0);
@@ -1410,18 +1294,6 @@ victim_color detect_WNW_victim() {
             followSRFs(srf_FR,srf_R,false,7);
         } while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 4) );
         ST.stop();
-        //    gyro_PID_setpoint = angle;
-        /*
-         //Follow wall to reverse into NW corner of field
-         ST.drive(-30);
-         motor_R_encoder.write(0);
-         do{
-         followSRFs(srf_FL,srf_L,true,7);
-         }
-         while(motor_R_encoder.read() > - (MOTOR_COUNTS_PER_REVOLUTION * 3) );  //Reverse 3 rotations measure what the approximate distance is
-         //    while(analogAverage(IR_REAR_PIN) < PROXIMITY_Threshold); //Reverse using the rear IR sensor, should place robot in the NW corner of the field
-         ST.stop();
-         */
         
         //Turn left to face NNW victim
         ST.stop();
@@ -1450,12 +1322,11 @@ victim_color detect_WNW_victim() {
         delay(500);
         //raise arm
         arm_servo.write(ARM_UP);
-        //    delay(300);
+        delay(300);
         
     }
     
     ST.stop();
-    return result;
 }
 
 void return_offroad(){

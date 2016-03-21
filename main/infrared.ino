@@ -7,7 +7,6 @@ float read_ir_long_range_cm(int sensor_pin){
         avg_sensor_value += analogRead(sensor_pin);
         //delay(48);
     }
-    //inches = 4192.936 * pow(((float)avg_sensor_value)/N,-0.935) - 3.937;
     return multiMap((avg_sensor_value / N), ir_left_raw_table, ir_distances_cm, IR_TABLE_SIZE);
 }
 

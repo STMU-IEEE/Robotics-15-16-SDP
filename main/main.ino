@@ -11,13 +11,9 @@ const int sampleNum = 1000;
 int16_t dc_offset = 0;
 float noise = 0;
 
-//const float sampleRate = 189.4F; //gyro update rate in Hz from datasheet
-const float SAMPLE_RATE = 183.3F; //measured gyro rate
-//float sampleRate = 183.3F; //may be able to measure during calibration
+//const float SAMPLE_RATE = 189.4F; //gyro update rate in Hz from datasheet
+const float SAMPLE_RATE = 183.3F; //measured gyro rate--may be able to measure during calibration
 
-//const float ADJUSTED_SENSITIVITY = 0.009388F; //empirically corrected sensitivity (for turn speed 16)
-//const float ADJUSTED_SENSITIVITY = 0.0097F; //compensate for measured gyro
-//const float ADJUSTED_SENSITIVITY = 0.0099F; //compensate for drift
 const float ADJUSTED_SENSITIVITY = 0.008956528F; //compensated 02/04/16
 int16_t& gyro_robot_z = gyro.g.y; //robot's -z axis corresponds to gyro's +y (data is negated)
 
@@ -33,13 +29,8 @@ double gyro_PID_Kp = 1.0;
 double gyro_PID_Ki = 0.0;
 double gyro_PID_Kd = 0.0;
 
-//bits for gyro registers (cf. datasheet):
-const byte H_Lactive       =     1 << 5;    //CTRL3(H_Lactive)--does not affect DRDY (cf. application note AN4506 p. 22)
+//bits for gyro registers (cf. datasheet)
 const byte INT2_DRDY       =     1 << 3;    //CTRL3(INT2_DRDY)
-const byte INT2_Empty      =     1 << 0;    //CTRL3(INT2_Empty)
-const byte FIFO_EN         =     1 << 6;    //CTRL5(FIFO_EN)
-const byte FM_BYPASS_MODE  = 0b000 << 5;    //FIFO_CTRL(FM2:0) for bypass mode (FIFO off/reset)
-const byte FM_STREAM_MODE  = 0b010 << 5;    //FIFO_CTRL(FM2:0) for stream mode
 const byte ZYXDA           =     1 << 3;    //STATUS(ZYXDA), aka XYZDA; data ready flag
 
 //Gyro PID controller
@@ -154,25 +145,7 @@ void setup() {
 }
 
 void loop() {
-    
     robot_game();
-    //srfTest();
-    
-    //wallFollower(srf_FL,srf_L);
-    //testMC();
-    /*
-     int i, sum = 0;
-     for(i = 0; i < 100; i++)
-     sum += srfOffset();
-     int averageOffset = sum / i;
-     Serial.print("Average offset: ");
-     Serial.print(averageOffset);
-     Serial.println(" uS");
-     */
-    //while(digitalRead(STOP_PIN) != LOW)
-    //while(true)
-    //srfTest();
-    //depart_from_Y();
 }
 
 void robot_game() {
@@ -230,7 +203,7 @@ void robot_game() {
         depart_from_Y_2();
     }
     
-    victim_color E_offroad = get_NE_victim();
+    victim_color E_offroad = get_E_offroad();
     
     victim_color W_offroad; //will determine using color of E offroad victim
     
@@ -255,21 +228,8 @@ void robot_game() {
         depart_from_Y_1();
     }
     
-    //end NE victim
-    /*
-     //get to common point for W offroad victim
-     //temporary: replace these with above checks against E_offroad once it can be retrieved
-     if(W_city == red){
-     L2_E_to_L2_S_B();
-     }
-     else{//W_city == yellow
-     depart_from_Y_1();
-     }
-     */
-    //TODO: read color from get_NE_victim() instead of detect_WNW_victim()
-    detect_WNW_victim();
+    get_W_offroad();
     return_offroad();
-    //victim_color W_offroad = detect_WNW_victim();
     L2_L3_opening_to_L1_L2_opening();
     if(W_offroad == yellow) {
         dropoff_Y();
