@@ -205,6 +205,7 @@ void robot_game() {
     }
     
     victim_color E_offroad = get_E_offroad();
+    return_offroad();
     
     victim_color W_offroad; //will determine using color of E offroad victim
     
