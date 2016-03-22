@@ -82,7 +82,7 @@ int srf_offset(){
 }
 
 //follows wall for 10s forwards and backwards
-void wallFollower(NewPing& srf_front, NewPing& srf_center){
+void wall_follower(NewPing& srf_front, NewPing& srf_center){
     const int8_t drive_power = 35;
     const unsigned int test_distance = 13;
     ST.drive(drive_power);
