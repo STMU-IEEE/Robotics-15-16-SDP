@@ -160,7 +160,7 @@ void robot_game() {
     L1_to_L2();
     
     //temporary: for getting to offroad victims
-    //L2_E_to_L2_S_B();
+    //L2_E_to_L2_N();
     //victim_color W_offroad = yellow;
     
     //retrieve and get color of E city victim

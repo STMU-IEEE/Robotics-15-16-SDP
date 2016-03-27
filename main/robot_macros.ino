@@ -611,31 +611,96 @@ victim_color get_E_offroad(){
     ST.drive(-20);
     while(rear_average() < PROXIMITY_THRESHOLD);
     
-    //go forward 2.67 rotations before swing turn (rev*8/3)
-    ST.drive(20);
-    motor_R_encoder.write(0);
-    gyro_PID_setpoint = angle;
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)){
-        follow_gyro();
+	//look for walls on right (as done for W offroad)
+	ST.turn(0);
+	ST.drive(25);
+	angle = 0;
+	gyro_PID_setpoint = 0;
+	for(int i = 1; i <= 2; i++){
+        //go 1/3 turn before detecting next wall
+        motor_R_encoder.write(0);
+        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+            follow_gyro();
+        
+        do {
+            if(millis() - last_srf_trigger_ms > 50){
+                last_srf_trigger_ms = millis();
+                last_srf_R_echo_us = srf_R.ping();
+                Serial.print("Right distance: ");
+                Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
+            }
+            follow_gyro();
+        } while(srf_R.convert_cm(last_srf_R_echo_us) > 16);
+        Serial.print("Wall ");
+        Serial.println(i);
+        
+        //go 1/3 turn before detecting next opening
+        motor_R_encoder.write(0);
+        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+            follow_gyro();
+        
+        do {
+            if(millis() - last_srf_trigger_ms > 50){
+                last_srf_trigger_ms = millis();
+                last_srf_R_echo_us = srf_R.ping();
+                Serial.print("Right distance: ");
+                Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
+            }
+            follow_gyro();
+        } while(srf_R.convert_cm(last_srf_R_echo_us) < 25);
+        Serial.print("Opening ");
+        Serial.println(i);
     }
-
-    //swing turn right 90 degrees
-    ST.drive(15);
-    ST.turn(15);
-    gyro_angle(angle+90);
     
-    //move foward .5 rotations.
-    ST.drive(25);
-    motor_R_encoder.write(0);
-    gyro_PID_setpoint += 90;
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 3){
-        follow_gyro();
-    }
-    
-    //point turn left 90 degrees
+    //maneuver around L3 wall and ENE obstacle
+    //point turn left 135 degrees
     ST.drive(0);
-    ST.turn(-15);
-    gyro_angle(angle-90);
+    ST.turn(-16);
+    gyro_angle(-135);
+    
+    //move backwards 2/3 rotations.
+    ST.turn(0);
+    ST.drive(-20);
+    motor_L_encoder.write(0);
+    gyro_PID_setpoint = -135;
+    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 3){
+        follow_gyro();
+    }
+    
+    //point turn right 45 degrees
+    ST.drive(0);
+    ST.turn(16);
+    gyro_angle(-90);
+    
+    //back into E wall
+    ST.drive(-25);
+    ST.turn(0);
+    gyro_PID_setpoint = -90;
+    while(rear_average() < PROXIMITY_THRESHOLD){
+        follow_gyro();
+    }
+    
+    //go forward 1/4 turn
+    ST.drive(20);
+    ST.turn(0);
+    gyro_PID_setpoint = -90;
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4)){
+        follow_gyro();
+    }
+    
+    //point turn right 90 degrees
+    ST.drive(0);
+    ST.turn(16);
+    gyro_angle(0);
+    
+    //back into L3 wall
+    ST.drive(-25);
+    ST.turn(0);
+    gyro_PID_setpoint = 0;
+    while(rear_average() < PROXIMITY_THRESHOLD){
+        follow_gyro();
+    }
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
