@@ -839,16 +839,30 @@ void follow_N_wall(){
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     }
     
-    //swing turn forward left facing W
-    ST.drive(15);
-    ST.turn(-15);
-    gyro_angle(angle-90);
+    //go forward 1/4 turn
+    ST.drive(20);
+    ST.turn(0);
+    angle = 0;
+    gyro_PID_setpoint = 0;
+    motor_R_encoder.write(0);
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4)){
+        if(follow_gyro()){
+            Serial.print("R Encoder: ");
+            Serial.println(motor_R_encoder.read());
+            Serial.flush();
+        }
+    }
+    
+    //point turn left facing W
+    ST.drive(0);
+    ST.turn(-16);
+    gyro_angle(-90);
     ST.stop();
     
     //go forward W for 7/3 rotations 
     ST.drive(35);
     motor_R_encoder.write(0);
-    gyro_PID_setpoint = angle;
+    gyro_PID_setpoint = -90;
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
         follow_gyro();
     }
@@ -856,7 +870,7 @@ void follow_N_wall(){
     //face S to L3-L2
     ST.drive(0);
     ST.turn(-15);
-    gyro_angle(angle-90);
+    gyro_angle(-180);
     ST.stop();
 }
 
