@@ -64,10 +64,12 @@
 /************************     Servos      ************************/
 //servo angles from testing
 #define ARM_UP          25
+#define ARM_ALMOST_DOWN 85
 #define ARM_DOWN        95
 //#define GRABBER_OPEN    125 //reduced--might not close if opened any wider
 #define GRABBER_OPEN    65 //reduced--might not close if opened any wider
 //#define GRABBER_CLOSE   72
+#define GRABBER_ALMOST_CLOSE   25
 #define GRABBER_CLOSE   15
 //#define GRABBER_MIN     50 //do not use when holding a victim
 #define GRABBER_MIN     0 //do not use when holding a victim

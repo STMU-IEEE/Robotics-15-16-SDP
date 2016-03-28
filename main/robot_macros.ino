@@ -54,26 +54,16 @@ void L1_to_L2(){
 
 victim_color get_E_city(){
 	Serial.println("get_E_city()");
-    //lower arm
-    arm_servo.write(ARM_DOWN);
-    //open grabber
-    grabber_servo.write(GRABBER_OPEN);
+	approach_victim();
     ST.drive(40); //can't make too fast (e.g. 60)--will get stuck against wall
     while(photogate_average() > PHOTOGATE_LOW){
         follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
     }
     while(photogate_average() < PHOTOGATE_HIGH);
     
-    //stop
     ST.stop();
     
-    //close grabber
-    grabber_servo.write(GRABBER_CLOSE);
-    //wait for grabber to close
-    delay(500);
-    //raise arm
-    arm_servo.write(ARM_UP);
-    delay(1000);
+    pick_up_victim();
     victim_color result = get_color();
     
     ST.drive(-40);
@@ -106,14 +96,7 @@ void dropoff_R(){
     } while (srf_F.convert_cm(last_srf_F_echo_us) >= 20); //need enough room to drop arm
     
     ST.stop();
-    //drop victim
-    arm_servo.write(ARM_DOWN);
-    delay(300);
-    grabber_servo.write(GRABBER_OPEN);
-    delay(300);
-    arm_servo.write(ARM_UP);
-    delay(300);
-    grabber_servo.write(GRABBER_CLOSE);
+    drop_victim();
     ST.turn(0);
     ST.drive(-60);
     do {
@@ -163,14 +146,7 @@ void dropoff_E_city_Y(){
     gyro_angle(-180);
     ST.stop();
     
-    //drop victim
-    arm_servo.write(ARM_DOWN);
-    delay(300);
-    grabber_servo.write(GRABBER_OPEN);
-    delay(300);
-    arm_servo.write(ARM_UP);
-    delay(300);
-    grabber_servo.write(GRABBER_CLOSE);
+    drop_victim();
     
 }
 
@@ -286,11 +262,8 @@ void get_W_city(){
         follow_gyro();
     
     //follow wall on left until victim
-    //lower arm
-    arm_servo.write(ARM_DOWN);
-    //open grabber
-    grabber_servo.write(GRABBER_OPEN);
-    //delay(500);
+    approach_victim();
+    
     while(photogate_average() > PHOTOGATE_LOW){
         follow_srf(srf_FL,srf_L,false,8);// its moving foward and the minimum distance is 7cm
     }
@@ -299,13 +272,7 @@ void get_W_city(){
     //stop
     ST.stop();
     
-    //close grabber
-    grabber_servo.write(GRABBER_CLOSE);
-    //wait for grabber to close
-    delay(500);
-    //raise arm
-    arm_servo.write(ARM_UP);
-    delay(300);
+    pick_up_victim();
     
     ST.drive(-40);
     
@@ -348,14 +315,8 @@ void dropoff_Y (){
     } while (srf_F.convert_cm(last_srf_F_echo_us) >= 17); //need enough room to drop arm
     
     ST.stop();
-    //drop victim
-    arm_servo.write(ARM_DOWN);
-    delay(300);
-    grabber_servo.write(GRABBER_OPEN);
-    delay(300);
-    arm_servo.write(ARM_UP);
-    delay(300);
-    grabber_servo.write(GRABBER_CLOSE);
+    
+    drop_victim();
 }
 
 
@@ -709,10 +670,7 @@ victim_color get_E_offroad(){
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
-    //lower arm
-    arm_servo.write(ARM_DOWN);
-    //open grabber
-    grabber_servo.write(GRABBER_OPEN);
+    approach_victim();
     ST.drive(40);
     motor_R_encoder.write(0);
     
@@ -735,13 +693,7 @@ victim_color get_E_offroad(){
     if(is_ENE_victim_present){
         while((photogate_average() < PHOTOGATE_HIGH));
         ST.stop();
-        //close grabber
-        grabber_servo.write(GRABBER_CLOSE);
-        //wait for grabber to close
-        delay(500);
-        //raise arm
-        arm_servo.write(ARM_UP);
-        delay(1000);
+        pick_up_victim();
         result = get_color();
         ST.stop();
         
@@ -807,10 +759,8 @@ victim_color get_E_offroad(){
         
         //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
         ST.stop();
-        //lower arm
-        arm_servo.write(ARM_DOWN);
-        //open grabber
-        grabber_servo.write(GRABBER_OPEN);
+        
+        approach_victim();
         delay(500);
         
         ST.drive(30); //can't make too fast (e.g. 60)--will get stuck against wall
@@ -822,13 +772,8 @@ victim_color get_E_offroad(){
         //stop
         ST.stop();
         
-        //close grabber
-        grabber_servo.write(GRABBER_CLOSE);
-        //wait for grabber to close
-        delay(1000);
-        //raise arm
-        arm_servo.write(ARM_UP);
-        delay(1000);
+        
+        pick_up_victim();
         result = get_color();
         
         follow_N_wall();
@@ -955,9 +900,7 @@ void get_W_offroad() {
     ST.turn(20);
     gyro_angle(angle+45);
 
-    //lower arm, open grabber
-    grabber_servo.write(GRABBER_OPEN);
-    arm_servo.write(ARM_DOWN);
+    approach_victim();
     
     //go forward until either victim in grabber, or encoders exceed limit
     motor_R_encoder.write(0);
@@ -983,9 +926,7 @@ void get_W_offroad() {
         //pick up victim and return (may need to move some of this to after the else case)
         while(photogate_average() < PHOTOGATE_HIGH);
         ST.stop();
-        grabber_servo.write(GRABBER_CLOSE);
-        delay(500);
-        arm_servo.write(ARM_UP);
+        pick_up_victim();
         delay(300);
         ST.drive(-25);
         //encoder_compensate_initialize();
@@ -1095,11 +1036,8 @@ void get_W_offroad() {
             follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }       
         
-        //lower arm
-        arm_servo.write(ARM_DOWN);
-        //open grabber
-        grabber_servo.write(GRABBER_OPEN);
-        //delay(500);
+        approach_victim();
+        
         ST.drive(20);
         motor_R_encoder.write(0);
         while(photogate_average() > PHOTOGATE_LOW){
@@ -1109,13 +1047,7 @@ void get_W_offroad() {
         
         //stop
         ST.stop();
-        //close grabber
-        grabber_servo.write(GRABBER_CLOSE);
-        //wait for grabber to close
-        delay(500);
-        //raise arm
-        arm_servo.write(ARM_UP);
-        delay(300);
+        pick_up_victim();
 
 //Reverse to North Wall
         ST.drive(-20);
