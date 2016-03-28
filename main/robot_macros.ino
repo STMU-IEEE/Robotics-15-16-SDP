@@ -99,6 +99,13 @@ void dropoff_R(){
     drop_victim();
     ST.turn(0);
     ST.drive(-60);
+    motor_L_encoder.write(0);
+    //follow S wall for 6 rotations
+    do {
+        follow_srf(srf_FR,srf_R,true,14);
+    } while (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6));
+    //slow down before finding opening
+    ST.drive(-30);
     do {
         while(!follow_srf(srf_FR,srf_R,true,14));// its moving backwards and the minimum distance is 14cm
         while(millis() - last_srf_trigger_ms < 50);
