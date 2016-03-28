@@ -34,11 +34,12 @@ void L1_to_L2(){
     do {
         if(millis() - last_srf_trigger_ms > 50){
             last_srf_trigger_ms = millis();
-            last_srf_F_echo_us = srf_F.ping_cm();
-            Serial.println(last_srf_F_echo_us);
+            last_srf_F_echo_us = srf_F.ping();
+            Serial.print("Front distance: ");
+            Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (last_srf_F_echo_us >= 4);
+    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 4);
     
     //turn right 45 degrees in place
     ST.drive(0);
@@ -99,6 +100,7 @@ void dropoff_R(){
         while(millis() - last_srf_trigger_ms < 50);
         last_srf_trigger_ms = millis();
         last_srf_F_echo_us = srf_F.ping();
+        Serial.print("Front distance: ");
         Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         
     } while (srf_F.convert_cm(last_srf_F_echo_us) >= 20); //need enough room to drop arm
@@ -263,11 +265,12 @@ void get_W_city(){
     do {
         if(millis() - last_srf_trigger_ms > 50){
             last_srf_trigger_ms = millis();
-            last_srf_F_echo_us = srf_F.ping_cm();
-            Serial.println(last_srf_F_echo_us);
+            last_srf_F_echo_us = srf_F.ping();
+            Serial.print("Front distance: ");
+            Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (last_srf_F_echo_us < 20);
+    } while (srf_F.convert_cm(last_srf_F_echo_us) < 20);
     
     //turn facing W city victim
     ST.turn(10);
@@ -339,6 +342,7 @@ void dropoff_Y (){
         while(millis() - last_srf_trigger_ms < 50);
         last_srf_trigger_ms = millis();
         last_srf_F_echo_us = srf_F.ping();
+        Serial.print("Front distance: ");
         Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         
     } while (srf_F.convert_cm(last_srf_F_echo_us) >= 17); //need enough room to drop arm
@@ -508,11 +512,12 @@ void L2_to_L1() {
     do {
         if(millis() - last_srf_trigger_ms > 50){
             last_srf_trigger_ms = millis();
-            last_srf_F_echo_us = srf_F.ping_cm();
-            Serial.println(last_srf_F_echo_us);
+            last_srf_F_echo_us = srf_F.ping();
+            Serial.print("Front distance: ");
+            Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (last_srf_F_echo_us >= 6);
+    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 6);
     
     //turn left 90 degrees in place
     ST.drive(0);
@@ -1017,10 +1022,11 @@ void get_W_offroad() {
         do {
             if(millis() - last_srf_trigger_ms > 50){
                 last_srf_trigger_ms = millis();
-                last_srf_F_echo_us = srf_F.ping_cm();
-                Serial.println(last_srf_F_echo_us);
+                last_srf_F_echo_us = srf_F.ping();
+                Serial.print("Front distance: ");
+                Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
             }
-        } while (last_srf_F_echo_us >= 6);
+        } while (srf_F.convert_cm(last_srf_F_echo_us) >= 6);
         ST.stop();
         
         angle = 0;
@@ -1148,11 +1154,12 @@ void return_offroad(){
     do {
         if(millis() - last_srf_trigger_ms > 50){
             last_srf_trigger_ms = millis();
-            last_srf_F_echo_us = srf_F.ping_cm();
-            Serial.println(last_srf_F_echo_us);
+            last_srf_F_echo_us = srf_F.ping();
+            Serial.print("Front distance: ");
+            Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (last_srf_F_echo_us > 8);
+    } while (srf_F.convert_cm(last_srf_F_echo_us) > 8);
     
     //swing turn toward from wall facing W
     angle = 0;
