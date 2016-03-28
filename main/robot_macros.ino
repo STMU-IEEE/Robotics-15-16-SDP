@@ -987,8 +987,10 @@ void get_W_offroad() {
         delay(500);
         
         ST.turn(0);
-        ST.drive(30);
+        ST.drive(25);
+        gyro_PID_setpoint = angle;
         do {
+            follow_gyro();
             if(millis() - last_srf_trigger_ms > 50){
                 last_srf_trigger_ms = millis();
                 last_srf_F_echo_us = srf_F.ping();
@@ -998,20 +1000,22 @@ void get_W_offroad() {
         } while (srf_F.convert_cm(last_srf_F_echo_us) >= 6);
         ST.stop();
         
+        encoder_compensate_apply(true);
+        
         angle = 0;
         gyro_PID_setpoint = angle;
         
         ST.stop();
         ST.drive(0);
         ST.turn(16);
-        gyro_angle(135); //angle+135 puts at 45 degrees to run parallel with the river
+        gyro_angle(130); //angle+135 puts at 45 degrees to run parallel with the river (use 130 to avoid W fixed obstacle)
         ST.stop();
         
         //Drive forward relying on the gyro to keep parallel with the river
         ST.drive(40);
         ST.turn(0);
         motor_R_encoder.write(0);
-        gyro_PID_setpoint = 135;
+        gyro_PID_setpoint = 130;
         while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 6){
         	follow_gyro();
         }  //drive forward 5 rotations measure what the approximate distance is
