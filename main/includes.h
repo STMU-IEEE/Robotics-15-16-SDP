@@ -63,9 +63,9 @@
 
 /************************     Servos      ************************/
 //servo angles from testing
-#define ARM_UP          25
-#define ARM_ALMOST_DOWN 85
-#define ARM_DOWN        95
+#define ARM_UP          30
+#define ARM_ALMOST_DOWN 90
+#define ARM_DOWN        105
 //#define GRABBER_OPEN    125 //reduced--might not close if opened any wider
 #define GRABBER_OPEN    65 //reduced--might not close if opened any wider
 //#define GRABBER_CLOSE   72
