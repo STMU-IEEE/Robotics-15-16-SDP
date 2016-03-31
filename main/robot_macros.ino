@@ -1023,6 +1023,7 @@ void get_W_offroad() {
         //go specified encoder distance backwards
         motor_L_encoder.write(0);
         digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+        angle = 0;
         gyro_PID_setpoint = angle;
         ST.drive(-25);
         while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2){
@@ -1031,10 +1032,9 @@ void get_W_offroad() {
         }
         //face toward L2-L3 wall
         Serial.println("Face L2-L3");
-        gyro_PID_setpoint = angle;
         ST.drive(0);
         ST.turn(-10);
-        gyro_angle(90);
+        gyro_angle(-90);
         
     }
     else{
