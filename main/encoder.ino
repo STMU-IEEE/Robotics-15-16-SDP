@@ -96,28 +96,34 @@ void encoder_compensate_apply(bool use_motor_R) {
     //swing turn about motor to correct difference
     if(use_motor_R) {
         motor_R_encoder.write(average_difference);
+        digitalWrite(COLOR_LED_PIN,HIGH); // debug encoder write
         if(average_difference > 0){
             ST.drive(-10);
             ST.turn(10);
-            while(motor_R_encoder.read() > 0);
+            while(motor_R_encoder.read() > 0)
+            	digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
         }
         else {
             ST.drive(10);
             ST.turn(-10);
-            while(motor_R_encoder.read() <= 0);
+            while(motor_R_encoder.read() <= 0)
+            	digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
         }
     }
     else {
         motor_L_encoder.write(average_difference);
+        digitalWrite(COLOR_LED_PIN,HIGH); // debug encoder write
         if(average_difference > 0){
             ST.drive(10);
             ST.turn(10);
-            while(motor_L_encoder.read() > 0);
+            while(motor_L_encoder.read() > 0)
+            	digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
         }
         else {
             ST.drive(-10);
             ST.turn(-10);
-            while(motor_L_encoder.read() <= 0);
+            while(motor_L_encoder.read() <= 0)
+            	digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
         }
     }
     ST.stop();
