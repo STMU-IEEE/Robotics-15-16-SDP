@@ -102,9 +102,12 @@ void dropoff_R(){
     ST.drive(-60);
     motor_L_encoder.write(0);
     //follow S wall for 6 rotations
-    do {
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6)){
         follow_srf(srf_FR,srf_R,true,14);
-    } while (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 6));
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
+    }
+    	
     //slow down before finding opening
     ST.drive(-30);
     do {
@@ -223,7 +226,9 @@ void depart_from_Y_2(){
     ST.turn(0);
     ST.drive(16);
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write;
     
     //swing turn facing lane 3
     //encoder_compensate_apply(true);
@@ -233,7 +238,9 @@ void depart_from_Y_2(){
     ST.turn(0);
     ST.drive(16);
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write;
     ST.drive(10);
     ST.turn(10);
     gyro_angle(angle+45);
@@ -265,9 +272,12 @@ void get_W_city(){
     ST.turn(0);
     ST.drive(40);
     motor_L_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     gyro_PID_setpoint = angle;
-    while( -motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)/2)
+    while( -motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)/2){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
+    }
     
     //follow wall on left until victim
     approach_victim();
@@ -347,7 +357,9 @@ void L2_W_to_L1_E(){
     //find inside of Y drop off on other side of opening
     //go 1/4 turn before detecting
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     do {
         while(!follow_srf(srf_FR,srf_R,false,7));// its moving forward and the minimum distance is 7cm
         while(millis() - last_srf_trigger_ms < 50);
@@ -366,7 +378,9 @@ void L2_W_to_L1_E(){
     ST.turn(0);
     ST.drive(-16);
     motor_L_encoder.write(0);
-    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     
     //complete turn
     ST.drive(-10);
@@ -464,8 +478,10 @@ void back_into_Y_then_face_L1(){
     gyro_angle(45);
     //go forward 1/6 turn
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     ST.turn(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     //keep swing turning toward L1
     ST.turn(10);
     gyro_angle(90);
@@ -527,7 +543,9 @@ void L2_E_to_L2_S_B(){
     //back up enough to clear wall
     ST.turn(0);
     motor_L_encoder.write(0);
-    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     //complete turn
     ST.turn(10);
     gyro_angle(90);
@@ -594,8 +612,11 @@ victim_color get_E_offroad(){
 	for(int i = 1; i <= 2; i++){
         //go 1/3 turn before detecting next wall
         motor_R_encoder.write(0);
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3)){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
+        }
         
         do {
             if(millis() - last_srf_trigger_ms > 50){
@@ -611,8 +632,11 @@ victim_color get_E_offroad(){
         
         //go 1/3 turn before detecting next opening
         motor_R_encoder.write(0);
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3)){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
+        }
         
         do {
             if(millis() - last_srf_trigger_ms > 50){
@@ -637,8 +661,10 @@ victim_color get_E_offroad(){
     ST.turn(0);
     ST.drive(-20);
     motor_L_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     gyro_PID_setpoint = -135;
     while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2) / 3){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
     }
     
@@ -660,7 +686,9 @@ victim_color get_E_offroad(){
     ST.turn(0);
     gyro_PID_setpoint = -90;
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4)){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
     }
     
@@ -682,6 +710,7 @@ victim_color get_E_offroad(){
     approach_victim();
     ST.drive(40);
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     
     bool is_ENE_victim_present;
     //its going to follow the wall a certain distance or it will detect the NE victim
@@ -696,6 +725,7 @@ victim_color get_E_offroad(){
             is_ENE_victim_present=false;
             break;
         }
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     }
     // it we have the NE victim, then wait until its in the correct position and get it.
     //pick up victim
@@ -723,8 +753,10 @@ victim_color get_E_offroad(){
         //go forward until L2-L3 on left
         ST.drive(20);
         motor_R_encoder.write(0);
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
         gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
         }
         ST.stop();
@@ -757,8 +789,10 @@ victim_color get_E_offroad(){
         //go forward from N wall
         ST.drive(20);
         motor_R_encoder.write(0);
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
         gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
         }
         
@@ -812,8 +846,10 @@ void follow_N_wall(){
     ST.turn(0);
     ST.drive(20);
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     gyro_PID_setpoint = angle;
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
     }
     ST.stop();
@@ -827,7 +863,9 @@ void follow_N_wall(){
     //go forward S for 2 rotations
     ST.drive(40);
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_srf(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
     }
     
@@ -849,7 +887,9 @@ void follow_N_wall(){
     angle = 0;
     gyro_PID_setpoint = 0;
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4)){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         if(follow_gyro()){
             Serial.print("R Encoder: ");
             Serial.println(motor_R_encoder.read());
@@ -866,8 +906,10 @@ void follow_N_wall(){
     //go forward W for 7/3 rotations 
     ST.drive(35);
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     gyro_PID_setpoint = -90;
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
     }
     
@@ -889,8 +931,11 @@ void get_W_offroad() {
     for(int i = 1; i <= 2; i++){
         //go 1/3 turn before detecting next wall
         motor_L_encoder.write(0);
-        while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+        while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3)){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
+        }
         
         do {
             if(millis() - last_srf_trigger_ms > 50){
@@ -906,8 +951,11 @@ void get_W_offroad() {
         
         //go 1/3 turn before detecting next opening
         motor_L_encoder.write(0);
-        while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+        while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3)){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
+        }
         
         do {
             if(millis() - last_srf_trigger_ms > 50){
@@ -928,7 +976,9 @@ void get_W_offroad() {
     ST.turn(0);
     ST.drive(16);
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     ST.drive(0);
     ST.turn(20);
     gyro_angle(angle+45);
@@ -937,6 +987,7 @@ void get_W_offroad() {
     
     //go forward until either victim in grabber, or encoders exceed limit
     motor_R_encoder.write(0);
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     ST.turn(0);
     ST.drive(30);
     bool is_WNW_victim_present;
@@ -946,6 +997,7 @@ void get_W_offroad() {
             is_WNW_victim_present = false;
             break;
         }
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         if(photogate_average() < PHOTOGATE_LOW) {
             is_WNW_victim_present = true;
             break;
@@ -970,9 +1022,11 @@ void get_W_offroad() {
         encoder_compensate_apply(true);
         //go specified encoder distance backwards
         motor_L_encoder.write(0);
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
         gyro_PID_setpoint = angle;
         ST.drive(-25);
         while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
         }
         //face toward L2-L3 wall
@@ -1020,8 +1074,10 @@ void get_W_offroad() {
         ST.drive(40);
         ST.turn(0);
         motor_R_encoder.write(0);
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
         gyro_PID_setpoint = 130;
         while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 6){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         	follow_gyro();
         }  //drive forward 5 rotations measure what the approximate distance is
         
@@ -1055,8 +1111,10 @@ void get_W_offroad() {
         ST.turn(0);
         ST.drive(20);
         motor_R_encoder.write(0);
+        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
         gyro_PID_setpoint = angle;
         while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 1) / 4){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
             follow_gyro();
         }
         //Turn right to face NNW victim
@@ -1100,7 +1158,9 @@ void get_W_offroad() {
         ST.turn(0);
 		ST.drive(45);
 		motor_R_encoder.write(0);
+		digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
 		while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
+            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
 			follow_srf(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
 		}
 		
@@ -1157,7 +1217,9 @@ void return_offroad(){
     ST.drive(16);
     ST.turn(0);
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     //complete swing turn forward right
     ST.drive(10);
     ST.turn(10);
@@ -1170,7 +1232,9 @@ void return_offroad(){
     ST.drive(-16);
     ST.turn(0);
     motor_L_encoder.write(0);
-    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     //swing turn backwards right
     ST.drive(-10);
     ST.turn(-10);
@@ -1192,7 +1256,9 @@ void L3_to_L2(){
     ST.drive(20);
     ST.turn(0);
     motor_R_encoder.write(0);
-    while(motor_R_encoder.read() < ((MOTOR_COUNTS_PER_REVOLUTION * 3)/ 4));
+    digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
+    while(motor_R_encoder.read() < ((MOTOR_COUNTS_PER_REVOLUTION * 1)/ 2))
+    	digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     
     //turn facing Y dropoff
     ST.turn(-10);
