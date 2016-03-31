@@ -18,3 +18,17 @@ int photogate_average() {
 int rear_average() {
 	return analog_average(IR_REAR_PIN);
 }
+
+//place robot with back against wall
+int find_rear_threshold() {
+	int max = rear_average();
+	ST.drive(20);
+	ST.turn(0);
+	motor_R_encoder.write(0);
+	digitalWrite(COLOR_LED_PIN,HIGH); // debug encoder write
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 2))
+		digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
+	ST.stop();
+	int min = rear_average();
+	return 4 * (max / 5) + (min / 5); //return 80% threshold
+}

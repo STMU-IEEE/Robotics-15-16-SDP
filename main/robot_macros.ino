@@ -138,7 +138,7 @@ void R_dropoff_to_start(){
 	Serial.println("R_dropoff_to_start()");
     ST.turn(0);
     ST.drive(-40);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_srf(srf_FR,srf_R,true,14);
     }
     ST.stop();
@@ -391,7 +391,7 @@ void L2_W_to_L1_E(){
     gyro_PID_setpoint = angle;
     ST.turn(0);
     ST.drive(-35);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_gyro();
     }
     
@@ -439,7 +439,7 @@ void Y_dropoff_to_start(){
     gyro_PID_setpoint = angle;
     ST.turn(0);
     ST.drive(-45);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_gyro();
     }
     
@@ -451,7 +451,7 @@ void Y_dropoff_to_start(){
     //go backwards into starting area
     ST.turn(0);
     ST.drive(-45);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_srf(srf_FR,srf_R,true,14); //going backwards, target distance is 14cm
     }
     
@@ -602,7 +602,7 @@ victim_color get_E_offroad(){
     //back into L1-L2 for reference
     ST.turn(0);
     ST.drive(-20);
-    while(rear_average() < PROXIMITY_THRESHOLD);
+    while(rear_average() < proximity_threshold);
     
 	//look for walls on right (as done for W offroad)
 	ST.turn(0);
@@ -677,7 +677,7 @@ victim_color get_E_offroad(){
     ST.drive(-25);
     ST.turn(0);
     gyro_PID_setpoint = -90;
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_gyro();
     }
     
@@ -701,7 +701,7 @@ victim_color get_E_offroad(){
     ST.drive(-25);
     ST.turn(0);
     gyro_PID_setpoint = 0;
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_gyro();
     }
     
@@ -740,7 +740,7 @@ victim_color get_E_offroad(){
         //back into L3
         ST.turn(0);
         ST.drive(-40);
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
             follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }
         
@@ -781,7 +781,7 @@ victim_color get_E_offroad(){
         //back into N wall
         ST.turn(0);
         ST.drive(-30);
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
             follow_srf(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
         }
         ST.stop();
@@ -805,7 +805,7 @@ victim_color get_E_offroad(){
         //back into E wall
         ST.turn(0);
         ST.drive(-20);
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
             follow_srf(srf_FR,srf_R,true,6);// its moving backwards and the minimum distance is 7cm
         }
         
@@ -838,7 +838,7 @@ victim_color get_E_offroad(){
 void follow_N_wall(){
 	//start following along N wall toward NE corner
     ST.drive(-45);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     }
     
@@ -877,7 +877,7 @@ void follow_N_wall(){
     //back up until L3 wall
     ST.turn(0);
     ST.drive(-40);
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
     }
     
@@ -1090,7 +1090,7 @@ void get_W_offroad() {
         ST.turn(0);
         ST.drive(-20);
         //back up to N wall
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
         	follow_gyro();
         }
         //swing turn facing E
@@ -1104,7 +1104,7 @@ void get_W_offroad() {
         motor_R_encoder.write(0);
         do{
             follow_srf(srf_FL,srf_L,true,9);
-        } while(rear_average() < PROXIMITY_THRESHOLD);
+        } while(rear_average() < proximity_threshold);
         ST.stop();
         
         //go forward before turning
@@ -1127,7 +1127,7 @@ void get_W_offroad() {
         //Reverse to North Wall
         ST.turn(0);
         ST.drive(-20);
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
             follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }       
         
@@ -1146,7 +1146,7 @@ void get_W_offroad() {
 
 //Reverse to North Wall
         ST.drive(-35);
-        while(rear_average() < PROXIMITY_THRESHOLD){
+        while(rear_average() < proximity_threshold){
             follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }
         //swing turn to face E
@@ -1248,7 +1248,7 @@ void L3_to_L2(){
     ST.drive(-35);
     angle = 90;
     gyro_PID_setpoint = 90;
-    while(rear_average() < PROXIMITY_THRESHOLD){
+    while(rear_average() < proximity_threshold){
         follow_gyro();
     }
     

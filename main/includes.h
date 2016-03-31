@@ -80,8 +80,8 @@
 #define PHOTOGATE_LOW   6000
 #define PHOTOGATE_HIGH  12000
 //#define PROXIMITY_THRESHOLD	2458 //about 0.375V
-#define PROXIMITY_THRESHOLD	3000 //2458 not high enough--would stop >5cm from wall
-
+//#define PROXIMITY_THRESHOLD	3000 //2458 not high enough--would stop >5cm from wall
+//use measured threshold instead
 
 /*************************   Gyro sensor     *********************/
 //uncomment to enable noise rejection
