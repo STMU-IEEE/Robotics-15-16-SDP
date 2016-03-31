@@ -1257,7 +1257,7 @@ void L3_to_L2(){
     ST.turn(0);
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-    while(motor_R_encoder.read() < ((MOTOR_COUNTS_PER_REVOLUTION * 1)/ 2))
+    while(motor_R_encoder.read() < ((MOTOR_COUNTS_PER_REVOLUTION * 3)/ 4))
     	digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     
     //turn facing Y dropoff
