@@ -59,8 +59,9 @@ victim_color get_E_city(){
     while(photogate_average() > PHOTOGATE_LOW){
         follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
     }
-    while(photogate_average() < PHOTOGATE_HIGH);
-    
+    unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+    while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
+        
     ST.stop();
     
     pick_up_victim();
@@ -274,8 +275,9 @@ void get_W_city(){
     while(photogate_average() > PHOTOGATE_LOW){
         follow_srf(srf_FL,srf_L,false,8);// its moving foward and the minimum distance is 7cm
     }
-    while(photogate_average() < PHOTOGATE_HIGH);
-    
+    unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+    while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
+        
     //stop
     ST.stop();
     
@@ -698,7 +700,8 @@ victim_color get_E_offroad(){
     // it we have the NE victim, then wait until its in the correct position and get it.
     //pick up victim
     if(is_ENE_victim_present){
-        while((photogate_average() < PHOTOGATE_HIGH));
+        unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+        while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
         ST.stop();
         pick_up_victim();
         result = get_color();
@@ -782,7 +785,8 @@ victim_color get_E_offroad(){
         while(photogate_average() > PHOTOGATE_LOW){
             follow_srf(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
         }
-        while(photogate_average() < PHOTOGATE_HIGH); //careful--don't crash into W wall
+        unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+        while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms > 1000));
         
         //stop
         ST.stop();
@@ -953,7 +957,8 @@ void get_W_offroad() {
     if(is_WNW_victim_present){
         Serial.println("WNW victim");
         //pick up victim and return (may need to move some of this to after the else case)
-        while(photogate_average() < PHOTOGATE_HIGH);
+        unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+        while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms > 1000));
         ST.stop();
         pick_up_victim();
         delay(300);
@@ -1075,7 +1080,8 @@ void get_W_offroad() {
         while(photogate_average() > PHOTOGATE_LOW){
             follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
         }
-        while(photogate_average() < PHOTOGATE_HIGH);
+        unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
+        while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
         
         ST.stop();
         pick_up_victim();
