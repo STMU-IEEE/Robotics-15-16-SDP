@@ -73,11 +73,6 @@ Encoder motor_R_encoder(MOTOR_R_ENCODER_A, MOTOR_R_ENCODER_B);
 int32_t encoder_compensate_sum; //sum of samples
 int encoder_compensate_n; //number of samples
 
-//tables for interpolation
-const int IR_TABLE_SIZE = 14;
-int ir_left_raw_table[IR_TABLE_SIZE] =	{ 92,102,108,116,128,140,153,173,193,223,265,331,419,539};
-int ir_distances_cm[IR_TABLE_SIZE] =	{150,140,130,120,110,100, 90, 80, 70, 60, 50, 40, 30, 20};
-
 
 void setup() {
     // put your setup code here, to run once:
