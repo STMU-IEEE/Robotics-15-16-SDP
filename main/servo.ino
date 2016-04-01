@@ -16,6 +16,7 @@ void approach_victim(){
 }
 
 void pick_up_victim(){
+    /* unused, grabber flipped upside down
     //lift arm slightly before closing
     arm_servo.write(ARM_ALMOST_DOWN);
     delay(500);
@@ -25,6 +26,7 @@ void pick_up_victim(){
     //lower grabber slightly to straighten victim
     arm_servo.write(ARM_DOWN);
     delay(500);
+    */
     //close grabber tightly
     grabber_servo.write(GRABBER_MIN);
     //wait for grabber to close
