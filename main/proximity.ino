@@ -30,5 +30,5 @@ int find_rear_threshold() {
 		digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
 	ST.stop();
 	int min = rear_average();
-	return 4 * (max / 5) + (min / 5); //return 80% threshold
+	return 3 * (max / 5) + 2 * (min / 5); //return 60% threshold
 }
