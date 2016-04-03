@@ -991,7 +991,7 @@ void get_W_offroad() {
     ST.turn(0);
     ST.drive(30);
     bool is_WNW_victim_present;
-    encoder_compensate_initialize();
+    //encoder_compensate_initialize();
     while(true){
         if(motor_R_encoder.read() > (MOTOR_COUNTS_PER_REVOLUTION * 7) / 2) {
             is_WNW_victim_present = false;
@@ -1003,7 +1003,7 @@ void get_W_offroad() {
             break;
         }
         if(follow_srf(srf_FL,srf_L,false,8)){
-            encoder_compensate_sample();
+            //encoder_compensate_sample();
         }
     }
     if(is_WNW_victim_present){
@@ -1014,12 +1014,13 @@ void get_W_offroad() {
         ST.stop();
         pick_up_victim();
         delay(300);
+        //encoder_compensate_initialize();
         ST.drive(-25);
         do{
             while(!follow_srf(srf_FL,srf_L,true,8));
-            encoder_compensate_sample();
+            //encoder_compensate_sample();
         } while(srf_L.convert_cm(last_srf_L_echo_us) < 25);
-        encoder_compensate_apply(true);
+        //encoder_compensate_apply(true);
         //go specified encoder distance backwards
         motor_L_encoder.write(0);
         digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
