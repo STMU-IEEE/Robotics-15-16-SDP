@@ -227,7 +227,7 @@ void depart_from_Y_2(){
     ST.drive(16);
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
         digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write;
     
     //swing turn facing lane 3
@@ -681,13 +681,13 @@ victim_color get_E_offroad(){
         follow_gyro();
     }
     
-    //go forward 1/4 turn
+    //go forward 1/3 turn
     ST.drive(20);
     ST.turn(0);
     gyro_PID_setpoint = -90;
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4)){
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3)){
         digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         follow_gyro();
     }
@@ -716,7 +716,7 @@ victim_color get_E_offroad(){
     //its going to follow the wall a certain distance or it will detect the NE victim
     
     while(true){
-        follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
+        follow_srf(srf_FR,srf_R,false,9);// its moving foward and the minimum distance is 9cm
         if(photogate_average() < PHOTOGATE_LOW){
             is_ENE_victim_present=true;
             break;
@@ -1002,7 +1002,7 @@ void get_W_offroad() {
             is_WNW_victim_present = true;
             break;
         }
-        if(follow_srf(srf_FL,srf_L,false,8)){
+        if(follow_srf(srf_FL,srf_L,false,9)){
             //encoder_compensate_sample();
         }
     }
@@ -1017,7 +1017,7 @@ void get_W_offroad() {
         //encoder_compensate_initialize();
         ST.drive(-25);
         do{
-            while(!follow_srf(srf_FL,srf_L,true,8));
+            while(!follow_srf(srf_FL,srf_L,true,9));
             //encoder_compensate_sample();
         } while(srf_L.convert_cm(last_srf_L_echo_us) < 25);
         //encoder_compensate_apply(true);
@@ -1202,7 +1202,7 @@ void return_offroad(){
     ST.drive(20);
     encoder_compensate_initialize();
     do {
-        while(!follow_srf(srf_FL,srf_L,false,7)); // its moving forward and the minimum distance is 7cm
+        while(!follow_srf(srf_FL,srf_L,false,9)); // its moving forward and the minimum distance is 9cm
         encoder_compensate_sample();
     } while (srf_FL.convert_cm(last_srf_FL_echo_us) < 30);
     ST.stop();
