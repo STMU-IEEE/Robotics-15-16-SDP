@@ -210,7 +210,7 @@ void depart_from_Y_2(){
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
-    } while (srf_R.convert_cm(last_srf_R_echo_us) < 36); //find L2-L3 center wall
+    } while (srf_R.convert_cm(last_srf_R_echo_us) < 36); //find L2-L3 E opening
     
     //go until last L2-L3 wall
     do {
@@ -220,7 +220,7 @@ void depart_from_Y_2(){
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
-    } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
+    } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 E wall
     
     //go back toward opening slightly
     ST.turn(0);
