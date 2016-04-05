@@ -21,14 +21,18 @@ int rear_average() {
 
 //place robot with back against wall
 int find_rear_threshold() {
-	int max = rear_average();
+	int max_value = INT_MIN;
+	int min_value = INT_MAX;
 	ST.drive(20);
 	ST.turn(0);
 	motor_R_encoder.write(0);
 	digitalWrite(COLOR_LED_PIN,HIGH); // debug encoder write
-	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 2))
+	while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 2)){
 		digitalWrite(COLOR_LED_PIN,LOW); // debug encoder write
+		int rear_sample = rear_average();
+		max_value = max(max_value, rear_sample);
+		min_value = min(min_value, rear_sample);
+	}
 	ST.stop();
-	int min = rear_average();
-	return 3 * (max / 5) + 2 * (min / 5); //return 60% threshold
+	return 3 * (max_value / 5) + 2 * (min_value / 5); //return 60% threshold
 }

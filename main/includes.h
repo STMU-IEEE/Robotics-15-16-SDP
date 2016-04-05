@@ -1,4 +1,5 @@
 /********************     Libraries      *******************/
+#include <limits.h>
 #include <Servo.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"  //color sensor; import from "Manage Libraries…"
