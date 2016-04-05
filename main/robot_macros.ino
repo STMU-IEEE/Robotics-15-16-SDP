@@ -742,34 +742,7 @@ victim_color get_E_offroad(){
         result = get_color();
         ST.stop();
         
-        //back into L3
-        ST.turn(0);
-        ST.drive(-40);
-        while(rear_average() < proximity_threshold){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }
-        
-        //face W
-        ST.drive(0);
-        ST.turn(-15);
-        gyro_angle(angle-90);
-        ST.stop();
-        
-        //go forward until L2-L3 on left
-        ST.drive(20);
-        motor_R_encoder.write(0);
-        digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-        gyro_PID_setpoint = angle;
-        while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 7)/3){
-            digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
-            follow_gyro();
-        }
-        ST.stop();
-        
-        //face L2-L3
-        ST.drive(0);
-        ST.turn(-15);
-        gyro_angle(angle-90);
+        follow_E_wall();
     }
     // lets get victim NNE but we have to be in the right position
     else{
@@ -879,6 +852,11 @@ void follow_N_wall(){
     ST.turn(25);
     gyro_angle(angle+180);
     
+    follow_E_wall();
+}
+
+void follow_E_wall(){
+	Serial.println("follow_E_wall()");
     //back up until L3 wall
     ST.turn(0);
     ST.drive(-40);
