@@ -192,6 +192,7 @@ void depart_from_Y_2(){
         encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) < 30);
     
+    motor_L_encoder.write(0);
     //keep going to L2-L3 center wall
     do {
         while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
@@ -200,7 +201,7 @@ void depart_from_Y_2(){
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
-    } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 center wall
+    } while ((srf_R.convert_cm(last_srf_R_echo_us) > 30) || (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))); //find L2-L3 center wall
     
     //go until 2nd opening to lane 3
     do {
@@ -210,8 +211,12 @@ void depart_from_Y_2(){
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
-    } while (srf_R.convert_cm(last_srf_R_echo_us) < 36); //find L2-L3 E opening
+    } while ((srf_R.convert_cm(last_srf_R_echo_us) < 36) || (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))); //find L2-L3 E opening
     
+    //slow down
+    ST.turn(0);
+    ST.drive(-20);
+    motor_L_encoder.write(0);
     //go until last L2-L3 wall
     do {
         while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
@@ -220,7 +225,7 @@ void depart_from_Y_2(){
         last_srf_R_echo_us = srf_R.ping();
         Serial.println(srf_R.convert_cm(last_srf_R_echo_us));
         encoder_compensate_sample();
-    } while (srf_R.convert_cm(last_srf_R_echo_us) > 30); //find L2-L3 E wall
+    } while ((srf_R.convert_cm(last_srf_R_echo_us) > 30) || (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))); //find L2-L3 E wall
     
     //go back toward opening slightly
     ST.turn(0);
