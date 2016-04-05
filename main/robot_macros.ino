@@ -882,11 +882,11 @@ void follow_E_wall(){
     
     //point turn left facing W
     ST.drive(0);
-    ST.turn(-16);
+    ST.turn(-20);
     gyro_angle(-90);
     ST.stop();
     
-    //go forward W for 7/3 rotations 
+    //go forward W until L2-L3 on left
     ST.drive(35);
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
@@ -898,7 +898,7 @@ void follow_E_wall(){
     
     //face S to L3-L2
     ST.drive(0);
-    ST.turn(-15);
+    ST.turn(-20);
     gyro_angle(-180);
     ST.stop();
 }
