@@ -1,7 +1,7 @@
 //Uncomment which sensors to test
 //#define TEST_L_SRF
 //#define TEST_R_SRF
-//#define TEST_F_SRF
+#define TEST_F_SRF
 //#define TEST_FR_SRF
 //#define TEST_FL_SRF
 
