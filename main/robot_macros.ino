@@ -1247,7 +1247,7 @@ void L3_to_L2(){
     //turn facing Y dropoff
     ST.turn(-10);
     ST.drive(-10);
-    gyro_angle(0);
+    gyro_angle(5);//don't crash into L1-L2
     
     //approach Y dropoff
     ST.turn(0);
