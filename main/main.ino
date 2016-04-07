@@ -142,9 +142,7 @@ void setup() {
 }
 
 void loop() {
-   srf_test();
-   
-    //robot_game();
+    robot_game();
 }
 
 void robot_game() {
