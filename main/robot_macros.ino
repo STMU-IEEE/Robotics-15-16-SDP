@@ -1051,7 +1051,7 @@ void get_W_offroad() {
         ST.stop();
         ST.drive(0);
         ST.turn(16);
-        gyro_angle(130); //angle+135 puts at 45 degrees to run parallel with the river (use 130 to avoid W fixed obstacle)
+        gyro_angle(132); //angle+135 puts at 45 degrees to run parallel with the river (use <135 to avoid W fixed obstacle)
         ST.stop();
         
         //Drive forward relying on the gyro to keep parallel with the river
@@ -1059,7 +1059,7 @@ void get_W_offroad() {
         ST.turn(0);
         motor_R_encoder.write(0);
         digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-        gyro_PID_setpoint = 130;
+        gyro_PID_setpoint = 132;
         while(motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 6){
             digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
         	follow_gyro();
