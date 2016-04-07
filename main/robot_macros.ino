@@ -1043,7 +1043,7 @@ void get_W_offroad() {
         } while (srf_F.convert_cm(last_srf_F_echo_us) >= 6);
         ST.stop();
         
-        encoder_compensate_apply(true);
+        //encoder_compensate_apply(true);
         
         angle = 0;
         gyro_PID_setpoint = angle;
