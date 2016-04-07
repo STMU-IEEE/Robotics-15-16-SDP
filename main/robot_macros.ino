@@ -1143,7 +1143,7 @@ void get_W_offroad() {
 		ST.drive(45);
 		motor_R_encoder.write(0);
 		digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
-		while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 2)){
+		while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 4)){
             digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
 			follow_srf(srf_FL,srf_L,false,7);// its moving foward and the minimum distance is 7cm
 		}
