@@ -94,7 +94,7 @@ void dropoff_R(){
         Serial.print("Front distance: ");
         Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         
-    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 20); //need enough room to drop arm
+    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 25); //need enough room to drop arm
     
     ST.stop();
     drop_victim();
@@ -336,7 +336,7 @@ void dropoff_Y (){
         Serial.print("Front distance: ");
         Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         
-    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 17); //need enough room to drop arm
+    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 25); //need enough room to drop arm
     
     ST.stop();
     
