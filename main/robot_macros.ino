@@ -909,7 +909,7 @@ void get_W_offroad() {
 	Serial.println("get_W_offroad()");
     //go backward from wall
     ST.turn(0);
-    ST.drive(-20);
+    ST.drive(-40); //too fast? need to get onto turf
     gyro_PID_setpoint = angle;
     
     //go back from L1-L2 and watch for L2-L3 and L3-offroad walls
@@ -955,11 +955,11 @@ void get_W_offroad() {
         Serial.println(i);
     }
     //turn facing WNW victim location
-    ST.drive(-10);
-    ST.turn(10);
+    ST.drive(-16);
+    ST.turn(16);
     gyro_angle(angle+45);
     ST.turn(0);
-    ST.drive(16);
+    ST.drive(20);
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 3))
@@ -974,7 +974,7 @@ void get_W_offroad() {
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     ST.turn(0);
-    ST.drive(30);
+    ST.drive(45); //too fast? don't let motors spin freely (else encoders run out early)
     bool is_WNW_victim_present;
     //encoder_compensate_initialize();
     while(true){
