@@ -268,7 +268,7 @@ void get_W_city(){
             Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (srf_F.convert_cm(last_srf_F_echo_us) < 20);
+    } while (srf_F.convert_cm(last_srf_F_echo_us) < 17); //crashed into L3
     
     //turn facing W city victim
     ST.turn(10);
