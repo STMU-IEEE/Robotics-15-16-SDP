@@ -841,7 +841,7 @@ void follow_N_wall(){
     //turn facing S
     ST.drive(0);
     ST.turn(-20);
-    gyro_angle(angle-90);
+    gyro_angle(angle-85); //don't crash into E wall--try facing away
     ST.stop();
     
     //go forward S for 2 rotations
