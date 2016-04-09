@@ -139,9 +139,11 @@ void R_dropoff_to_start(){
 	Serial.println("R_dropoff_to_start()");
     ST.turn(0);
     ST.drive(-40);
-    while(rear_average() < proximity_threshold){
-        follow_srf(srf_FR,srf_R,true,14);
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_srf(srf_FR,srf_R,true,14);
+    } while (last_rear_average < proximity_threshold);    
     ST.stop();
 }
 
@@ -398,9 +400,11 @@ void L2_W_to_L1_E(){
     gyro_PID_setpoint = angle;
     ST.turn(0);
     ST.drive(-35);
-    while(rear_average() < proximity_threshold){
-        follow_gyro();
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
     
     //swing turn toward R dropoff
     ST.drive(10);
@@ -446,9 +450,11 @@ void Y_dropoff_to_start(){
     gyro_PID_setpoint = angle;
     ST.turn(0);
     ST.drive(-45);
-    while(rear_average() < proximity_threshold){
-        follow_gyro();
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
     
     //swing turn toward R dropoff
     ST.drive(10);
@@ -458,9 +464,12 @@ void Y_dropoff_to_start(){
     //go backwards into starting area
     ST.turn(0);
     ST.drive(-45);
-    while(rear_average() < proximity_threshold){
-        follow_srf(srf_FR,srf_R,true,14); //going backwards, target distance is 14cm
-    }
+    
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_srf(srf_FR,srf_R,true,14); //going backwards, target distance is 14cm
+    } while (last_rear_average < proximity_threshold);
     
     ST.stop();
 }
@@ -609,7 +618,12 @@ victim_color get_E_offroad(){
     //back into L1-L2 for reference
     ST.turn(0);
     ST.drive(-20);
-    while(rear_average() < proximity_threshold);
+    gyro_PID_threshold = angle;
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
     
 	//look for walls on right (as done for W offroad)
 	ST.turn(0);
@@ -684,9 +698,12 @@ victim_color get_E_offroad(){
     ST.drive(-25);
     ST.turn(0);
     gyro_PID_setpoint = -90;
-    while(rear_average() < proximity_threshold){
-        follow_gyro();
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
+    
     
     //go forward 1/3 turn
     ST.drive(20);
@@ -708,9 +725,12 @@ victim_color get_E_offroad(){
     ST.drive(-25);
     ST.turn(0);
     gyro_PID_setpoint = 0;
-    while(rear_average() < proximity_threshold){
-        follow_gyro();
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
+    
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
@@ -765,9 +785,11 @@ victim_color get_E_offroad(){
         //back into N wall
         ST.turn(0);
         ST.drive(-30);
-        while(rear_average() < proximity_threshold){
-            follow_srf(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
-        }
+        do {
+			last_rear_average = rear_average();
+			Serial.println(last_rear_average);
+			follow_srf(srf_FL,srf_L,true,7);// its moving backwards and the minimum distance is 7cm
+		} while (last_rear_average < proximity_threshold);
         ST.stop();
         
         //go forward from N wall
@@ -789,9 +811,11 @@ victim_color get_E_offroad(){
         //back into E wall
         ST.turn(0);
         ST.drive(-20);
-        while(rear_average() < proximity_threshold){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+        	follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+    	} while (last_rear_average < proximity_threshold);
         
         //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
         ST.stop();
@@ -822,9 +846,11 @@ victim_color get_E_offroad(){
 void follow_N_wall(){
 	//start following along N wall toward NE corner
     ST.drive(-45);
-    while(rear_average() < proximity_threshold){
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-    }
+    } while (last_rear_average < proximity_threshold);
     
     //go forward from E wall
     ST.turn(0);
@@ -866,9 +892,11 @@ void follow_E_wall(){
     //back up until L3 wall
     ST.turn(0);
     ST.drive(-40);
-    while(rear_average() < proximity_threshold){
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
         follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-    }
+    } while (last_rear_average < proximity_threshold);
     
     //go forward 1/4 turn
     ST.drive(20);
@@ -1080,9 +1108,11 @@ void get_W_offroad() {
         ST.turn(0);
         ST.drive(-20);
         //back up to N wall
-        while(rear_average() < proximity_threshold){
-        	follow_gyro();
-        }
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+    		follow_gyro();
+		} while (last_rear_average < proximity_threshold);
         //swing turn facing E
         ST.turn(-16);
         ST.drive(16);
@@ -1092,9 +1122,11 @@ void get_W_offroad() {
         ST.turn(0);
         ST.drive(-30);
         motor_R_encoder.write(0);
-        do{
-            follow_srf(srf_FL,srf_L,true,9);
-        } while(rear_average() < proximity_threshold);
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+    		follow_srf(srf_FL,srf_L,true,9);
+		} while (last_rear_average < proximity_threshold);
         ST.stop();
         
         //go forward before turning
@@ -1117,17 +1149,22 @@ void get_W_offroad() {
         //Reverse to North Wall
         ST.turn(0);
         ST.drive(-20);
-        while(rear_average() < proximity_threshold){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }       
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+        	follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+    	} while (last_rear_average < proximity_threshold);
         
         approach_victim();
         
         ST.drive(20);
         motor_R_encoder.write(0);
-        while(photogate_average() > PHOTOGATE_LOW){
-            follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
-        }
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+        	follow_srf(srf_FR,srf_R,false,7);// its moving forward and the minimum distance is 7cm
+    	} while (last_rear_average < proximity_threshold);
+        
         unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
         while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
         
@@ -1136,9 +1173,12 @@ void get_W_offroad() {
 
 //Reverse to North Wall
         ST.drive(-35);
-        while(rear_average() < proximity_threshold){
-            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
-        }
+        do {
+    		last_rear_average = rear_average();
+    		Serial.println(last_rear_average);
+        	follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
+    	} while (last_rear_average < proximity_threshold);
+        
         //swing turn to face E
         ST.turn(-16);
         ST.drive(16);
@@ -1238,9 +1278,11 @@ void L3_to_L2(){
     ST.drive(-35);
     angle = 90;
     gyro_PID_setpoint = 90;
-    while(rear_average() < proximity_threshold){
-        follow_gyro();
-    }
+    do {
+    	last_rear_average = rear_average();
+    	Serial.println(last_rear_average);
+    	follow_gyro();
+    } while (last_rear_average < proximity_threshold);
     
     //go far enough from wall for safe swing turn
     ST.drive(20);

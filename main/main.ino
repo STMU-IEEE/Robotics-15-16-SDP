@@ -75,6 +75,7 @@ int encoder_compensate_n; //number of samples
 
 //rear proximity sensor 80%-to-wall threshold
 long proximity_threshold;
+long last_rear_average; //output to debug not backing into walls
 
 void setup() {
     // put your setup code here, to run once:
