@@ -287,5 +287,20 @@ void ISR_STOP() {
     arm_servo.attach(ARM_PIN);
 }
 
-
+void test_rear_noise(){
+    while(digitalRead(GO_PIN) != LOW);
+    robot_setup();
+    ST.turn(0);
+    ST.drive(50);
+    unsigned long ts = millis();
+    while(millis() - ts < 1000){
+    	Serial.println(rear_average());
+    }
+    ST.drive(-50);
+    ts = millis();
+    while(millis() - ts < 1000){
+    	Serial.println(rear_average());
+    }
+    ST.stop();
+}
 
