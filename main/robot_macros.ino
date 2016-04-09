@@ -714,6 +714,10 @@ victim_color get_E_offroad(){
     
     //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
     ST.stop();
+    ST.turn(0);
+    ST.drive(55); //go fast enough to get onto turf
+    while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION * 3)/4)
+        digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write
     approach_victim();
     ST.drive(40);
     motor_R_encoder.write(0);
