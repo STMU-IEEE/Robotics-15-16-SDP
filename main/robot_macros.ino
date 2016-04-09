@@ -790,7 +790,7 @@ victim_color get_E_offroad(){
         ST.turn(0);
         ST.drive(-20);
         while(rear_average() < proximity_threshold){
-            follow_srf(srf_FR,srf_R,true,6);// its moving backwards and the minimum distance is 7cm
+            follow_srf(srf_FR,srf_R,true,7);// its moving backwards and the minimum distance is 7cm
         }
         
         //its going to put the grabber down, follow the wall and its going to detect if NE victim is present
@@ -801,7 +801,7 @@ victim_color get_E_offroad(){
         
         ST.drive(30); //can't make too fast (e.g. 60)--will get stuck against wall
         while(photogate_average() > PHOTOGATE_LOW){
-            follow_srf(srf_FR,srf_R,false,6);// its moving foward and the minimum distance is 7cm
+            follow_srf(srf_FR,srf_R,false,7);// its moving foward and the minimum distance is 7cm
         }
         unsigned long photogate_blocked_ms = millis(); //wait up to 1s for photogate to become unblocked
         while((photogate_average() < PHOTOGATE_HIGH) && (millis() - photogate_blocked_ms < 1000));
