@@ -182,21 +182,21 @@ void depart_from_Y_1(){
 void depart_from_Y_2(){
 	Serial.println("depart_from_Y_2()");
     //back up to opening
-    ST.drive(-30);
+    ST.drive(-20);
     
     //compensate encoders before turning at end of lane 2
     encoder_compensate_initialize();
     
     //go until 1st opening to lane 3
     do {
-        while(!follow_srf(srf_FR,srf_R,true,7));// its moving backwards and the minimum distance is 7cm
+        while(!follow_srf(srf_FR,srf_R,true,8));// its moving backwards and the minimum distance is 7cm
         encoder_compensate_sample();
     } while (srf_R.convert_cm(last_srf_R_echo_us) < 30);
     
     motor_L_encoder.write(0);
     //keep going to L2-L3 center wall
     do {
-        while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+        while(!follow_srf(srf_FL,srf_L,true,8));// its moving backwards and the minimum distance is 7cm
         while(millis() - last_srf_trigger_ms < 50);
         last_srf_trigger_ms = millis();
         last_srf_R_echo_us = srf_R.ping();
@@ -206,7 +206,7 @@ void depart_from_Y_2(){
     
     //go until 2nd opening to lane 3
     do {
-        while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+        while(!follow_srf(srf_FL,srf_L,true,8));// its moving backwards and the minimum distance is 7cm
         while(millis() - last_srf_trigger_ms < 50);
         last_srf_trigger_ms = millis();
         last_srf_R_echo_us = srf_R.ping();
@@ -220,7 +220,7 @@ void depart_from_Y_2(){
     motor_L_encoder.write(0);
     //go until last L2-L3 wall
     do {
-        while(!follow_srf(srf_FL,srf_L,true,7));// its moving backwards and the minimum distance is 7cm
+        while(!follow_srf(srf_FL,srf_L,true,8));// its moving backwards and the minimum distance is 7cm
         while(millis() - last_srf_trigger_ms < 50);
         last_srf_trigger_ms = millis();
         last_srf_R_echo_us = srf_R.ping();
@@ -268,7 +268,7 @@ void get_W_city(){
             Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         }
         follow_gyro();
-    } while (srf_F.convert_cm(last_srf_F_echo_us) < 17); //crashed into L3
+    } while (2*srf_F.convert_cm(last_srf_F_echo_us) < 37); //i.e. 18.5 (20->crashed into L3; 17->crashed into L2-L3)
     
     //turn facing W city victim
     ST.turn(10);
