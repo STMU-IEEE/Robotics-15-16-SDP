@@ -523,7 +523,7 @@ void L2_to_L1() {
 void L2_E_to_L2_S_B(){
 	Serial.println("L2_E_to_L2_S_B()");
     //go forward to L2-L3 W opening
-    ST.drive(35);
+    ST.drive(20);
     do {
         while(!follow_srf(srf_FR,srf_R,false,9));// its moving forward and the minimum distance is 9cm
         while(millis() - last_srf_trigger_ms < 50);
