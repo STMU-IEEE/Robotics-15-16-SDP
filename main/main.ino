@@ -74,7 +74,7 @@ int32_t encoder_compensate_sum; //sum of samples
 int encoder_compensate_n; //number of samples
 
 //rear proximity sensor 80%-to-wall threshold
-int proximity_threshold;
+long proximity_threshold;
 
 void setup() {
     // put your setup code here, to run once:

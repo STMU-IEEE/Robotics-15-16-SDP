@@ -78,8 +78,8 @@
 /*******************   Proximity/Photogate    *********************/
 //15-bit thresholds with hysteresis
 //(readings are roughly 2200 to 20000)
-#define PHOTOGATE_LOW   6000
-#define PHOTOGATE_HIGH  10000
+#define PHOTOGATE_LOW   6000*8L
+#define PHOTOGATE_HIGH  10000*8L
 //#define PROXIMITY_THRESHOLD	2458 //about 0.375V
 //#define PROXIMITY_THRESHOLD	3000 //2458 not high enough--would stop >5cm from wall
 //use measured threshold instead
