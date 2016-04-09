@@ -82,7 +82,7 @@ void dropoff_R(){
     
     ST.turn(0);
     ST.drive(60);
-    
+    motor_R_encoder.write(0);
     
     
     do {
@@ -94,7 +94,8 @@ void dropoff_R(){
         Serial.print("Front distance: ");
         Serial.println(srf_F.convert_cm(last_srf_F_echo_us));
         
-    } while (srf_F.convert_cm(last_srf_F_echo_us) >= 25); //need enough room to drop arm
+    } while ((srf_F.convert_cm(last_srf_F_echo_us) >= 25)//need enough room to drop arm
+           || (motor_R_encoder.read() < MOTOR_COUNTS_PER_REVOLUTION * 5)); //go past 4ft where halves of field meet (don't detect edge)
     
     ST.stop();
     drop_victim();
