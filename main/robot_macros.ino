@@ -229,13 +229,14 @@ void depart_from_Y_2(){
     } while ((srf_R.convert_cm(last_srf_R_echo_us) > 30) || (motor_L_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 4))); //find L2-L3 E wall
     
     //go back toward opening slightly
+    /*
     ST.turn(0);
     ST.drive(16);
     motor_R_encoder.write(0);
     digitalWrite(COLOR_LED_PIN,HIGH); //debug encoder write
     while(motor_R_encoder.read() < (MOTOR_COUNTS_PER_REVOLUTION / 6))
         digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write;
-    
+    */
     //swing turn facing lane 3
     //encoder_compensate_apply(true);
     ST.drive(10);
