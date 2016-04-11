@@ -60,6 +60,7 @@
 //A5 shorted to SCL by Adafruit motor shield
 #define IR_FRONT_PIN    A8    //long range sensor: Sharp GP2Y0A02YK0F
 #define IR_LEFT_PIN    A9    //long range sensor: Sharp GP2Y0A02YK0F
+#define REAR_TOUCH_PIN 64
 #define IR_REAR_PIN     A10   //photodiode proximity sensor behind battery
 
 /************************     Servos      ************************/
@@ -83,7 +84,7 @@
 //#define PROXIMITY_THRESHOLD	2458 //about 0.375V
 //#define PROXIMITY_THRESHOLD	3000 //2458 not high enough--would stop >5cm from wall
 //use measured threshold instead
-
+#define proximity_threshold 5555L //dummy threshold
 /*************************   Gyro sensor     *********************/
 //uncomment to enable noise rejection
 //#define GYRO_NOISE_THRESHOLD

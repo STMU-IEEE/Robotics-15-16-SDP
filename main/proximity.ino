@@ -15,12 +15,21 @@ long photogate_average() {
     return analog_average(PHOTOGATE_PIN);
 }
 
+/*
 long rear_average() {
 	return analog_average(IR_REAR_PIN);
 }
+*/
+//return dummy values
+long rear_average() {
+	if(!digitalRead(REAR_TOUCH_PIN))
+		return 9999L;
+	else
+		return 1111L;
+}
 
 //place robot with back against wall
-long find_rear_threshold() {
+/*long find_rear_threshold() {
 	long max_value = LONG_MIN;
 	long min_value = LONG_MAX;
 	ST.drive(20);
@@ -35,4 +44,4 @@ long find_rear_threshold() {
 	}
 	ST.stop();
 	return 3 * (max_value / 5) + 2 * (min_value / 5); //return 60% threshold
-}
+}*/

@@ -74,7 +74,7 @@ int32_t encoder_compensate_sum; //sum of samples
 int encoder_compensate_n; //number of samples
 
 //rear proximity sensor 80%-to-wall threshold
-long proximity_threshold;
+//long proximity_threshold;
 long last_rear_average; //output to debug not backing into walls
 
 void setup() {
@@ -91,6 +91,8 @@ void setup() {
     //configure go pin
     pinMode(GO_PIN, INPUT_PULLUP);
     
+    //configure rear touch sensor
+    pinMode(REAR_TOUCH_PIN,INPUT);
     
     //set serial baud
     Serial.begin(115200);
@@ -269,7 +271,7 @@ void robot_setup(){
     gyro_PID.SetMode(AUTOMATIC);
     
     //calibrate proximity sensor
-    proximity_threshold = find_rear_threshold();
+    //proximity_threshold = find_rear_threshold();
 }
 
 //Interrupt functions for STOP buttons 
@@ -288,7 +290,7 @@ void ISR_STOP() {
     arm_servo.attach(ARM_PIN);
 }
 
-void test_rear_noise(){
+/*void test_rear_noise(){
     while(digitalRead(GO_PIN) != LOW);
     robot_setup();
     ST.turn(0);
@@ -304,4 +306,4 @@ void test_rear_noise(){
     }
     ST.stop();
 }
-
+*/
