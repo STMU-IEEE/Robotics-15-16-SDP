@@ -618,7 +618,7 @@ victim_color get_E_offroad(){
     //back into L1-L2 for reference
     ST.turn(0);
     ST.drive(-20);
-    gyro_PID_threshold = angle;
+    gyro_PID_setpoint = angle;
     do {
     	last_rear_average = rear_average();
     	Serial.println(last_rear_average);
