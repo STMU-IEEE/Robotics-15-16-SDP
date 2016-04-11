@@ -252,7 +252,7 @@ void depart_from_Y_2(){
         digitalWrite(COLOR_LED_PIN,LOW); //debug encoder write;
     ST.drive(10);
     ST.turn(10);
-    gyro_angle(angle+45);
+    gyro_angle(angle+43);
     ST.stop();
 }
 //victim_color get_W_city(){
