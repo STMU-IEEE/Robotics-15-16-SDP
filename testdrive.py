@@ -3,13 +3,14 @@
 import serial
 import time
 import struct
+from enum import Enum
 
 #getch 1.0 from pypi:
 #	sudo -H pip install getch
 import getch
 
 # Commands for Arduino
-class arduino_comms():
+class arduino_comms(Enum):
 	MC_ECHO_INIT = 170
 	MC_ECHO_COMM = 171
 	SERVO_ATTACH = 14
@@ -19,18 +20,18 @@ class arduino_comms():
 	READ_GYRO = 30
 
 # channels for servos (not pins--defined in arduino_comm.ino)
-class servo_channels():
+class servo_channels(Enum):
 	GRABBER = 0
 	ARM = 1
 
-class servo_angles():
+class servo_angles(Enum):
 	OPEN = 140
 	GRAB = 72
 	LIFT = 22
 	DROP = 94
 	
 # commands for Sabertooth 2x25
-class mc_comms():
+class mc_comms(Enum):
 	driveForwardMotor1 = 0
 	driveBackwardsMotor1 = 1
 	minVoltage = 2
