@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #Use python 3: need byte objects
 
 import serial
